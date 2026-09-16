@@ -94,15 +94,27 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
   }
 
   void _showAuthSheet(bool isRegister) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => AuthModalSheet(
-        isRegisterInitial: isRegister,
-        onSuccess: () {
-          Navigator.pop(ctx);
-          _navigateToMainApp();
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => AuthScreen(
+          isRegisterInitial: isRegister,
+          onSuccess: () {
+            Navigator.pop(context);
+            _navigateToMainApp();
+          },
+        ),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+            )),
+            child: child,
+          );
         },
       ),
     );
@@ -132,7 +144,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                     opacity: _fadeInSiply1.value,
                     child: Text(
                       'Muslim Habit',
-                      style: GoogleFonts.balooThammudu2(
+                      style: GoogleFonts.balooTammudu2(
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primaryGreen,
@@ -160,7 +172,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                           Center(
                             child: Text(
                               'Muslim Habit',
-                              style: GoogleFonts.balooThammudu(
+                              style: GoogleFonts.balooTammudu2(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w800,
                                 color: Colors.white,
@@ -233,7 +245,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
           child: Center(
             child: Text(
               'Muslim Habit',
-              style: GoogleFonts.balooThammudu2(
+              style: GoogleFonts.balooTammudu2(
                 fontSize: 32,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
@@ -314,7 +326,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
               ),
               child: Text(
                 'Masuk',
-                style: GoogleFonts.balooThammudu(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryGreen,
@@ -340,7 +352,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
               ),
               child: Text(
                 'Daftar',
-                style: GoogleFonts.balooThammudu(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -389,7 +401,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
         const SizedBox(height: 12),
         Text(
           'Jamal Si Unta Buddy',
-          style: GoogleFonts.balooThammudu2(
+          style: GoogleFonts.balooTammudu2(
             color: Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 18,

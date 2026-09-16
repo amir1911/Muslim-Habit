@@ -19,7 +19,7 @@ class HabitsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Muslim Habit',
-          style: GoogleFonts.balooThammudu2(
+          style: GoogleFonts.balooTammudu2(
             fontWeight: FontWeight.w800,
             fontSize: 22,
             color: AppColors.primaryGreen,
@@ -47,7 +47,7 @@ class HabitsScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${habitProvider.streakCount} Hari',
-                  style: GoogleFonts.balooThammudu2(
+                  style: GoogleFonts.balooTammudu2(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
                     color: AppColors.streakFire,
@@ -82,7 +82,7 @@ class HabitsScreen extends StatelessWidget {
                     // Salam → Baloo (judul)
                     Text(
                       'Assalamu\'alaikum, ${habitProvider.userName}',
-                      style: GoogleFonts.balooThammudu2(
+                      style: GoogleFonts.balooTammudu2(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textDark,
@@ -135,7 +135,7 @@ class HabitsScreen extends StatelessWidget {
               // Section heading → Baloo
               Text(
                 'Target Hari Ini',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textDark,
@@ -219,7 +219,7 @@ class HabitsScreen extends StatelessWidget {
                       // Label chip → Baloo
                       child: Text(
                         'Jamal • Level ${provider.userLevel}',
-                        style: GoogleFonts.balooThammudu2(
+                        style: GoogleFonts.balooTammudu2(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
@@ -230,7 +230,7 @@ class HabitsScreen extends StatelessWidget {
                     // XP → Baloo (gamifikasi angka penting)
                     Text(
                       '${provider.userPoints} XP',
-                      style: GoogleFonts.balooThammudu2(
+                      style: GoogleFonts.balooTammudu2(
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFFFFD54F),
@@ -286,7 +286,7 @@ class HabitsScreen extends StatelessWidget {
                   // Angka % → Baloo
                   child: Text(
                     '$pct%',
-                    style: GoogleFonts.balooThammudu2(
+                    style: GoogleFonts.balooTammudu2(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryGreen,
@@ -305,7 +305,7 @@ class HabitsScreen extends StatelessWidget {
                 // Section label → Baloo
                 Text(
                   'Konsistensi Harian',
-                  style: GoogleFonts.balooThammudu2(
+                  style: GoogleFonts.balooTammudu2(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
@@ -399,7 +399,7 @@ class HabitsScreen extends StatelessWidget {
               // Judul habit → Baloo
               child: Text(
                 habit.title,
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   decoration: habit.isCompleted ? TextDecoration.lineThrough : null,
@@ -422,7 +422,7 @@ class HabitsScreen extends StatelessWidget {
                     const SizedBox(width: 2),
                     Text(
                       '${habit.streak}',
-                      style: GoogleFonts.balooThammudu2(
+                      style: GoogleFonts.balooTammudu2(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         color: AppColors.streakFire,

@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../home/home_screen.dart';
 import '../habits/habits_screen.dart';
-import '../tasbih/tasbih_screen.dart';
 import '../tilawah/tilawah_screen.dart';
+import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
@@ -17,9 +18,10 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
+    HomeScreen(),
     HabitsScreen(),
-    TasbihScreen(),
     TilawahScreen(),
+    TasbihScreen(),
     BadgesScreen(),
   ];
 
@@ -31,29 +33,30 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
         children: _screens,
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          border: Border(
+          border: const Border(
             top: BorderSide(color: AppColors.beigeAccent, width: 1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Color(0x0C000000),
+              color: Colors.black.withValues(alpha: 0.06),
               blurRadius: 16,
-              offset: Offset(0, -4),
+              offset: const Offset(0, -4),
             ),
           ],
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNavItem(0, Icons.check_circle_outline_rounded, Icons.check_circle_rounded, 'Habits'),
-                _buildNavItem(1, Icons.spa_outlined, Icons.spa_rounded, 'Tasbih'),
-                _buildNavItem(2, Icons.auto_stories_outlined, Icons.auto_stories_rounded, 'Tilawah'),
-                _buildNavItem(3, Icons.military_tech_outlined, Icons.military_tech_rounded, 'Lencana'),
+                _buildNavItem(0, Icons.home_outlined, Icons.home_rounded, 'Home'),
+                _buildNavItem(1, Icons.track_changes_outlined, Icons.track_changes_rounded, 'Habbit'),
+                _buildNavItem(2, Icons.menu_book_outlined, Icons.menu_book_rounded, "Qur'an"),
+                _buildNavItem(3, Icons.people_outline_rounded, Icons.people_rounded, 'Community'),
+                _buildNavItem(4, Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
               ],
             ),
           ),
@@ -67,33 +70,27 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
     return InkWell(
       onTap: () => setState(() => _currentIndex = index),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.greenSurface : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               isSelected ? selectedIcon : unselectedIcon,
-              color: isSelected ? AppColors.primaryGreen : AppColors.textLight,
-              size: 22,
+              color: isSelected ? const Color(0xFF557C2B) : AppColors.textLight,
+              size: 24,
             ),
-            if (isSelected) ...[
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: GoogleFonts.balooThammudu2(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryDarkGreen,
-                ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 10.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? const Color(0xFF557C2B) : AppColors.textLight,
               ),
-            ],
+            ),
           ],
         ),
       ),

@@ -58,7 +58,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
               const SizedBox(height: 8),
               Text(
                 'Alhamdulillah!',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primaryGreen,
@@ -103,7 +103,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
       appBar: AppBar(
         title: Text(
           'Tasbih Digital',
-          style: GoogleFonts.balooThammudu2(
+          style: GoogleFonts.balooTammudu2(
             fontWeight: FontWeight.w800,
             fontSize: 20,
             color: AppColors.primaryGreen,
@@ -147,7 +147,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
                     onSelected: (_) => tasbih.selectDhikr(index),
                     selectedColor: AppColors.primaryGreen,
                     backgroundColor: Colors.white,
-                    labelStyle: GoogleFonts.balooThammudu2(
+                    labelStyle: GoogleFonts.balooTammudu2(
                       color: isSelected ? Colors.white : AppColors.textMedium,
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
@@ -200,7 +200,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
                         const SizedBox(height: 8),
                         Text(
                           dhikr.latin,
-                          style: GoogleFonts.balooThammudu2(
+                          style: GoogleFonts.balooTammudu2(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textDark,
@@ -285,7 +285,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
                                 children: [
                                   Text(
                                     '${dhikr.currentCount}',
-                                    style: GoogleFonts.balooThammudu2(
+                                    style: GoogleFonts.balooTammudu2(
                                       fontSize: 54,
                                       fontWeight: FontWeight.w800,
                                       color: Colors.white,
@@ -398,7 +398,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Reset Hitungan?',
-          style: GoogleFonts.balooThammudu2(fontWeight: FontWeight.w700),
+          style: GoogleFonts.balooTammudu2(fontWeight: FontWeight.w700),
         ),
         content: Text(
           'Hitungan putaran aktif akan kembali ke 0.',

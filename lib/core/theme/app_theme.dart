@@ -12,7 +12,7 @@ class AppFonts {
     double? letterSpacing,
     double? height,
   }) =>
-      GoogleFonts.balooThammudu2(
+      GoogleFonts.balooTammudu2(
         fontSize: fontSize,
         fontWeight: fontWeight,
         color: color,
@@ -64,15 +64,15 @@ class AppTheme {
       ),
       textTheme: TextTheme(
         // Headings → Baloo Thammudu 2
-        displayLarge: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        displayMedium: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        displaySmall: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        headlineLarge: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        headlineMedium: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        headlineSmall: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
-        titleLarge: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
-        titleMedium: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
-        titleSmall: GoogleFonts.balooThammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
+        displayLarge: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        displayMedium: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        displaySmall: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        headlineLarge: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        headlineMedium: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        headlineSmall: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
+        titleLarge: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w700),
+        titleMedium: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
+        titleSmall: GoogleFonts.balooTammudu2(color: AppColors.textDark, fontWeight: FontWeight.w600),
 
         // Body & Label → Inter
         bodyLarge: GoogleFonts.inter(color: AppColors.textDark),
@@ -87,7 +87,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.balooThammudu2(
+        titleTextStyle: GoogleFonts.balooTammudu2(
           fontSize: 20,
           fontWeight: FontWeight.w700,
           color: AppColors.primaryGreen,

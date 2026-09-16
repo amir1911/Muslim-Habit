@@ -19,7 +19,7 @@ class BadgesScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Pencapaian & Badge',
-          style: GoogleFonts.balooThammudu2(
+          style: GoogleFonts.balooTammudu2(
             fontWeight: FontWeight.w800,
             fontSize: 20,
             color: AppColors.primaryGreen,
@@ -85,7 +85,7 @@ class BadgesScreen extends StatelessWidget {
                         ),
                         child: Text(
                           'Level ${provider.userLevel}',
-                          style: GoogleFonts.balooThammudu2(
+                          style: GoogleFonts.balooTammudu2(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
@@ -99,7 +99,7 @@ class BadgesScreen extends StatelessWidget {
 
                 Text(
                   provider.userName,
-                  style: GoogleFonts.balooThammudu2(
+                  style: GoogleFonts.balooTammudu2(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppColors.textDark,
@@ -164,7 +164,7 @@ class BadgesScreen extends StatelessWidget {
             children: [
               Text(
                 'Koleksi Lencana Islami',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textDark,
@@ -256,7 +256,7 @@ class BadgesScreen extends StatelessWidget {
             Text(
               badge.title,
               textAlign: TextAlign.center,
-              style: GoogleFonts.balooThammudu2(
+              style: GoogleFonts.balooTammudu2(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
                 color: badge.isUnlocked ? AppColors.textDark : AppColors.textMedium,
@@ -305,7 +305,7 @@ class BadgesScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               badge.title,
-              style: GoogleFonts.balooThammudu2(
+              style: GoogleFonts.balooTammudu2(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: AppColors.textDark,
@@ -344,7 +344,7 @@ class BadgesScreen extends StatelessWidget {
               onPressed: () => Navigator.pop(ctx),
               child: Text(
                 'Tutup',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primaryGreen,
                 ),

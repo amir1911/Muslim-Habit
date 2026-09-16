@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
@@ -16,7 +16,7 @@ class TilawahScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Tilawah Al-Qur\'an',
-          style: GoogleFonts.balooThammudu2(
+          style: GoogleFonts.balooTammudu2(
             fontWeight: FontWeight.w800,
             fontSize: 20,
             color: AppColors.primaryGreen,
@@ -58,7 +58,7 @@ class TilawahScreen extends StatelessWidget {
                       ),
                       child: Text(
                         'Target: 1 Juz / Hari',
-                        style: GoogleFonts.balooThammudu2(
+                        style: GoogleFonts.balooTammudu2(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
@@ -71,7 +71,7 @@ class TilawahScreen extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           'Khatam dlm ~${tilawah.remainingDaysToKhatam} hari',
-                          style: GoogleFonts.balooThammudu2(
+                          style: GoogleFonts.balooTammudu2(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -92,7 +92,7 @@ class TilawahScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Juz ${tilawah.currentJuz}',
-                            style: GoogleFonts.balooThammudu2(
+                            style: GoogleFonts.balooTammudu2(
                               fontSize: 26,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
@@ -100,7 +100,7 @@ class TilawahScreen extends StatelessWidget {
                           ),
                           Text(
                             'Halaman ${tilawah.currentPage} dari 604',
-                            style: GoogleFonts.balooThammudu2(
+                            style: GoogleFonts.balooTammudu2(
                               fontSize: 14,
                               color: Colors.white.withValues(alpha: 0.85),
                             ),
@@ -119,7 +119,7 @@ class TilawahScreen extends StatelessWidget {
                       child: Center(
                         child: Text(
                           '${(tilawah.overallProgress * 100).toInt()}%',
-                          style: GoogleFonts.balooThammudu2(
+                          style: GoogleFonts.balooTammudu2(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
@@ -144,7 +144,7 @@ class TilawahScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Hari ini: ${tilawah.pagesReadToday} / ${tilawah.dailyTargetPages} halaman terbaca',
-                  style: GoogleFonts.balooThammudu2(
+                  style: GoogleFonts.balooTammudu2(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.9),
                   ),
@@ -157,7 +157,7 @@ class TilawahScreen extends StatelessWidget {
           // QUICK UPDATE ACTIONS
           Text(
             'Catat Bacaan Hari Ini',
-            style: GoogleFonts.balooThammudu2(
+            style: GoogleFonts.balooTammudu2(
               fontSize: 16,
               fontWeight: FontWeight.w800,
               color: AppColors.textDark,
@@ -198,7 +198,7 @@ class TilawahScreen extends StatelessWidget {
             children: [
               Text(
                 'Daftar 30 Juz',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textDark,
@@ -206,7 +206,7 @@ class TilawahScreen extends StatelessWidget {
               ),
               Text(
                 '${tilawah.currentJuz - 1} dari 30 Khatam',
-                style: GoogleFonts.balooThammudu2(
+                style: GoogleFonts.balooTammudu2(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryGreen,
@@ -260,7 +260,7 @@ class TilawahScreen extends StatelessWidget {
                       children: [
                         Text(
                           'Juz $juzNum',
-                          style: GoogleFonts.balooThammudu2(
+                          style: GoogleFonts.balooTammudu2(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: textColor,
@@ -302,7 +302,7 @@ class TilawahScreen extends StatelessWidget {
         child: Center(
           child: Text(
             title,
-            style: GoogleFonts.balooThammudu2(
+            style: GoogleFonts.balooTammudu2(
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: isPrimary ? Colors.white : AppColors.textDark,
