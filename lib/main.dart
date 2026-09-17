@@ -6,6 +6,11 @@ import 'services/storage_service.dart';
 import 'providers/habit_provider.dart';
 import 'providers/tasbih_provider.dart';
 import 'providers/tilawah_provider.dart';
+import 'providers/prayer_time_provider.dart';
+import 'providers/quran_provider.dart';
+import 'providers/hadith_provider.dart';
+import 'providers/qibla_provider.dart';
+import 'services/qibla_service.dart';
 import 'presentation/splash/animated_splash_screen.dart';
 
 void main() async {
@@ -19,6 +24,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => HabitProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TasbihProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TilawahProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => PrayerTimeProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => QuranProvider(storageService)),
+        ChangeNotifierProvider(create: (_) => HadithProvider(storageService)),
+        ChangeNotifierProvider(
+          create: (_) => QiblaProvider(
+            service: QiblaService(storageService: storageService),
+          ),
+        ),
       ],
       child: const MuslimHabitApp(),
     ),

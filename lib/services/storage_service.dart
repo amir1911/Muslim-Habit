@@ -73,4 +73,62 @@ class StorageService {
   // Dhikr
   int getDhikrTotal() => _prefs.getInt(_keyDhikrStats) ?? 99;
   Future<void> setDhikrTotal(int count) => _prefs.setInt(_keyDhikrStats, count);
+
+  // Prayer Schedule Cache
+  static const String _keyPrayerSchedule = 'cached_prayer_schedule_v3';
+  static const String _keyPrayerCity = 'saved_prayer_city';
+
+  String? getSavedPrayerSchedule() => _prefs.getString(_keyPrayerSchedule);
+  Future<void> savePrayerSchedule(String jsonStr) => _prefs.setString(_keyPrayerSchedule, jsonStr);
+
+  String getSavedPrayerCity() => _prefs.getString(_keyPrayerCity) ?? 'Palembang';
+  Future<void> setSavedPrayerCity(String city) => _prefs.setString(_keyPrayerCity, city);
+
+  // Quran Verse Cache
+  static const String _keyCachedVerse = 'cached_random_verse';
+  String? getSavedVerse() => _prefs.getString(_keyCachedVerse);
+  Future<void> saveVerse(String jsonStr) => _prefs.setString(_keyCachedVerse, jsonStr);
+
+  // Hadith Cache
+  static const String _keyCachedHadith = 'cached_random_hadith';
+  String? getSavedHadith() => _prefs.getString(_keyCachedHadith);
+  Future<void> saveHadith(String jsonStr) => _prefs.setString(_keyCachedHadith, jsonStr);
+
+  // Qibla Cache
+  static const String _keyCachedQibla = 'cached_qibla_info';
+  String? getSavedQibla() => _prefs.getString(_keyCachedQibla);
+  Future<void> saveQibla(String jsonStr) => _prefs.setString(_keyCachedQibla, jsonStr);
+
+  // Full Surah List Cache
+  static const String _keyCachedSurahList = 'cached_all_surahs_list';
+  String? getSavedSurahList() => _prefs.getString(_keyCachedSurahList);
+  Future<void> saveSurahList(String jsonStr) => _prefs.setString(_keyCachedSurahList, jsonStr);
+
+  // Surah Detail Cache (keyed by surah number)
+  static const String _keySurahDetailPrefix = 'cached_surah_detail_';
+  String? getSavedSurahDetail(int number) => _prefs.getString('$_keySurahDetailPrefix$number');
+  Future<void> saveSurahDetail(int number, String jsonStr) => _prefs.setString('$_keySurahDetailPrefix$number', jsonStr);
+
+  // Recent Reading State
+  static const String _keyRecentSurahNum = 'recent_reading_surah_num';
+  static const String _keyRecentSurahName = 'recent_reading_surah_name';
+  static const String _keyRecentAyahNum = 'recent_reading_ayah_num';
+  static const String _keyRecentProgress = 'recent_reading_progress';
+
+  int getRecentSurahNumber() => _prefs.getInt(_keyRecentSurahNum) ?? 2;
+  String getRecentSurahName() => _prefs.getString(_keyRecentSurahName) ?? 'Al-Baqarah';
+  int getRecentAyahNumber() => _prefs.getInt(_keyRecentAyahNum) ?? 10;
+  double getRecentProgress() => _prefs.getDouble(_keyRecentProgress) ?? 0.56;
+
+  Future<void> saveRecentReading({
+    required int surahNumber,
+    required String surahName,
+    required int ayahNumber,
+    required double progress,
+  }) async {
+    await _prefs.setInt(_keyRecentSurahNum, surahNumber);
+    await _prefs.setString(_keyRecentSurahName, surahName);
+    await _prefs.setInt(_keyRecentAyahNum, ayahNumber);
+    await _prefs.setDouble(_keyRecentProgress, progress);
+  }
 }

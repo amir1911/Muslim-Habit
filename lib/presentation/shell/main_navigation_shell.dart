@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../home/home_screen.dart';
 import '../habits/habits_screen.dart';
-import '../tilawah/tilawah_screen.dart';
+import '../quran/quran_screen.dart';
 import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
 
@@ -20,7 +20,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
   final List<Widget> _screens = const [
     HomeScreen(),
     HabitsScreen(),
-    TilawahScreen(),
+    QuranScreen(),
     TasbihScreen(),
     BadgesScreen(),
   ];
