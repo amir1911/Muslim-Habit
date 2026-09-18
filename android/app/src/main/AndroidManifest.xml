@@ -4,6 +4,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- Sensor permission for compass (flutter_compass) -->
     <uses-permission android:name="android.permission.HIGH_SAMPLING_RATE_SENSORS"/>
+    <!-- Microphone permission for Quran recitation detection -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Internet for audio streaming and API -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="muslim_habit"
         android:name="${applicationName}"

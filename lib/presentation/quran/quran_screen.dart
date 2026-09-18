@@ -6,6 +6,8 @@ import '../../providers/habit_provider.dart';
 import '../../providers/quran_provider.dart';
 import 'surah_detail_screen.dart';
 import 'widgets/islamic_star_badge.dart';
+import 'widgets/quran_belajar_tab.dart';
+import 'widgets/quran_bookmark_tab.dart';
 
 class QuranScreen extends StatefulWidget {
   const QuranScreen({super.key});
@@ -55,36 +57,54 @@ class _QuranScreenState extends State<QuranScreen> {
                       ),
                     ),
 
-                    // Recent Reading Card
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                        child: _buildRecentCard(context, quranProv),
+                    if (quranProv.selectedTabIndex == 0) ...[
+                      // Recent Reading Card
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                          child: _buildRecentCard(context, quranProv),
+                        ),
                       ),
-                    ),
 
-                    // Section Title: Daftar Surat & Dropdown Tampilan
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-                        child: _buildDaftarSuratHeader(quranProv),
+                      // Section Title: Daftar Surat & Dropdown Tampilan
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                          child: _buildDaftarSuratHeader(quranProv),
+                        ),
                       ),
-                    ),
 
-                    // Search Bar
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                        child: _buildSearchBar(quranProv),
+                      // Search Bar
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+                          child: _buildSearchBar(quranProv),
+                        ),
                       ),
-                    ),
 
-                    // Daftar List Surat
-                    _buildSurahListSliver(context, quranProv),
+                      // Daftar List Surat
+                      _buildSurahListSliver(context, quranProv),
+                    ] else if (quranProv.selectedTabIndex == 1) ...[
+                      // BELAJAR TAB (Sesuai Desain Mockup)
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
+                          child: QuranBelajarTab(),
+                        ),
+                      ),
+                    ] else ...[
+                      // BOOKMARK TAB
+                      const SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
+                          child: QuranBookmarkTab(),
+                        ),
+                      ),
+                    ],
 
-                    // Bottom padding
+                    // Bottom padding agar tidak tertutup nav bar
                     const SliverToBoxAdapter(
-                      child: SizedBox(height: 80),
+                      child: SizedBox(height: 90),
                     ),
                   ],
                 ),
