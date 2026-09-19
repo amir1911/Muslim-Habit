@@ -131,4 +131,41 @@ class StorageService {
     await _prefs.setInt(_keyRecentAyahNum, ayahNumber);
     await _prefs.setDouble(_keyRecentProgress, progress);
   }
+
+  // ── Baca Al-Qur'an Progress & Settings ──
+  static const String _keyProgressPrefix = 'reading_progress_surah_';
+  static const String _keyBookmarks = 'quran_bookmarked_verses';
+  static const String _keyArabicFontSize = 'reader_arabic_font_size';
+  static const String _keyTransFontSize = 'reader_trans_font_size';
+  static const String _keyShowTajwid = 'reader_show_tajwid';
+  static const String _keyShowTranslation = 'reader_show_translation';
+  static const String _keyReaderTheme = 'reader_theme_mode'; // 'light', 'dark', 'sepia'
+  static const String _keyAudioSpeed = 'reader_audio_speed';
+
+  String? getReadingProgress(int surahId) => _prefs.getString('$_keyProgressPrefix$surahId');
+  Future<void> saveReadingProgress(int surahId, String jsonStr) =>
+      _prefs.setString('$_keyProgressPrefix$surahId', jsonStr);
+
+  List<String> getBookmarkedVerses() => _prefs.getStringList(_keyBookmarks) ?? [];
+  Future<void> saveBookmarkedVerses(List<String> list) =>
+      _prefs.setStringList(_keyBookmarks, list);
+
+  double getArabicFontSize() => _prefs.getDouble(_keyArabicFontSize) ?? 24.0;
+  Future<void> setArabicFontSize(double size) => _prefs.setDouble(_keyArabicFontSize, size);
+
+  double getTranslationFontSize() => _prefs.getDouble(_keyTransFontSize) ?? 13.0;
+  Future<void> setTranslationFontSize(double size) => _prefs.setDouble(_keyTransFontSize, size);
+
+  bool getShowTajwid() => _prefs.getBool(_keyShowTajwid) ?? true;
+  Future<void> setShowTajwid(bool show) => _prefs.setBool(_keyShowTajwid, show);
+
+  bool getShowTranslation() => _prefs.getBool(_keyShowTranslation) ?? true;
+  Future<void> setShowTranslation(bool show) => _prefs.setBool(_keyShowTranslation, show);
+
+  String getReaderTheme() => _prefs.getString(_keyReaderTheme) ?? 'sepia';
+  Future<void> setReaderTheme(String theme) => _prefs.setString(_keyReaderTheme, theme);
+
+  double getAudioSpeed() => _prefs.getDouble(_keyAudioSpeed) ?? 1.0;
+  Future<void> setAudioSpeed(double speed) => _prefs.setDouble(_keyAudioSpeed, speed);
 }
+

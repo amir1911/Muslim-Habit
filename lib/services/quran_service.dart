@@ -112,10 +112,32 @@ class QuranService {
     return SurahItem.fallbackSurahList;
   }
 
-  /// Ambil ayat-ayat lengkap surat tertentu
+  /// Ambil ayat-ayat lengkap surat tertentu beserta audio per ayat untuk seluruh surah
   Future<SurahDetail?> fetchSurahDetail(int surahNumber) async {
+    // 1. Coba ambil dari Equran.id (Paling lengkap 114 surah, teks Utsmani Kemenag, audio per ayat dari 6 qari)
     try {
-      final uri = Uri.parse('$_surahDetailUrl/$surahNumber');
+      final uri = Uri.parse('https://equran.id/api/v2/surat/$surahNumber');
+      final response = await http
+          .get(uri, headers: _headers)
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        if (decoded['code'] == 200 && decoded['data'] is Map) {
+          final detail = SurahDetail.fromJson(decoded);
+          if (detail.ayahs.isNotEmpty) {
+            if (_storageService != null) {
+              _storageService.saveSurahDetail(surahNumber, response.body);
+            }
+            return detail;
+          }
+        }
+      }
+    } catch (_) {}
+
+    // 2. Fallback: coba dari API MyQuran v3 dengan limit 300
+    try {
+      final uri = Uri.parse('$_surahDetailUrl/$surahNumber?limit=300');
       final response = await http
           .get(uri, headers: _headers)
           .timeout(const Duration(seconds: 15));
@@ -124,15 +146,17 @@ class QuranService {
         final decoded = jsonDecode(response.body) as Map<String, dynamic>;
         if (decoded['status'] == true && decoded['data'] is Map) {
           final detail = SurahDetail.fromJson(decoded);
-          if (_storageService != null) {
-            _storageService.saveSurahDetail(surahNumber, response.body);
+          if (detail.ayahs.isNotEmpty) {
+            if (_storageService != null) {
+              _storageService.saveSurahDetail(surahNumber, response.body);
+            }
+            return detail;
           }
-          return detail;
         }
       }
     } catch (_) {}
 
-    // Fallback dari cache
+    // 3. Fallback dari cache lokal
     if (_storageService != null) {
       try {
         final cachedStr = _storageService.getSavedSurahDetail(surahNumber);

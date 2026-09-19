@@ -3,6 +3,7 @@ class SurahAyah {
   final String arabicText;
   final String translation;
   final String? audioUrl;
+  final Map<String, String>? audioMap;
   final String? tafsir;
   final int? juz;
   final int? page;
@@ -12,6 +13,7 @@ class SurahAyah {
     required this.arabicText,
     required this.translation,
     this.audioUrl,
+    this.audioMap,
     this.tafsir,
     this.juz,
     this.page,
@@ -36,17 +38,41 @@ class SurahAyah {
       pageVal = m['page'] as int?;
     }
 
+    // Audio extraction
+    String? resolvedAudio;
+    Map<String, String> resolvedAudioMap = {};
+    if (json['audio'] is Map) {
+      final aMap = json['audio'] as Map;
+      aMap.forEach((k, v) {
+        if (v is String) resolvedAudioMap[k.toString()] = v;
+      });
+      // Default: '05' (Misyari Rasyid) atau audio pertama
+      resolvedAudio = resolvedAudioMap['05'] ??
+          resolvedAudioMap['01'] ??
+          (resolvedAudioMap.isNotEmpty ? resolvedAudioMap.values.first : null);
+    } else if (json['audio'] is String) {
+      resolvedAudio = json['audio'] as String;
+    } else if (json['audio_url'] is String) {
+      resolvedAudio = json['audio_url'] as String;
+    }
+
     return SurahAyah(
-      ayahNumber: json['ayah_number'] as int? ??
+      ayahNumber: json['nomorAyat'] as int? ??
+          json['ayah_number'] as int? ??
           json['verse_number'] as int? ??
           json['nomor'] as int? ??
           1,
-      arabicText: json['arab'] as String? ?? json['arabic_text'] as String? ?? '',
-      translation: json['translation'] as String? ??
+      arabicText: json['teksArab'] as String? ??
+          json['arab'] as String? ??
+          json['arabic_text'] as String? ??
+          '',
+      translation: json['teksIndonesia'] as String? ??
+          json['translation'] as String? ??
           json['terjemah'] as String? ??
           json['id'] as String? ??
           '',
-      audioUrl: json['audio_url'] as String?,
+      audioUrl: resolvedAudio,
+      audioMap: resolvedAudioMap.isNotEmpty ? resolvedAudioMap : null,
       tafsir: tafsirText,
       juz: juzVal,
       page: pageVal,
@@ -58,6 +84,7 @@ class SurahAyah {
         'arab': arabicText,
         'translation': translation,
         'audio_url': audioUrl,
+        'audio': audioMap,
         'tafsir': tafsir,
         'meta': {'juz': juz, 'page': page},
       };
@@ -72,6 +99,7 @@ class SurahDetail {
   final String revelation;
   final String description;
   final String? audioUrl;
+  final Map<String, String>? audioFullMap;
   final List<SurahAyah> ayahs;
 
   SurahDetail({
@@ -83,6 +111,7 @@ class SurahDetail {
     required this.revelation,
     required this.description,
     this.audioUrl,
+    this.audioFullMap,
     required this.ayahs,
   });
 
@@ -90,52 +119,74 @@ class SurahDetail {
     final data = json['data'] is Map ? json['data'] as Map<String, dynamic> : json;
 
     final ayahsList = <SurahAyah>[];
-    if (data['ayahs'] is List) {
-      for (final a in data['ayahs'] as List) {
+    if (data['ayat'] is List) {
+      for (final a in data['ayat'] as List) {
         if (a is Map<String, dynamic>) {
           ayahsList.add(SurahAyah.fromJson(a));
         }
       }
-    } else if (data['ayat'] is List) {
-      for (final a in data['ayat'] as List) {
+    } else if (data['ayahs'] is List) {
+      for (final a in data['ayahs'] as List) {
         if (a is Map<String, dynamic>) {
           ayahsList.add(SurahAyah.fromJson(a));
         }
       }
     }
 
+    // Audio Full
+    String? fullAudio;
+    Map<String, String> fullAudioMap = {};
+    if (data['audioFull'] is Map) {
+      final aMap = data['audioFull'] as Map;
+      aMap.forEach((k, v) {
+        if (v is String) fullAudioMap[k.toString()] = v;
+      });
+      fullAudio = fullAudioMap['05'] ?? fullAudioMap['01'] ?? (fullAudioMap.isNotEmpty ? fullAudioMap.values.first : null);
+    } else if (data['audio_url'] is String) {
+      fullAudio = data['audio_url'] as String;
+    }
+
     return SurahDetail(
-      number: data['number'] as int? ?? 1,
-      nameLatin: data['name_latin'] as String? ??
+      number: data['nomor'] as int? ?? data['number'] as int? ?? 1,
+      nameLatin: data['namaLatin'] as String? ??
+          data['name_latin'] as String? ??
           data['name'] as String? ??
           data['name_en'] as String? ??
           'Surah 1',
-      nameArabic: data['name'] as String? ??
+      nameArabic: data['nama'] as String? ??
           data['name_short'] as String? ??
           data['name_long'] as String? ??
           '',
-      numberOfAyahs: data['number_of_ayahs'] as int? ??
+      numberOfAyahs: data['jumlahAyat'] as int? ??
+          data['number_of_ayahs'] as int? ??
           data['number_of_verses'] as int? ??
           ayahsList.length,
-      translation: data['translation'] as String? ??
+      translation: data['arti'] as String? ??
+          data['translation'] as String? ??
           data['name_id'] as String? ??
           '',
-      revelation: data['revelation'] as String? ?? 'Makkiyah',
-      description: data['description'] as String? ?? '',
-      audioUrl: data['audio_url'] as String?,
+      revelation: data['tempatTurun'] as String? ??
+          data['revelation'] as String? ??
+          'Makkiyah',
+      description: data['deskripsi'] as String? ??
+          data['description'] as String? ??
+          '',
+      audioUrl: fullAudio,
+      audioFullMap: fullAudioMap.isNotEmpty ? fullAudioMap : null,
       ayahs: ayahsList,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'number': number,
-        'name_latin': nameLatin,
-        'name': nameArabic,
-        'number_of_ayahs': numberOfAyahs,
-        'translation': translation,
-        'revelation': revelation,
-        'description': description,
+        'nomor': number,
+        'namaLatin': nameLatin,
+        'nama': nameArabic,
+        'jumlahAyat': numberOfAyahs,
+        'arti': translation,
+        'tempatTurun': revelation,
+        'deskripsi': description,
         'audio_url': audioUrl,
-        'ayahs': ayahs.map((a) => a.toJson()).toList(),
+        'audioFull': audioFullMap,
+        'ayat': ayahs.map((a) => a.toJson()).toList(),
       };
 }

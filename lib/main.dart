@@ -21,6 +21,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        Provider<StorageService>.value(value: storageService),
         ChangeNotifierProvider(create: (_) => HabitProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TasbihProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TilawahProvider(storageService)),

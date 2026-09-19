@@ -46,6 +46,7 @@ class QuranProvider extends ChangeNotifier {
   }
 
   // Getters
+  StorageService get storageService => _storageService;
   QuranVerse get currentVerse => _currentVerse ?? QuranVerse.defaultVerse();
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
