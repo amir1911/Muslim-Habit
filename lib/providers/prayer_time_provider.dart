@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import '../models/prayer_alarm_model.dart';
 import '../models/prayer_schedule.dart';
 import '../services/prayer_time_service.dart';
 import '../services/storage_service.dart';
@@ -25,6 +27,84 @@ class PrayerTimeProvider extends ChangeNotifier {
 
   /// Mendapatkan waktu sholat berikutnya secara dinamis
   Map<String, String> get nextPrayer => schedule.getNextPrayer(DateTime.now());
+
+  DateTime _selectedDate = DateTime.now();
+  DateTime get selectedDate => _selectedDate;
+
+  void setSelectedDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
+
+  String _dateKey(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  // ── Rekaman Sholat Tercatat ──
+  String? getRecordedPrayerTime(String prayerKey) {
+    return _storageService.getPrayerRecordedTime(_dateKey(_selectedDate), prayerKey);
+  }
+
+  bool isPrayerDone(String prayerKey) {
+    return getRecordedPrayerTime(prayerKey) != null;
+  }
+
+  Future<void> togglePrayerRecord(String prayerKey) async {
+    final dKey = _dateKey(_selectedDate);
+    final existing = _storageService.getPrayerRecordedTime(dKey, prayerKey);
+    if (existing != null) {
+      await _storageService.setPrayerRecordedTime(dKey, prayerKey, null);
+    } else {
+      final now = DateTime.now();
+      final timeFormatted =
+          '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')} ${now.hour >= 12 ? "PM" : "AM"}';
+      await _storageService.setPrayerRecordedTime(dKey, prayerKey, timeFormatted);
+    }
+    notifyListeners();
+  }
+
+  // ── Pengaturan Alarm Per Sholat ──
+  PrayerAlarmModel getAlarmModel(String prayerKey, String defaultScheduleTime) {
+    final raw = _storageService.getPrayerAlarmConfig(prayerKey);
+    if (raw != null) {
+      try {
+        final decoded = jsonDecode(raw) as Map<String, dynamic>;
+        return PrayerAlarmModel.fromJson(decoded);
+      } catch (_) {}
+    }
+
+    String prayerName = 'Subuh';
+    switch (prayerKey.toLowerCase()) {
+      case 'subuh':
+        prayerName = 'Subuh';
+        break;
+      case 'dzuhur':
+        prayerName = 'Dzuhur';
+        break;
+      case 'ashar':
+        prayerName = 'Ashar';
+        break;
+      case 'maghrib':
+        prayerName = 'Maghrib';
+        break;
+      case 'isya':
+        prayerName = 'Isya';
+        break;
+      default:
+        prayerName = prayerKey;
+    }
+
+    return PrayerAlarmModel(
+      prayerKey: prayerKey,
+      name: prayerName,
+      customTime: defaultScheduleTime,
+    );
+  }
+
+  Future<void> saveAlarmModel(PrayerAlarmModel model) async {
+    await _storageService.savePrayerAlarmConfig(model.prayerKey, jsonEncode(model.toJson()));
+    notifyListeners();
+  }
 
   Future<void> loadTodayPrayer({String? city}) async {
     final targetCity = city ?? _currentCity;

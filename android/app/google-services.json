@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "124725735669",
+    "project_id": "muslim-habit",
+    "storage_bucket": "muslim-habit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:124725735669:android:e0de0f167334b04d6ad5bc",
+        "android_client_info": {
+          "package_name": "com.muslimhabit.muslim_habit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "124725735669-j3fr9oh5fqkpvc3deg5s9v47dbepd4hg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBS23I5_PfamJ_Hi_IwZDtMQpU5PUntRsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "124725735669-j3fr9oh5fqkpvc3deg5s9v47dbepd4hg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

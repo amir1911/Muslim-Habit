@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/habit_item.dart';
 import '../models/badge_item.dart';
+import '../models/ai_assistant_model.dart';
 import '../services/storage_service.dart';
 
 class HabitProvider extends ChangeNotifier {
@@ -15,12 +16,32 @@ class HabitProvider extends ChangeNotifier {
   int _streakCount = 3;
   String _selectedCategory = 'all'; // all, wajib, sunnah
   String _userName = 'Sahabat Muslim';
+  String _selectedAIId = 'teen';
+  bool _hasCompletedOnboarding = false;
 
   int get userPoints => _userPoints;
   int get userLevel => _userLevel;
   int get streakCount => _streakCount;
   String get selectedCategory => _selectedCategory;
   String get userName => _userName;
+  String get selectedAIId => _selectedAIId;
+  bool get hasCompletedOnboarding => _hasCompletedOnboarding;
+
+  AIAssistantModel get currentAssistant => AIAssistantModel.getById(_selectedAIId);
+
+  Future<void> setSelectedAI(String aiId) async {
+    _selectedAIId = aiId;
+    await _storageService.setSelectedAIId(aiId);
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding(String aiId) async {
+    _selectedAIId = aiId;
+    _hasCompletedOnboarding = true;
+    await _storageService.setSelectedAIId(aiId);
+    await _storageService.setCompletedOnboarding(true);
+    notifyListeners();
+  }
 
   void setCategory(String cat) {
     _selectedCategory = cat;
@@ -307,6 +328,8 @@ class HabitProvider extends ChangeNotifier {
     _userLevel = _storageService.getUserLevel();
     _streakCount = _storageService.getStreakCount();
     _userName = _storageService.getUserName();
+    _selectedAIId = _storageService.getSelectedAIId();
+    _hasCompletedOnboarding = _storageService.hasCompletedOnboarding();
 
     final savedBadges = _storageService.getUnlockedBadges();
     for (var b in _badges) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/habit_provider.dart';
+import '../../services/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -57,6 +58,45 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  void _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final authService = context.read<AuthService>();
+      final credential = await authService.signInWithGoogle();
+      if (credential != null && mounted) {
+        final displayName = credential.user?.displayName;
+        if (displayName != null && displayName.isNotEmpty) {
+          context.read<HabitProvider>().setUserName(displayName);
+        }
+        widget.onSuccess();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login Google gagal: $e', style: GoogleFonts.inter(fontSize: 13)),
+            backgroundColor: Colors.red[700],
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _handleFacebookSignIn() async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Login Facebook memerlukan Facebook App ID di meta developers.',
+          style: GoogleFonts.inter(fontSize: 13),
+        ),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   void _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -98,7 +138,7 @@ class _AuthScreenState extends State<AuthScreen> {
             // Peeking Camel Mascot at Top-Right
             Positioned(
               top: -10,
-              right: -5,
+              right: -20,
               child: Image.asset(
                 'assets/images/mascot2.png',
                 width: 200,
@@ -247,12 +287,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           children: [
                             _buildSocialButton(
                               isGoogle: true,
-                              onTap: _handleSubmit,
+                              onTap: _handleGoogleSignIn,
                             ),
                             const SizedBox(width: 16),
                             _buildSocialButton(
                               isGoogle: false,
-                              onTap: _handleSubmit,
+                              onTap: _handleFacebookSignIn,
                             ),
                           ],
                         ),

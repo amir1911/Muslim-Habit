@@ -3,7 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/badge_item.dart';
+import '../../models/ai_assistant_model.dart';
 import '../../providers/habit_provider.dart';
+import '../onboarding/ai_selection_carousel_screen.dart';
 
 class BadgesScreen extends StatelessWidget {
   const BadgesScreen({super.key});
@@ -60,7 +62,7 @@ class BadgesScreen extends StatelessWidget {
                       ),
                       child: ClipOval(
                         child: Image.asset(
-                          'assets/images/image 52.png',
+                          provider.currentAssistant.imagePath,
                           fit: BoxFit.cover,
                           errorBuilder: (_, __, ___) => const Center(
                             child: Text('🐪', style: TextStyle(fontSize: 50)),
@@ -112,6 +114,85 @@ class BadgesScreen extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryDarkGreen,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Card Pengaturan AI Assistant Pendamping
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.greenSurface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.primaryLightGreen.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            provider.currentAssistant.imagePath,
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'AI: ${provider.currentAssistant.name} (${provider.currentAssistant.levelTitle})',
+                              style: GoogleFonts.inter(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2C3E1F),
+                              ),
+                            ),
+                            Text(
+                              'Pendamping Ibadah',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.textMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const AISelectionCarouselScreen(),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Ganti AI',
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 16),

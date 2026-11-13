@@ -1,9 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../providers/habit_provider.dart';
 import '../shell/main_navigation_shell.dart';
 import '../auth/auth_modal_sheet.dart';
+import '../onboarding/onboarding_welcome_screen.dart';
 
 class AnimatedSplashScreen extends StatefulWidget {
   const AnimatedSplashScreen({super.key});
@@ -93,6 +96,18 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
     );
   }
 
+  void _navigateToOnboarding() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 600),
+        pageBuilder: (_, __, ___) => const OnboardingWelcomeScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
+  }
+
   void _showAuthSheet(bool isRegister) {
     Navigator.push(
       context,
@@ -101,7 +116,12 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
           isRegisterInitial: isRegister,
           onSuccess: () {
             Navigator.pop(context);
-            _navigateToMainApp();
+            final hasCompleted = context.read<HabitProvider>().hasCompletedOnboarding;
+            if (isRegister || !hasCompleted) {
+              _navigateToOnboarding();
+            } else {
+              _navigateToMainApp();
+            }
           },
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {

@@ -9,6 +9,9 @@ import '../../providers/quran_provider.dart';
 import '../../providers/hadith_provider.dart';
 import '../../providers/qibla_provider.dart';
 import '../quran/quran_screen.dart';
+import '../doa/doa_screen.dart';
+import '../sholat/sholat_screen.dart';
+import '../../core/theme/home_time_theme.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME SCREEN  (sesuai desain Figma)
@@ -24,9 +27,19 @@ class _HomeScreenState extends State<HomeScreen> {
   final int _totalQuranPages = 604;
   int _quranPageReading = 1;
   final String _currentSurah = 'Al-Baqarah';
+  late HomeTimeTheme _timeTheme;
+
+  @override
+  void initState() {
+    super.initState();
+    _timeTheme = HomeTimeTheme.fromDateTime(DateTime.now());
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Perbarui tema waktu secara dinamis mengikuti waktu sekarang
+    _timeTheme = HomeTimeTheme.fromDateTime(DateTime.now());
+
     final provider = context.watch<HabitProvider>();
     final prayerProvider = context.watch<PrayerTimeProvider>();
     final quranProvider = context.watch<QuranProvider>();
@@ -92,10 +105,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ────────────── GREEN HEADER (Nature background + Standing Mascot) ──────────────
   Widget _buildGreenHeader(BuildContext context, HabitProvider provider, PrayerTimeProvider prayerProvider, QuranProvider quranProvider) {
-    return Container(
-      decoration: const BoxDecoration(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/home_bg.png'),
+          image: AssetImage(_timeTheme.backgroundImage),
           fit: BoxFit.cover,
           alignment: Alignment.topCenter,
         ),
@@ -144,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'Assalamualaikum',
                           style: GoogleFonts.inter(
                             fontSize: 11,
-                            color: const Color(0xFF1E3710),
+                            color: _timeTheme.greetingColor,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -153,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: GoogleFonts.balooTammudu2(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: const Color(0xFF1E3710),
+                            color: _timeTheme.userNameColor,
                             height: 1.1,
                           ),
                         ),
@@ -174,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 34,
                     height: 34,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A7220),
+                      color: _timeTheme.bellBackgroundColor,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -184,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 18),
+                    child: Icon(Icons.notifications_none_rounded, color: _timeTheme.bellIconColor, size: 18),
                   ),
                 ],
               ),
@@ -204,23 +219,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         // Ayah Card (live dari API MyQuran)
                         GestureDetector(
                           onTap: () => _showVerseDetailModal(context, quranProvider),
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 400),
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.75),
+                              color: _timeTheme.ayahCardBg,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.85), width: 1.5),
+                              border: Border.all(color: _timeTheme.ayahCardBorder, width: 1.5),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
+                                  color: Colors.black.withValues(alpha: 0.08),
                                   blurRadius: 6,
                                   offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
                             child: quranProvider.isLoading
-                                ? const SizedBox(
+                                ? SizedBox(
                                     height: 40,
                                     child: Center(
                                       child: SizedBox(
@@ -228,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         height: 18,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
-                                          color: Color(0xFF557C2B),
+                                          color: _timeTheme.ayahSurahColor,
                                         ),
                                       ),
                                     ),
@@ -240,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         quranProvider.currentVerse.arabicText,
                                         style: GoogleFonts.amiri(
                                           fontSize: 13,
-                                          color: const Color(0xFF1E3710),
+                                          color: _timeTheme.ayahTextColor,
                                           fontWeight: FontWeight.w700,
                                           height: 1.5,
                                         ),
@@ -253,7 +269,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         quranProvider.currentVerse.translation,
                                         style: GoogleFonts.inter(
                                           fontSize: 9.5,
-                                          color: const Color(0xFF2E4717),
+                                          color: _timeTheme.ayahTranslationColor,
                                           fontStyle: FontStyle.italic,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -265,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         quranProvider.currentVerse.reference,
                                         style: GoogleFonts.inter(
                                           fontSize: 8.5,
-                                          color: const Color(0xFF557C2B),
+                                          color: _timeTheme.ayahSurahColor,
                                           fontWeight: FontWeight.w700,
                                         ),
                                         textAlign: TextAlign.right,
@@ -290,15 +306,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Speech bubble
-                        _buildSpeechBubble('Semangat menghafal hari ini, ${context.read<HabitProvider>().userName.split(' ').first}!'),
+                        // Speech bubble dinamis sesuai karakter AI
+                        _buildSpeechBubble(
+                          '${provider.currentAssistant.name}: "${provider.currentAssistant.homeMotivationDefault}"',
+                        ),
                         const SizedBox(height: 2),
 
-                        // Standing Camel mascot
+                        // Mascot AI yang dipilih (Lulu, Nunu, Riri)
                         SizedBox(
                           height: 165,
                           child: Image.asset(
-                            'assets/images/mascot_standing.png',
+                            provider.currentAssistant.imagePath,
                             fit: BoxFit.contain,
                             alignment: Alignment.bottomCenter,
                           ),
@@ -319,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    const Color(0xFFF9F8F2).withValues(alpha: 0.7),
+                    _timeTheme.bottomFadeColor.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -335,10 +353,11 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: _timeTheme.speechBubbleBg,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
@@ -353,7 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.inter(
               fontSize: 10.5,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF233615),
+              color: _timeTheme.speechTextColor,
               height: 1.3,
             ),
           ),
@@ -362,10 +381,11 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(right: 28),
           child: ClipPath(
             clipper: _SpeechArrowClipper(),
-            child: Container(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
               width: 12,
               height: 8,
-              color: Colors.white,
+              color: _timeTheme.speechBubbleBg,
             ),
           ),
         ),
@@ -374,10 +394,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _greenBadge({required String icon, required String value}) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF4A7220),
+        color: _timeTheme.badgeBackgroundColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -397,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: GoogleFonts.balooTammudu2(
               fontSize: 12.5,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: _timeTheme.badgeTextColor,
               height: 1.1,
             ),
           ),
@@ -412,19 +433,23 @@ class _HomeScreenState extends State<HomeScreen> {
     final isLoading = prayerProvider.isLoading;
 
     return GestureDetector(
-      onTap: () => _showPrayerScheduleModal(context, prayerProvider),
-      child: Container(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const SholatScreen()),
+      ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF7CB83E), Color(0xFF538622)],
+            colors: _timeTheme.prayerGradient,
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF3B6114).withValues(alpha: 0.25),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -441,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.18),
+                      color: _timeTheme.prayerTagBg,
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
@@ -452,16 +477,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 7.5,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
+                            color: _timeTheme.prayerNextTextColor,
                             letterSpacing: 0.8,
                           ),
                         ),
                         if (isLoading) ...[
                           const SizedBox(width: 4),
-                          const SizedBox(
+                          SizedBox(
                             width: 7,
                             height: 7,
-                            child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.white),
+                            child: CircularProgressIndicator(strokeWidth: 1.5, color: _timeTheme.prayerNextTextColor),
                           ),
                         ],
                       ],
@@ -485,7 +510,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: GoogleFonts.balooTammudu2(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: _timeTheme.prayerTimeColor,
                           height: 1,
                         ),
                       ),
@@ -522,13 +547,14 @@ class _HomeScreenState extends State<HomeScreen> {
             // Emblem icon container (Tap to open Qibla Compass)
             GestureDetector(
               onTap: () => _showQiblaCompassModal(context),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3F6919),
+                  color: _timeTheme.prayerCompassBg,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.5),
+                  border: Border.all(color: _timeTheme.prayerCompassBorder, width: 1.5),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
@@ -541,7 +567,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(9),
                   child: Image.asset(
                     'assets/icon/kiblat.png',
-                    color: Colors.white,
+                    color: _timeTheme.prayerCompassIconColor,
                   ),
                 ),
               ),
@@ -554,13 +580,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ────────────── FEATURE GRID ──────────────
   Widget _buildFeatureGrid(BuildContext context) {
-    final prayerProvider = context.read<PrayerTimeProvider>();
     final features = [
       {
         'label': 'Sholat',
         'asset': 'assets/icon/shalat.png',
         'icon': Icons.mosque_outlined,
-        'onTap': () => _showPrayerScheduleModal(context, prayerProvider),
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SholatScreen()),
+        ),
       },
       {
         'label': 'Al-Quran',
@@ -572,7 +600,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       },
       {'label': 'Dzikir', 'asset': 'assets/icon/Image (Dzikir).png', 'icon': Icons.spa_rounded},
-      {'label': 'Doa', 'asset': 'assets/icon/Image (Doa).png', 'icon': Icons.volunteer_activism_rounded},
+      {
+        'label': 'Doa',
+        'asset': 'assets/icon/Image (Doa).png',
+        'icon': Icons.volunteer_activism_rounded,
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DoaScreen()),
+        ),
+      },
       {'label': 'Puasa', 'asset': 'assets/icon/Image (Malam).png', 'icon': Icons.nightlight_round},
     ];
 

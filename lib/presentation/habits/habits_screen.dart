@@ -26,6 +26,7 @@ class HabitsScreen extends StatelessWidget {
           ),
         ),
         actions: [
+          // Streak Counter Chip
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -47,7 +48,7 @@ class HabitsScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '${habitProvider.streakCount} Hari',
-                  style: GoogleFonts.balooTammudu2(
+                  style: GoogleFonts.plusJakartaSans(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
                     color: AppColors.streakFire,
@@ -69,21 +70,19 @@ class HabitsScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tanggal → Inter (penjelasan)
                     Text(
                       todayFormatted,
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         color: AppColors.textLight,
                       ),
                     ),
                     const SizedBox(height: 2),
-                    // Salam → Baloo (judul)
                     Text(
                       'Assalamu\'alaikum, ${habitProvider.userName}',
-                      style: GoogleFonts.balooTammudu2(
-                        fontSize: 18,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textDark,
                       ),
@@ -104,12 +103,11 @@ class HabitsScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.primaryDarkGreen),
                     const SizedBox(width: 4),
-                    // Tanggal hijriah → Inter
                     Text(
                       '28 Rabiul Awwal',
-                      style: GoogleFonts.inter(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: AppColors.primaryDarkGreen,
                       ),
                     ),
@@ -120,31 +118,33 @@ class HabitsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
+          // GAMIFIED CAMEL BUDDY INTERACTIVE CARD
           _buildCamelBuddyCard(context, habitProvider),
           const SizedBox(height: 20),
 
+          // PROGRESS OVERVIEW RING & STATS
           _buildDailyProgressCard(habitProvider),
           const SizedBox(height: 20),
 
+          // CATEGORY SELECTOR CHIPS (Semua, Wajib, Sunnah)
           _buildCategoryFilter(habitProvider),
           const SizedBox(height: 16),
 
+          // HABIT CHECKLIST SECTION
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Section heading → Baloo
               Text(
                 'Target Hari Ini',
-                style: GoogleFonts.balooTammudu2(
-                  fontSize: 17,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: AppColors.textDark,
                 ),
               ),
-              // Counter caption → Inter
               Text(
                 '${habitProvider.completedHabitsCount} dari ${habitProvider.totalHabitsCount} Selesai',
-                style: GoogleFonts.inter(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryGreen,
@@ -154,6 +154,7 @@ class HabitsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
+          // Habit Cards
           ...habitProvider.habits.map((habit) => _buildHabitItemCard(context, habitProvider, habit)),
         ],
       ),
@@ -180,6 +181,7 @@ class HabitsScreen extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       child: Row(
         children: [
+          // 3D Camel Avatar
           Container(
             width: 76,
             height: 76,
@@ -193,7 +195,7 @@ class HabitsScreen extends StatelessWidget {
                 'assets/images/image 52.png',
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Image.asset(
-                  'assets/images/camel_solo.png',
+                  'assets/images/image 52.png',
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => const Center(
                     child: Text('🐪', style: TextStyle(fontSize: 38)),
@@ -204,6 +206,7 @@ class HabitsScreen extends StatelessWidget {
           ),
           const SizedBox(width: 16),
 
+          // Camel Speech Bubble & Status
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,10 +219,9 @@ class HabitsScreen extends StatelessWidget {
                         color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      // Label chip → Baloo
                       child: Text(
                         'Jamal • Level ${provider.userLevel}',
-                        style: GoogleFonts.balooTammudu2(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
@@ -227,11 +229,10 @@ class HabitsScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    // XP → Baloo (gamifikasi angka penting)
                     Text(
                       '${provider.userPoints} XP',
-                      style: GoogleFonts.balooTammudu2(
-                        fontSize: 13,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
                         fontWeight: FontWeight.w800,
                         color: const Color(0xFFFFD54F),
                       ),
@@ -239,13 +240,12 @@ class HabitsScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                // Pesan maskot → Inter (kalimat penjelasan)
                 Text(
                   provider.mascotMessage,
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
-                    height: 1.4,
-                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
@@ -269,6 +269,7 @@ class HabitsScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Circular Progress
           SizedBox(
             width: 56,
             height: 56,
@@ -283,10 +284,9 @@ class HabitsScreen extends StatelessWidget {
                   strokeCap: StrokeCap.round,
                 ),
                 Center(
-                  // Angka % → Baloo
                   child: Text(
                     '$pct%',
-                    style: GoogleFonts.balooTammudu2(
+                    style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
                       color: AppColors.primaryGreen,
@@ -298,24 +298,23 @@ class HabitsScreen extends StatelessWidget {
           ),
           const SizedBox(width: 18),
 
+          // Progress text
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Section label → Baloo
                 Text(
                   'Konsistensi Harian',
-                  style: GoogleFonts.balooTammudu2(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),
                 ),
                 const SizedBox(height: 3),
-                // Penjelasan → Inter
                 Text(
                   '${provider.completedHabitsCount} dari ${provider.totalHabitsCount} ibadah telah selesai hari ini',
-                  style: GoogleFonts.inter(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     color: AppColors.textMedium,
                   ),
@@ -342,6 +341,7 @@ class HabitsScreen extends StatelessWidget {
 
   Widget _buildFilterChip(HabitProvider provider, String key, String label) {
     final isSelected = provider.selectedCategory == key;
+
     return GestureDetector(
       onTap: () => provider.setCategory(key),
       child: AnimatedContainer(
@@ -354,12 +354,11 @@ class HabitsScreen extends StatelessWidget {
             color: isSelected ? AppColors.primaryGreen : AppColors.beigeAccent,
           ),
         ),
-        // Chip label → Inter
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: isSelected ? Colors.white : AppColors.textMedium,
           ),
         ),
@@ -396,10 +395,9 @@ class HabitsScreen extends StatelessWidget {
         title: Row(
           children: [
             Expanded(
-              // Judul habit → Baloo
               child: Text(
                 habit.title,
-                style: GoogleFonts.balooTammudu2(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   decoration: habit.isCompleted ? TextDecoration.lineThrough : null,
@@ -422,7 +420,7 @@ class HabitsScreen extends StatelessWidget {
                     const SizedBox(width: 2),
                     Text(
                       '${habit.streak}',
-                      style: GoogleFonts.balooTammudu2(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         color: AppColors.streakFire,
@@ -434,10 +432,9 @@ class HabitsScreen extends StatelessWidget {
             ],
           ],
         ),
-        // Waktu & XP → Inter (penjelasan)
         subtitle: Text(
           '${habit.timeSuggestion} • +${habit.points} XP',
-          style: GoogleFonts.inter(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 12,
             color: AppColors.textLight,
           ),

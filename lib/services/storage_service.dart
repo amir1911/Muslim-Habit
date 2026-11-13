@@ -167,5 +167,71 @@ class StorageService {
 
   double getAudioSpeed() => _prefs.getDouble(_keyAudioSpeed) ?? 1.0;
   Future<void> setAudioSpeed(double speed) => _prefs.setDouble(_keyAudioSpeed, speed);
+
+  // ── Doa Cache ──
+  static const String _keyCachedDoaList = 'cached_all_doa_list';
+  static const String _keyFavoriteDoaIds = 'favorite_doa_ids';
+
+  String? getSavedDoaList() => _prefs.getString(_keyCachedDoaList);
+  Future<void> saveDoaList(String jsonStr) => _prefs.setString(_keyCachedDoaList, jsonStr);
+
+  List<String> getFavoriteDoaIds() => _prefs.getStringList(_keyFavoriteDoaIds) ?? [];
+  Future<void> saveFavoriteDoaIds(List<String> ids) => _prefs.setStringList(_keyFavoriteDoaIds, ids);
+
+  static const String _keyReadDoaIds = 'read_doa_ids_today';
+  static const String _keyReadDoaDate = 'read_doa_date';
+
+  List<String> getTodayReadDoaIds() {
+    final savedDate = _prefs.getString(_keyReadDoaDate);
+    final today = _todayKey();
+    if (savedDate != today) {
+      return [];
+    }
+    return _prefs.getStringList(_keyReadDoaIds) ?? [];
+  }
+
+  Future<void> markDoaAsRead(int id) async {
+    final today = _todayKey();
+    final savedDate = _prefs.getString(_keyReadDoaDate);
+    List<String> current = (savedDate == today) ? (_prefs.getStringList(_keyReadDoaIds) ?? []) : [];
+    final idStr = id.toString();
+    if (!current.contains(idStr)) {
+      current.add(idStr);
+      await _prefs.setString(_keyReadDoaDate, today);
+      await _prefs.setStringList(_keyReadDoaIds, current);
+    }
+  }
+
+  // ── Sholat & Alarm Settings ──
+  static const String _keyPrayerAlarmPrefix = 'prayer_alarm_config_';
+  static const String _keyPrayerDonePrefix = 'prayer_done_record_';
+
+  String? getPrayerAlarmConfig(String prayerKey) => _prefs.getString('$_keyPrayerAlarmPrefix$prayerKey');
+  Future<void> savePrayerAlarmConfig(String prayerKey, String jsonStr) =>
+      _prefs.setString('$_keyPrayerAlarmPrefix$prayerKey', jsonStr);
+
+  // Status sholat tercatat per tanggal (dateKey + prayerKey)
+  String? getPrayerRecordedTime(String dateKey, String prayerKey) =>
+      _prefs.getString('$_keyPrayerDonePrefix${dateKey}_$prayerKey');
+
+  Future<void> setPrayerRecordedTime(String dateKey, String prayerKey, String? timeStr) async {
+    final key = '$_keyPrayerDonePrefix${dateKey}_$prayerKey';
+    if (timeStr == null) {
+      await _prefs.remove(key);
+    } else {
+      await _prefs.setString(key, timeStr);
+    }
+  }
+
+  // ── Onboarding & Selected AI Assistant ──
+  static const String _keySelectedAIId = 'selected_ai_assistant_id';
+  static const String _keyHasCompletedOnboarding = 'has_completed_onboarding';
+
+  String getSelectedAIId() => _prefs.getString(_keySelectedAIId) ?? 'teen';
+  Future<void> setSelectedAIId(String aiId) => _prefs.setString(_keySelectedAIId, aiId);
+
+  bool hasCompletedOnboarding() => _prefs.getBool(_keyHasCompletedOnboarding) ?? false;
+  Future<void> setCompletedOnboarding(bool completed) =>
+      _prefs.setBool(_keyHasCompletedOnboarding, completed);
 }
 
