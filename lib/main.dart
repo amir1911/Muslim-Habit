@@ -1,7 +1,10 @@
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'core/theme/app_theme.dart';
 import 'services/storage_service.dart';
 import 'services/auth_service.dart';
@@ -14,6 +17,7 @@ import 'providers/hadith_provider.dart';
 import 'providers/doa_provider.dart';
 import 'providers/qibla_provider.dart';
 import 'services/qibla_service.dart';
+import 'features/ai_companion/providers/ai_chat_provider.dart';
 import 'presentation/splash/animated_splash_screen.dart';
 
 void main() async {
@@ -22,8 +26,17 @@ void main() async {
 
   try {
     await Firebase.initializeApp();
+
+    // App Check otomatis aktif menggunakan Play Integrity untuk mode Production.
+    // Di mode Debug, dinonaktifkan sementara agar tidak memblokir request selama development.
+    if (!kDebugMode) {
+      await FirebaseAppCheck.instance.activate(
+        androidProvider: AndroidProvider.playIntegrity,
+        appleProvider: AppleProvider.deviceCheck,
+      );
+    }
   } catch (e) {
-    debugPrint('Firebase init error: $e');
+    debugPrint('Firebase / App Check init error: $e');
   }
 
   final storageService = await StorageService.init();
@@ -45,6 +58,7 @@ void main() async {
             service: QiblaService(storageService: storageService),
           ),
         ),
+        ChangeNotifierProvider(create: (_) => AIChatProvider()),
       ],
       child: const MuslimHabitApp(),
     ),

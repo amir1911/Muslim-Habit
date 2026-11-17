@@ -12,6 +12,7 @@ import '../quran/quran_screen.dart';
 import '../doa/doa_screen.dart';
 import '../sholat/sholat_screen.dart';
 import '../../core/theme/home_time_theme.dart';
+import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME SCREEN  (sesuai desain Figma)
@@ -93,7 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
       // Floating Chat Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
+          );
+        },
         backgroundColor: const Color(0xFF557C2B),
         elevation: 4,
         mini: false,
@@ -302,26 +308,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Right column: Speech Bubble + Mascot
                   Expanded(
                     flex: 9,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Speech bubble dinamis sesuai karakter AI
-                        _buildSpeechBubble(
-                          '${provider.currentAssistant.name}: "${provider.currentAssistant.homeMotivationDefault}"',
-                        ),
-                        const SizedBox(height: 2),
-
-                        // Mascot AI yang dipilih (Lulu, Nunu, Riri)
-                        SizedBox(
-                          height: 165,
-                          child: Image.asset(
-                            provider.currentAssistant.imagePath,
-                            fit: BoxFit.contain,
-                            alignment: Alignment.bottomCenter,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
+                        );
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Speech bubble dinamis sesuai karakter AI
+                          _buildSpeechBubble(
+                            '${provider.currentAssistant.name}: "${provider.currentAssistant.homeMotivationDefault}"',
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+
+                          // Mascot AI yang dipilih (Lulu, Nunu, Riri)
+                          SizedBox(
+                            height: 165,
+                            child: Image.asset(
+                              provider.currentAssistant.imagePath,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.bottomCenter,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Companion Chats
+    // Path: users/{userId}/companion_chats/{companionId}/messages/{messageId}
+    match /users/{userId}/companion_chats/{companionId}/messages/{messageId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default deny for all other collections
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
