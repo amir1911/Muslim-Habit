@@ -44,14 +44,22 @@ class BacaQuranProvider extends ChangeNotifier {
   Duration _audioPosition = Duration.zero;
   Duration _audioDuration = Duration.zero;
 
+  // Kontrol sinkronisasi & debounce untuk mencegah pemanggilan ganda dan lompatan ayat
+  int _audioSessionId = 0;
+  bool _isLoadingAudio = false;
+  bool _hasHandledCompletionForCurrentAyah = false;
+
   StreamSubscription? _playerStateSub;
   StreamSubscription? _positionSub;
   StreamSubscription? _durationSub;
 
   final List<String> qariList = [
     'Misyari Rasyid',
-    'Saad Al-Ghamdi',
     'Abdurrahman As-Sudais',
+    'Abdullah Al-Juhany',
+    'Abdul Muhsin Al-Qasim',
+    'Ibrahim Al-Dossari',
+    'Saad Al-Ghamdi',
   ];
 
   BacaQuranProvider({
@@ -277,9 +285,20 @@ class BacaQuranProvider extends ChangeNotifier {
   // ── AUDIO CONTROLS ──
   void _initAudioListeners() {
     _playerStateSub = _audioPlayer.playerStateStream.listen((state) {
-      _isPlayingAudio = state.playing;
-      if (state.processingState == ProcessingState.completed) {
-        _onAudioCompleted();
+      final isPlaying = state.playing;
+      final processingState = state.processingState;
+
+      if (processingState == ProcessingState.completed) {
+        _isPlayingAudio = false;
+
+        // PENTING: Hanya jalankan perpindahan tepat SATU KALI per event selesai.
+        // Mencegah duplicate call dari ExoPlayer/AVPlayer yang menyebabkan ayat terlompati.
+        if (!_hasHandledCompletionForCurrentAyah && !_isLoadingAudio) {
+          _hasHandledCompletionForCurrentAyah = true;
+          _onAudioCompleted();
+        }
+      } else {
+        _isPlayingAudio = isPlaying;
       }
       notifyListeners();
     });
@@ -296,21 +315,33 @@ class BacaQuranProvider extends ChangeNotifier {
   }
 
   /// Audio selesai TIDAK otomatis membuat ayat menjadi read!
-  /// Hanya lanjut memutar ayat berikutnya jika auto-next aktif.
+  /// Hanya lanjut memutar TEPAT SATU ayat berikutnya jika auto-next aktif,
+  /// atau mengulang ayat yang sama jika repeat aktif.
   void _onAudioCompleted() {
     if (_isRepeatAudio) {
-      _audioPlayer.seek(Duration.zero);
-      _audioPlayer.play();
+      _hasHandledCompletionForCurrentAyah = false;
+      _isPlayingAudio = true;
+      notifyListeners();
+      _audioPlayer.seek(Duration.zero).then((_) {
+        _audioPlayer.play();
+      });
     } else if (_isAutoNextAudio) {
       final total = _surahDetail?.ayahs.length ?? surah.numberOfAyahs;
       if (_currentAudioAyah < total) {
+        // Berpindah TEPAT 1 ayat ke depan secara berurutan
         playAyahAudio(_currentAudioAyah + 1);
       } else {
+        // Mencapai ayat terakhir dalam surah: audio berhenti dengan benar
         _isPlayingAudio = false;
+        _isLoadingAudio = false;
+        _audioPosition = Duration.zero;
+        _audioPlayer.seek(Duration.zero);
+        _audioPlayer.pause();
         notifyListeners();
       }
     } else {
       _isPlayingAudio = false;
+      _isLoadingAudio = false;
       notifyListeners();
     }
   }
@@ -319,7 +350,7 @@ class BacaQuranProvider extends ChangeNotifier {
     final s = surah.number.toString().padLeft(3, '0');
     final a = ayahNum.toString().padLeft(3, '0');
 
-    // 1. Cek dari audioMap data API jika ada
+    // 1. Cek dari audioMap data resmi API Equran.id v2 jika ada
     final ayahs = _surahDetail?.ayahs;
     if (ayahs != null && ayahNum > 0 && ayahNum <= ayahs.length) {
       final currentAyahData = ayahs[ayahNum - 1];
@@ -328,16 +359,26 @@ class BacaQuranProvider extends ChangeNotifier {
         if (_selectedQari == 'Misyari Rasyid' && map['05'] != null) return map['05']!;
         if (_selectedQari == 'Abdurrahman As-Sudais' && map['03'] != null) return map['03']!;
         if (_selectedQari == 'Abdullah Al-Juhany' && map['01'] != null) return map['01']!;
+        if (_selectedQari == 'Abdul Muhsin Al-Qasim' && map['02'] != null) return map['02']!;
+        if (_selectedQari == 'Ibrahim Al-Dossari' && map['04'] != null) return map['04']!;
+        // Jika qari lain atau fallback
+        if (map.values.isNotEmpty) return map.values.first;
       }
       if (currentAyahData.audioUrl != null && currentAyahData.audioUrl!.isNotEmpty) {
         return currentAyahData.audioUrl!;
       }
     }
 
-    // 2. Fallback ke CDN resmi
+    // 2. Fallback ke CDN resmi Equran.id
     switch (_selectedQari) {
       case 'Abdurrahman As-Sudais':
         return 'https://cdn.equran.id/audio-partial/Abdurrahman-as-Sudais/$s$a.mp3';
+      case 'Abdullah Al-Juhany':
+        return 'https://cdn.equran.id/audio-partial/Abdullah-Al-Juhany/$s$a.mp3';
+      case 'Abdul Muhsin Al-Qasim':
+        return 'https://cdn.equran.id/audio-partial/Abdul-Muhsin-Al-Qasim/$s$a.mp3';
+      case 'Ibrahim Al-Dossari':
+        return 'https://cdn.equran.id/audio-partial/Ibrahim-Al-Dossari/$s$a.mp3';
       case 'Saad Al-Ghamdi':
         return 'https://everyayah.com/data/Ghamadi_40kbps/$s$a.mp3';
       case 'Misyari Rasyid':
@@ -352,6 +393,12 @@ class BacaQuranProvider extends ChangeNotifier {
     switch (_selectedQari) {
       case 'Abdurrahman As-Sudais':
         return 'https://everyayah.com/data/Abdurrahmaan_As-Sudais_192kbps/$s$a.mp3';
+      case 'Abdullah Al-Juhany':
+        return 'https://cdn.equran.id/audio-partial/Abdullah-Al-Juhany/$s$a.mp3';
+      case 'Abdul Muhsin Al-Qasim':
+        return 'https://cdn.equran.id/audio-partial/Abdul-Muhsin-Al-Qasim/$s$a.mp3';
+      case 'Ibrahim Al-Dossari':
+        return 'https://cdn.equran.id/audio-partial/Ibrahim-Al-Dossari/$s$a.mp3';
       case 'Saad Al-Ghamdi':
         return 'https://everyayah.com/data/Ghamadi_40kbps/$s$a.mp3';
       case 'Misyari Rasyid':
@@ -361,43 +408,100 @@ class BacaQuranProvider extends ChangeNotifier {
   }
 
   Future<void> playAyahAudio(int ayahNum) async {
+    final total = _surahDetail?.ayahs.length ?? surah.numberOfAyahs;
+    if (ayahNum < 1 || ayahNum > total) return;
+
+    // Token sesi unik untuk membatalkan proses async lama jika ada request baru
+    final currentSession = ++_audioSessionId;
+
+    // Kunci state agar tidak terjadi eksekusi ganda dan event completion lama terblokir
+    _isLoadingAudio = true;
+    _hasHandledCompletionForCurrentAyah = true;
     _currentAudioAyah = ayahNum;
+    _isPlayingAudio = true;
+    _audioPosition = Duration.zero;
+    _audioDuration = Duration.zero;
+    notifyListeners();
+
     final primaryUrl = _getAudioUrlForAyah(ayahNum);
 
     try {
       await _audioPlayer.stop();
+      if (currentSession != _audioSessionId) return;
+
       await _audioPlayer.setUrl(primaryUrl);
+      if (currentSession != _audioSessionId) return;
+
       await _audioPlayer.setSpeed(_audioSpeed);
-      await _audioPlayer.play();
+      if (currentSession != _audioSessionId) return;
+
+      await _audioPlayer.setLoopMode(_isRepeatAudio ? LoopMode.one : LoopMode.off);
+      if (currentSession != _audioSessionId) return;
+
+      // PENTING: Buka kunci completion dan set loading ke false SEBELUM memutar,
+      // dan jalankan play() tanpa await blocking agar listener completion dapat berjalan normal.
       _isPlayingAudio = true;
+      _isLoadingAudio = false;
+      _hasHandledCompletionForCurrentAyah = false;
+      notifyListeners();
+
+      _audioPlayer.play();
     } catch (_) {
+      if (currentSession != _audioSessionId) return;
+
       // Coba fallback URL jika CDN pertama kendala jaringan
       try {
         final backupUrl = _getBackupAudioUrl(ayahNum);
+        if (currentSession != _audioSessionId) return;
+
         await _audioPlayer.setUrl(backupUrl);
+        if (currentSession != _audioSessionId) return;
+
         await _audioPlayer.setSpeed(_audioSpeed);
-        await _audioPlayer.play();
+        if (currentSession != _audioSessionId) return;
+
+        await _audioPlayer.setLoopMode(_isRepeatAudio ? LoopMode.one : LoopMode.off);
+        if (currentSession != _audioSessionId) return;
+
         _isPlayingAudio = true;
+        _isLoadingAudio = false;
+        _hasHandledCompletionForCurrentAyah = false;
+        notifyListeners();
+
+        _audioPlayer.play();
       } catch (_) {
-        _isPlayingAudio = false;
+        if (currentSession == _audioSessionId) {
+          _isPlayingAudio = false;
+          _isLoadingAudio = false;
+          _hasHandledCompletionForCurrentAyah = false;
+          notifyListeners();
+        }
       }
     }
-    notifyListeners();
   }
 
   Future<void> togglePlayPause() async {
     if (_isPlayingAudio) {
       await _audioPlayer.pause();
       _isPlayingAudio = false;
+      notifyListeners();
     } else {
       if (_audioPlayer.processingState == ProcessingState.idle) {
         await playAyahAudio(_currentAudioAyah);
-      } else {
-        await _audioPlayer.play();
+      } else if (_audioPlayer.processingState == ProcessingState.completed) {
+        // Jika status completed, putar ulang ayat saat ini dari awal
+        _hasHandledCompletionForCurrentAyah = false;
         _isPlayingAudio = true;
+        notifyListeners();
+        await _audioPlayer.seek(Duration.zero);
+        _audioPlayer.play();
+      } else {
+        _hasHandledCompletionForCurrentAyah = false;
+        _isPlayingAudio = true;
+        notifyListeners();
+        _audioPlayer.play();
       }
     }
-    notifyListeners();
   }
 
   void nextAudio() {
@@ -415,11 +519,21 @@ class BacaQuranProvider extends ChangeNotifier {
 
   void toggleRepeat() {
     _isRepeatAudio = !_isRepeatAudio;
+    if (_isRepeatAudio) {
+      _isAutoNextAudio = false;
+      _audioPlayer.setLoopMode(LoopMode.one);
+    } else {
+      _audioPlayer.setLoopMode(LoopMode.off);
+    }
     notifyListeners();
   }
 
   void toggleAutoNext() {
     _isAutoNextAudio = !_isAutoNextAudio;
+    if (_isAutoNextAudio) {
+      _isRepeatAudio = false;
+      _audioPlayer.setLoopMode(LoopMode.off);
+    }
     notifyListeners();
   }
 

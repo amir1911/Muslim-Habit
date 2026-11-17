@@ -5,10 +5,12 @@ import '../models/surah_item.dart';
 import '../models/surah_detail.dart';
 import 'storage_service.dart';
 
+/// Service resmi Al-Qur'an menggunakan API Equran.id v2 (https://equran.id/api/v2)
+/// Menyediakan teks mushaf Kemenag, terjemahan resmi, audio 5 qari ternama, dan tafsir lengkap.
 class QuranService {
-  static const String _randomUrl = 'https://api.myquran.com/v3/quran/random';
-  static const String _surahListUrl = 'https://api.myquran.com/v2/quran/surat/semua';
-  static const String _surahDetailUrl = 'https://api.myquran.com/v3/quran';
+  static const String _equranBaseUrl = 'https://equran.id/api/v2';
+  static const String _surahListUrl = '$_equranBaseUrl/surat';
+  static const String _tafsirUrl = '$_equranBaseUrl/tafsir';
 
   final StorageService? _storageService;
 
@@ -16,27 +18,33 @@ class QuranService {
 
   Map<String, String> get _headers => {
         'Accept': 'application/json',
-        'User-Agent': 'MuslimHabitApp/1.0',
+        'User-Agent': 'MuslimHabitApp/2.0',
       };
 
+  /// Ambil ayat harian / random verse
   Future<QuranVerse> fetchRandomVerse() async {
     try {
-      final uri = Uri.parse(_randomUrl);
-      final response = await http
-          .get(uri, headers: _headers)
-          .timeout(const Duration(seconds: 10));
-
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        if (decoded['status'] == true && decoded['data'] is Map) {
-          final data = decoded['data'] as Map<String, dynamic>;
-          final verse = QuranVerse.fromJson(data);
-
-          if (_storageService != null) {
-            _storageService.saveVerse(jsonEncode(verse.toJson()));
-          }
-          return verse;
+      // Ambil salah satu surah inspiratif harian dari Equran.id
+      final sampleSurahs = [1, 2, 3, 14, 18, 55, 67, 93, 94];
+      final randomSurah = sampleSurahs[DateTime.now().second % sampleSurahs.length];
+      final detail = await fetchSurahDetail(randomSurah);
+      if (detail != null && detail.ayahs.isNotEmpty) {
+        final idx = DateTime.now().minute % detail.ayahs.length;
+        final randomAyah = detail.ayahs[idx];
+        final verse = QuranVerse(
+          id: randomAyah.ayahNumber,
+          surahNumber: detail.number,
+          surahName: detail.nameLatin,
+          ayahNumber: randomAyah.ayahNumber,
+          arabicText: randomAyah.arabicText,
+          translation: randomAyah.translation,
+          tafsirShort: randomAyah.tafsir,
+          audioUrl: randomAyah.audioUrl,
+        );
+        if (_storageService != null) {
+          _storageService.saveVerse(jsonEncode(verse.toJson()));
         }
+        return verse;
       }
     } catch (_) {}
 
@@ -53,13 +61,13 @@ class QuranService {
     return QuranVerse.defaultVerse();
   }
 
-  /// Ambil daftar 114 Surat Al-Qur'an lengkap
+  /// Ambil daftar 114 Surat Al-Qur'an lengkap dari Equran.id v2 (https://equran.id/api/v2/surat)
   Future<List<SurahItem>> fetchSurahList() async {
     try {
       final uri = Uri.parse(_surahListUrl);
       final response = await http
           .get(uri, headers: _headers)
-          .timeout(const Duration(seconds: 12));
+          .timeout(const Duration(seconds: 14));
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -86,7 +94,7 @@ class QuranService {
       }
     } catch (_) {}
 
-    // Fallback dari cache
+    // Fallback dari cache lokal
     if (_storageService != null) {
       try {
         final cachedStr = _storageService.getSavedSurahList();
@@ -113,10 +121,10 @@ class QuranService {
   }
 
   /// Ambil ayat-ayat lengkap surat tertentu beserta audio per ayat untuk seluruh surah
+  /// dari Equran.id v2 (https://equran.id/api/v2/surat/{nomor})
   Future<SurahDetail?> fetchSurahDetail(int surahNumber) async {
-    // 1. Coba ambil dari Equran.id (Paling lengkap 114 surah, teks Utsmani Kemenag, audio per ayat dari 6 qari)
     try {
-      final uri = Uri.parse('https://equran.id/api/v2/surat/$surahNumber');
+      final uri = Uri.parse('$_equranBaseUrl/surat/$surahNumber');
       final response = await http
           .get(uri, headers: _headers)
           .timeout(const Duration(seconds: 15));
@@ -135,28 +143,7 @@ class QuranService {
       }
     } catch (_) {}
 
-    // 2. Fallback: coba dari API MyQuran v3 dengan limit 300
-    try {
-      final uri = Uri.parse('$_surahDetailUrl/$surahNumber?limit=300');
-      final response = await http
-          .get(uri, headers: _headers)
-          .timeout(const Duration(seconds: 15));
-
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
-        if (decoded['status'] == true && decoded['data'] is Map) {
-          final detail = SurahDetail.fromJson(decoded);
-          if (detail.ayahs.isNotEmpty) {
-            if (_storageService != null) {
-              _storageService.saveSurahDetail(surahNumber, response.body);
-            }
-            return detail;
-          }
-        }
-      }
-    } catch (_) {}
-
-    // 3. Fallback dari cache lokal
+    // Fallback dari cache lokal
     if (_storageService != null) {
       try {
         final cachedStr = _storageService.getSavedSurahDetail(surahNumber);
@@ -166,6 +153,25 @@ class QuranService {
         }
       } catch (_) {}
     }
+
+    return null;
+  }
+
+  /// Ambil tafsir lengkap surat tertentu dari Equran.id v2 (https://equran.id/api/v2/tafsir/{nomor})
+  Future<Map<String, dynamic>?> fetchSurahTafsir(int surahNumber) async {
+    try {
+      final uri = Uri.parse('$_tafsirUrl/$surahNumber');
+      final response = await http
+          .get(uri, headers: _headers)
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        if (decoded['code'] == 200 && decoded['data'] is Map) {
+          return decoded['data'] as Map<String, dynamic>;
+        }
+      }
+    } catch (_) {}
 
     return null;
   }

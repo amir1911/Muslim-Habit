@@ -117,6 +117,63 @@ class PrayerSchedule {
         'Isya': isya,
       };
 
+  /// Menentukan waktu sholat yang sedang berlangsung
+  Map<String, String> getCurrentPrayer(DateTime now) {
+    final nowMinutes = now.hour * 60 + now.minute;
+
+    int parseMinutes(String timeStr) {
+      final parts = timeStr.trim().split(':');
+      if (parts.length >= 2) {
+        return (int.tryParse(parts[0]) ?? 0) * 60 + (int.tryParse(parts[1]) ?? 0);
+      }
+      return 0;
+    }
+
+    final subuhMin = parseMinutes(subuh);
+    final dzuhurMin = parseMinutes(dzuhur);
+    final asharMin = parseMinutes(ashar);
+    final maghribMin = parseMinutes(maghrib);
+    final isyaMin = parseMinutes(isya);
+
+    if (nowMinutes < subuhMin) {
+      return {
+        'label': 'Berikutnya',
+        'name': 'Subuh',
+        'time': subuh,
+      };
+    } else if (nowMinutes < dzuhurMin) {
+      return {
+        'label': 'Sekarang',
+        'name': 'Subuh',
+        'time': subuh,
+      };
+    } else if (nowMinutes < asharMin) {
+      return {
+        'label': 'Sekarang',
+        'name': 'Dzuhur',
+        'time': dzuhur,
+      };
+    } else if (nowMinutes < maghribMin) {
+      return {
+        'label': 'Sekarang',
+        'name': 'Ashar',
+        'time': ashar,
+      };
+    } else if (nowMinutes < isyaMin) {
+      return {
+        'label': 'Sekarang',
+        'name': 'Maghrib',
+        'time': maghrib,
+      };
+    } else {
+      return {
+        'label': 'Sekarang',
+        'name': 'Isya',
+        'time': isya,
+      };
+    }
+  }
+
   /// Menentukan waktu sholat berikutnya secara dinamis
   Map<String, String> getNextPrayer(DateTime now) {
     final prayers = [

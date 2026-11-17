@@ -34,6 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _timeTheme = HomeTimeTheme.fromDateTime(DateTime.now());
+    // Mulai sensor kompas qibla segera setelah widget siap
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<QiblaProvider>().determineLocationAndQibla();
+      }
+    });
   }
 
   @override
@@ -58,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // ── White content area ──
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 // Fitur-Fitur
@@ -92,20 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // Floating Chat Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
-          );
-        },
-        backgroundColor: const Color(0xFF557C2B),
-        elevation: 4,
-        mini: false,
-        shape: const CircleBorder(),
-        child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 22),
-      ),
+
     );
   }
 
@@ -558,33 +551,60 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Emblem icon container (Tap to open Qibla Compass)
-            GestureDetector(
-              onTap: () => _showQiblaCompassModal(context),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: _timeTheme.prayerCompassBg,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: _timeTheme.prayerCompassBorder, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+            // ── Mini Qibla Compass (live sensor, menggunakan kiblat.png) ──
+            Consumer<QiblaProvider>(
+              builder: (ctx, qibla, _) {
+                final angle = qibla.relativeAngle; // derajat arah kiblat relatif
+                final isAligned = qibla.isFacingQibla;
+                final borderColor = isAligned
+                    ? const Color(0xFF4CAF50)
+                    : _timeTheme.prayerCompassBorder;
+                final bgColor = isAligned
+                    ? const Color(0xFF2E7D32)
+                    : _timeTheme.prayerCompassBg;
+
+                return GestureDetector(
+                  onTap: () => _showQiblaCompassModal(context),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: borderColor, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(9),
-                  child: Image.asset(
-                    'assets/icon/kiblat.png',
-                    color: _timeTheme.prayerCompassIconColor,
+                    child: ClipOval(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TweenAnimationBuilder<double>(
+                          tween: Tween<double>(end: angle * math.pi / 180),
+                          duration: const Duration(milliseconds: 350),
+                          curve: Curves.easeOut,
+                          builder: (ctx, radians, _) {
+                            return Transform.rotate(
+                              angle: radians,
+                              child: Image.asset(
+                                'assets/icon/kiblat.png',
+                                fit: BoxFit.contain,
+                                // Tint putih saat menghadap kiblat, default warna asli
+                                color: isAligned ? Colors.white : null,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),

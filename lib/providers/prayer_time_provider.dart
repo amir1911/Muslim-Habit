@@ -4,6 +4,7 @@ import '../models/prayer_alarm_model.dart';
 import '../models/prayer_schedule.dart';
 import '../services/prayer_time_service.dart';
 import '../services/storage_service.dart';
+import '../services/widget_update_service.dart';
 
 class PrayerTimeProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -117,6 +118,24 @@ class PrayerTimeProvider extends ChangeNotifier {
       _schedule = result;
       _currentCity = result.city;
       _errorMessage = null;
+
+      // ── Update Home Screen Widget dengan data terbaru ──
+      final now = DateTime.now();
+      final current = result.getCurrentPrayer(now);
+      final next = result.getNextPrayer(now);
+      await WidgetUpdateService.updatePrayerData(
+        subuh:              result.subuh,
+        dzuhur:             result.dzuhur,
+        ashar:              result.ashar,
+        maghrib:            result.maghrib,
+        isya:               result.isya,
+        currentLabel:       current['label'] ?? 'Sekarang',
+        currentPrayerName:  current['name'] ?? 'Subuh',
+        currentPrayerTime:  current['time'] ?? result.subuh,
+        nextPrayerName:     next['name'] ?? 'Salat',
+        nextPrayerTime:     next['time'] ?? '--:--',
+        timezone:           'WIB',
+      );
     } catch (e) {
       _errorMessage = 'Gagal memuat jadwal sholat: $e';
       // Tetap gunakan fallback jika belum ada schedule

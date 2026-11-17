@@ -8,6 +8,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'core/theme/app_theme.dart';
 import 'services/storage_service.dart';
 import 'services/auth_service.dart';
+import 'services/widget_update_service.dart';
 import 'providers/habit_provider.dart';
 import 'providers/tasbih_provider.dart';
 import 'providers/tilawah_provider.dart';
@@ -40,6 +41,9 @@ void main() async {
   }
 
   final storageService = await StorageService.init();
+
+  // Inisialisasi Home Screen Widget service
+  await WidgetUpdateService.init();
 
   runApp(
     MultiProvider(

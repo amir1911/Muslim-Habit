@@ -6,6 +6,7 @@ import '../habits/habits_screen.dart';
 import '../quran/quran_screen.dart';
 import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
+import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
   const MainNavigationShell({super.key});
@@ -27,28 +28,50 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Hitung total tinggi nav bar floating untuk posisi tombol AI:
+    // SafeArea bottom + padding bottom(16) + tinggi container(72) + gap tombol(12)
+    final bottomNavHeight = MediaQuery.of(context).padding.bottom + 16 + 72 + 12;
+
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: const Border(
-            top: BorderSide(color: AppColors.beigeAccent, width: 1),
+      extendBody: true, // content mengalir di bawah floating nav
+      body: Stack(
+        children: [
+          // ── Konten halaman utama ──
+          IndexedStack(
+            index: _currentIndex,
+            children: _screens,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
+
+          // ── Floating AI Chat Button ──
+          Positioned(
+            right: 20,
+            bottom: bottomNavHeight,
+            child: _buildAiChatButton(context),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          top: false,
+          child: Container(
+            height: 72,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.13),
+                  blurRadius: 24,
+                  offset: const Offset(0, 6),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -65,22 +88,62 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     );
   }
 
+  // ── Floating AI Chat Button ──
+  Widget _buildAiChatButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
+      ),
+      child: Container(
+        width: 54,
+        height: 54,
+        decoration: BoxDecoration(
+          color: const Color(0xFF557C2B),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF557C2B).withValues(alpha: 0.40),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Image.asset(
+            'assets/icon/tanyaAI.png',
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildNavItem(int index, IconData unselectedIcon, IconData selectedIcon, String label) {
     final isSelected = _currentIndex == index;
 
-    return InkWell(
-      onTap: () => setState(() => _currentIndex = index),
-      borderRadius: BorderRadius.circular(14),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+    return Expanded(
+      child: InkWell(
+        onTap: () => setState(() => _currentIndex = index),
+        borderRadius: BorderRadius.circular(14),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            Icon(
-              isSelected ? selectedIcon : unselectedIcon,
-              color: isSelected ? const Color(0xFF557C2B) : AppColors.textLight,
-              size: 24,
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                isSelected ? selectedIcon : unselectedIcon,
+                key: ValueKey(isSelected),
+                color: isSelected ? const Color(0xFF557C2B) : AppColors.textLight,
+                size: 24,
+              ),
             ),
             const SizedBox(height: 3),
             Text(

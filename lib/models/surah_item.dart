@@ -20,36 +20,55 @@ class SurahItem {
   });
 
   factory SurahItem.fromJson(Map<String, dynamic> json) {
-    final numVal = int.tryParse(json['number']?.toString() ?? '') ?? 1;
+    final numVal = int.tryParse(
+          json['nomor']?.toString() ?? json['number']?.toString() ?? '',
+        ) ??
+        1;
     final ayahsVal = int.tryParse(
-          json['number_of_verses']?.toString() ??
+          json['jumlahAyat']?.toString() ??
+              json['jumlah_ayat']?.toString() ??
+              json['number_of_verses']?.toString() ??
               json['number_of_ayahs']?.toString() ??
               '',
         ) ??
         7;
 
+    String? audioFullUrl;
+    if (json['audioFull'] is Map) {
+      final aMap = json['audioFull'] as Map;
+      audioFullUrl = aMap['05'] as String? ??
+          aMap['03'] as String? ??
+          (aMap.values.isNotEmpty ? aMap.values.first as String? : null);
+    } else if (json['audio_url'] is String) {
+      audioFullUrl = json['audio_url'] as String;
+    }
+
     return SurahItem(
       number: numVal,
-      nameLatin: json['name_en'] as String? ??
-          json['name_latin'] as String? ??
+      nameLatin: json['namaLatin'] as String? ??
           json['nama_latin'] as String? ??
+          json['name_latin'] as String? ??
+          json['name_en'] as String? ??
           'Surah $numVal',
-      nameArabic: json['name_short'] as String? ??
+      nameArabic: json['nama'] as String? ??
+          json['name_short'] as String? ??
           json['name_long'] as String? ??
           json['arab'] as String? ??
           '',
-      nameId: json['name_id'] as String? ??
+      nameId: json['namaLatin'] as String? ??
+          json['name_id'] as String? ??
           json['name'] as String? ??
           'Surah $numVal',
-      translation: json['translation'] as String? ??
-          json['arti'] as String? ??
+      translation: json['arti'] as String? ??
+          json['translation'] as String? ??
           json['name_id'] as String? ??
           '',
       numberOfAyahs: ayahsVal,
-      revelation: json['revelation'] as String? ??
+      revelation: json['tempatTurun'] as String? ??
           json['tempat_turun'] as String? ??
+          json['revelation'] as String? ??
           'Makkiyah',
-      audioUrl: json['audio_url'] as String?,
+      audioUrl: audioFullUrl,
     );
   }
 

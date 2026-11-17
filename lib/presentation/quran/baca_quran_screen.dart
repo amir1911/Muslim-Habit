@@ -28,6 +28,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
   final Map<int, GlobalKey> _ayahKeys = {};
   bool _showResumeBanner = false;
   int _lastReadToResume = 0;
+  int _lastScrolledAudioAyah = 0;
 
   @override
   void initState() {
@@ -130,6 +131,16 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
     final readCount = prov.progress.readCount;
     final progressVal = totalAyahs > 0 ? (readCount / totalAyahs).clamp(0.0, 1.0) : 0.0;
     final progressPercent = (progressVal * 100).toStringAsFixed(1).replaceAll('.', ',');
+
+    // Sinkronisasi posisi scroll layar dengan ayat audio yang sedang diputar
+    if (prov.isPlayingAudio && prov.currentAudioAyah != _lastScrolledAudioAyah) {
+      _lastScrolledAudioAyah = prov.currentAudioAyah;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _scrollToAyah(prov.currentAudioAyah);
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: scaffoldBg,

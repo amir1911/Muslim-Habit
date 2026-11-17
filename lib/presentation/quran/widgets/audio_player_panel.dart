@@ -169,14 +169,18 @@ class _AudioPlayerPanelState extends State<AudioPlayerPanel> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '${widget.surahName} : Ayat ${widget.currentAyah}',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                      Expanded(
+                        child: Text(
+                          '${widget.surahName} : Ayat ${widget.currentAyah}',
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 8),
                       // Dropdown Qari
                       PopupMenuButton<String>(
                         initialValue: widget.selectedQari,

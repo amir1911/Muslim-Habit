@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="horizontal"
+    android:paddingStart="14dp"
+    android:paddingEnd="12dp"
+    android:paddingTop="9dp"
+    android:paddingBottom="9dp">
+
+    <!-- LEFT PANEL: Badge, Time, Mascot, Action Button -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Badge (Sekarang Ashar / Berikutnya Subuh) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/badge_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="9dp"
+            android:paddingEnd="9dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp">
+
+            <TextView
+                android:id="@+id/tv_badge_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sekarang"
+                android:textColor="#D0E8B5"
+                android:textSize="9.5sp"
+                android:paddingEnd="4dp"/>
+
+            <TextView
+                android:id="@+id/tv_next_prayer_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ashar"
+                android:textColor="#FFFFFF"
+                android:textSize="10.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Big Prayer Time -->
+        <TextView
+            android:id="@+id/tv_next_prayer_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="15:30 WIB"
+            android:textColor="#FFFFFF"
+            android:textSize="21sp"
+            android:textStyle="bold"/>
+
+        <!-- Spacer -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- Mascot Image (diperbesar agar jelas, proporsional, dan manis) -->
+        <ImageView
+            android:id="@+id/iv_mascot"
+            android:layout_width="66dp"
+            android:layout_height="66dp"
+            android:src="@drawable/ic_mascot_widget"
+            android:scaleType="fitCenter"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="2dp"/>
+
+        <!-- Button "Pantau habit →" -->
+        <LinearLayout
+            android:id="@+id/btn_open_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pantau habit"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" →"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- RIGHT PANEL: Full Prayer Schedule (5 Waktu) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1.15"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="2dp">
+
+        <!-- Subuh Row -->
+        <LinearLayout
+            android:id="@+id/row_subuh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3.5dp"
+            android:paddingBottom="3.5dp"
+            android:background="@drawable/active_prayer_row">
+
+            <TextView
+                android:id="@+id/tv_label_subuh"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Subuh"
+                android:textColor="#FFFFFF"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_subuh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="04:30"
+                android:textColor="#FFFFFF"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Dzuhur Row -->
+        <LinearLayout
+            android:id="@+id/row_dzuhur"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3.5dp"
+            android:paddingBottom="3.5dp">
+
+            <TextView
+                android:id="@+id/tv_label_dzuhur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Dzuhur"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_dzuhur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="11:55"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Ashar Row -->
+        <LinearLayout
+            android:id="@+id/row_ashar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3.5dp"
+            android:paddingBottom="3.5dp">
+
+            <TextView
+                android:id="@+id/tv_label_ashar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ashar"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_ashar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="15:30"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Maghrib Row -->
+        <LinearLayout
+            android:id="@+id/row_maghrib"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3.5dp"
+            android:paddingBottom="3.5dp">
+
+            <TextView
+                android:id="@+id/tv_label_maghrib"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Maghrib"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_maghrib"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="17:50"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <!-- Isya Row -->
+        <LinearLayout
+            android:id="@+id/row_isya"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="3.5dp"
+            android:paddingBottom="3.5dp">
+
+            <TextView
+                android:id="@+id/tv_label_isya"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Isya"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tv_isya"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="19:00"
+                android:textColor="#1B3D0D"
+                android:textSize="11.5sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

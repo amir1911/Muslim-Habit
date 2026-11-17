@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Muslim Habbit</string>
+    <string name="widget_description">Tampilkan jadwal salat MuslimHabit di layar utama</string>
+    <string name="widget_name">MuslimHabit - Jadwal Salat</string>
+</resources>

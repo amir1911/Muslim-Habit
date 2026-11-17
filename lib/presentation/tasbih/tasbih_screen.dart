@@ -166,7 +166,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
 
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
               child: Column(
                 children: [
                   // ARABIC PHRASE CARD
