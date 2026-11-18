@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../data/companion_prompts.dart';
 import '../models/chat_message.dart';
 
@@ -30,11 +31,19 @@ class AIModelService {
   // ─── Konfigurasi API & Backend ──────────────────────────────────────────────
   /// Backend proxy yang aman untuk lingkungan produksi agar tidak mengekspos
   /// kredensial rahasia di sisi aplikasi mobile.
-  static const String _backendUrl = String.fromEnvironment('AI_BACKEND_URL');
+  static String get _backendUrl {
+    final envVal = dotenv.isInitialized ? dotenv.maybeGet('AI_BACKEND_URL') : null;
+    if (envVal != null && envVal.isNotEmpty) return envVal;
+    return const String.fromEnvironment('AI_BACKEND_URL');
+  }
 
-  /// Kunci API untuk lingkungan development / pengujian lokal via --dart-define.
-  /// Jangan pernah menanamkan (hardcode) kunci API langsung di source code.
-  static const String _geminiApiKey = String.fromEnvironment('GEMINI_API_KEY');
+  /// Kunci API untuk lingkungan development / pengujian lokal.
+  /// Dibaca otomatis dari file lokal `.env` atau argumen `--dart-define`.
+  static String get _geminiApiKey {
+    final envVal = dotenv.isInitialized ? dotenv.maybeGet('GEMINI_API_KEY') : null;
+    if (envVal != null && envVal.isNotEmpty) return envVal;
+    return const String.fromEnvironment('GEMINI_API_KEY');
+  }
 
   static const String _apiBaseUrl =
       'https://generativelanguage.googleapis.com/v1beta';
