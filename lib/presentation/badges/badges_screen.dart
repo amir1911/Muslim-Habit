@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/badge_item.dart';
-import '../../models/ai_assistant_model.dart';
 import '../../providers/habit_provider.dart';
 import '../onboarding/ai_selection_carousel_screen.dart';
 

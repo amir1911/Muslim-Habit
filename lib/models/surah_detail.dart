@@ -1,6 +1,7 @@
 class SurahAyah {
   final int ayahNumber;
   final String arabicText;
+  final String latinText;
   final String translation;
   final String? audioUrl;
   final Map<String, String>? audioMap;
@@ -11,6 +12,7 @@ class SurahAyah {
   SurahAyah({
     required this.ayahNumber,
     required this.arabicText,
+    this.latinText = '',
     required this.translation,
     this.audioUrl,
     this.audioMap,
@@ -66,6 +68,10 @@ class SurahAyah {
           json['arab'] as String? ??
           json['arabic_text'] as String? ??
           '',
+      latinText: json['teksLatin'] as String? ??
+          json['latin'] as String? ??
+          json['transliteration'] as String? ??
+          '',
       translation: json['teksIndonesia'] as String? ??
           json['translation'] as String? ??
           json['terjemah'] as String? ??
@@ -82,6 +88,7 @@ class SurahAyah {
   Map<String, dynamic> toJson() => {
         'ayah_number': ayahNumber,
         'arab': arabicText,
+        'teksLatin': latinText,
         'translation': translation,
         'audio_url': audioUrl,
         'audio': audioMap,
