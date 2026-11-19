@@ -19,6 +19,10 @@ import 'providers/hadith_provider.dart';
 import 'providers/doa_provider.dart';
 import 'providers/qibla_provider.dart';
 import 'services/qibla_service.dart';
+import 'providers/fasting_provider.dart';
+import 'providers/dzikir_provider.dart';
+import 'providers/khatam_provider.dart';
+import 'providers/community_provider.dart';
 import 'features/ai_companion/providers/ai_chat_provider.dart';
 import 'presentation/splash/animated_splash_screen.dart';
 
@@ -70,6 +74,31 @@ void main() async {
             service: QiblaService(storageService: storageService),
           ),
         ),
+        ChangeNotifierProxyProvider<PrayerTimeProvider, FastingProvider>(
+          create: (_) => FastingProvider(),
+          update: (_, prayerProvider, fastingProvider) {
+            final fp = fastingProvider ?? FastingProvider();
+            fp.updatePrayerProvider(prayerProvider);
+            return fp;
+          },
+        ),
+        ChangeNotifierProxyProvider<HabitProvider, DzikirProvider>(
+          create: (_) => DzikirProvider(),
+          update: (_, habitProvider, dzikirProvider) {
+            final dp = dzikirProvider ?? DzikirProvider();
+            dp.updateHabitProvider(habitProvider);
+            return dp;
+          },
+        ),
+        ChangeNotifierProxyProvider2<HabitProvider, PrayerTimeProvider, KhatamProvider>(
+          create: (_) => KhatamProvider(),
+          update: (_, habitProvider, prayerProvider, khatamProvider) {
+            final kp = khatamProvider ?? KhatamProvider();
+            kp.updateDependencies(habitProvider, prayerProvider);
+            return kp;
+          },
+        ),
+        ChangeNotifierProvider(create: (_) => CommunityProvider()),
         ChangeNotifierProvider(create: (_) => AIChatProvider()),
       ],
       child: const MuslimHabitApp(),

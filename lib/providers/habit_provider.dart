@@ -3,6 +3,7 @@ import '../models/habit_item.dart';
 import '../models/badge_item.dart';
 import '../models/ai_assistant_model.dart';
 import '../services/storage_service.dart';
+import '../core/utils/streak_helper.dart';
 
 class HabitProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -14,6 +15,7 @@ class HabitProvider extends ChangeNotifier {
   int _userPoints = 150;
   int _userLevel = 1;
   int _streakCount = 3;
+  Set<String> _activeDates = {};
   String _selectedCategory = 'all'; // all, wajib, sunnah
   String _userName = 'Sahabat Muslim';
   String _selectedAIId = 'teen';
@@ -22,6 +24,7 @@ class HabitProvider extends ChangeNotifier {
   int get userPoints => _userPoints;
   int get userLevel => _userLevel;
   int get streakCount => _streakCount;
+  Set<String> get activeDates => _activeDates;
   String get selectedCategory => _selectedCategory;
   String get userName => _userName;
   String get selectedAIId => _selectedAIId;
@@ -277,16 +280,56 @@ class HabitProvider extends ChangeNotifier {
         streak: newStreak,
       );
 
+      final todayStr = StreakHelper.formatDate(DateTime.now());
+
       if (newStatus) {
         _userPoints += current.points;
         _checkLevelUp();
         _checkBadges();
       } else {
-        _userPoints = (_userPoints - current.points).clamp(0, 99999);
+        _userPoints = (_userPoints - current.points).clamp(0, 999999);
       }
 
+      // Ambil daftar habit yang selesai hari ini
+      final completedHabitIds = _habits.where((h) => h.isCompleted).map((h) => h.id).toList();
+
+      // Perbarui activeDates: jika ada minimal 1 habit selesai hari ini, tandai hari ini aktif
+      if (completedHabitIds.isNotEmpty) {
+        _activeDates.add(todayStr);
+      } else {
+        _activeDates.remove(todayStr);
+      }
+
+      // Hitung ulang streak harian secara dinamis berdasarkan activeDates
+      _streakCount = StreakHelper.calculateStreak(_activeDates);
+
+      // Simpan perubahan ke penyimpanan persisten
+      _storageService.setDailyCompletedHabitIds(todayStr, completedHabitIds);
+      _storageService.setActiveDates(_activeDates.toList());
+      _storageService.setLastActiveDate(todayStr);
       _saveState();
+
       notifyListeners();
+    }
+  }
+
+  /// Menambahkan poin (bintang) dari aktivitas ibadah lainnya secara dinamis
+  void addPoints(int points, {String? reason}) {
+    if (points <= 0) return;
+    _userPoints += points;
+    _checkLevelUp();
+    _storageService.setUserPoints(_userPoints);
+    _storageService.setUserLevel(_userLevel);
+    notifyListeners();
+  }
+
+  /// Menyelesaikan habit terkait fitur (misal selesai Shalat, Tilawah, Puasa)
+  void markFeatureHabitCompleted(String habitId) {
+    String targetId = habitId;
+    if (habitId == 'quran') targetId = 'tilawah';
+    final index = _habits.indexWhere((h) => h.id == targetId);
+    if (index != -1 && !_habits[index].isCompleted) {
+      toggleHabit(targetId);
     }
   }
 
@@ -326,10 +369,43 @@ class HabitProvider extends ChangeNotifier {
   void _loadState() {
     _userPoints = _storageService.getUserPoints();
     _userLevel = _storageService.getUserLevel();
-    _streakCount = _storageService.getStreakCount();
     _userName = _storageService.getUserName();
     _selectedAIId = _storageService.getSelectedAIId();
     _hasCompletedOnboarding = _storageService.hasCompletedOnboarding();
+
+    final todayStr = StreakHelper.formatDate(DateTime.now());
+    _activeDates = _storageService.getActiveDates().toSet();
+
+    // Jika activeDates masih kosong tapi ada streak tersimpan sebelumnya, inisialisasi riwayat
+    final savedStreak = _storageService.getStreakCount();
+    if (_activeDates.isEmpty && savedStreak > 0) {
+      final now = DateTime.now();
+      for (int i = 0; i < savedStreak; i++) {
+        final d = now.subtract(Duration(days: i));
+        _activeDates.add(StreakHelper.formatDate(d));
+      }
+      _storageService.setActiveDates(_activeDates.toList());
+    }
+
+    // Muat status habit hari ini
+    final completedToday = _storageService.getDailyCompletedHabitIds(todayStr);
+    if (completedToday.isNotEmpty) {
+      for (int i = 0; i < _habits.length; i++) {
+        final h = _habits[i];
+        final done = completedToday.contains(h.id);
+        _habits[i] = h.copyWith(isCompleted: done);
+      }
+      _activeDates.add(todayStr);
+    } else {
+      // Jika hari baru belum ada habit yang dicentang, mulai dari uncompleted
+      for (int i = 0; i < _habits.length; i++) {
+        _habits[i] = _habits[i].copyWith(isCompleted: false);
+      }
+    }
+
+    // Hitung streak otomatis berdasarkan konsistensi hari
+    _streakCount = StreakHelper.calculateStreak(_activeDates);
+    _storageService.setStreakCount(_streakCount);
 
     final savedBadges = _storageService.getUnlockedBadges();
     for (var b in _badges) {
@@ -344,6 +420,7 @@ class HabitProvider extends ChangeNotifier {
     _storageService.setUserPoints(_userPoints);
     _storageService.setUserLevel(_userLevel);
     _storageService.setStreakCount(_streakCount);
+    _storageService.setActiveDates(_activeDates.toList());
 
     final unlockedIds = _badges.where((b) => b.isUnlocked).map((b) => b.id).toList();
     _storageService.setUnlockedBadges(unlockedIds);

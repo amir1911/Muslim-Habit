@@ -7,6 +7,8 @@ class StorageService {
   static const String _keyUserLevel = 'user_level';
   static const String _keyStreakCount = 'streak_count';
   static const String _keyLastActiveDate = 'last_active_date';
+  static const String _keyActiveDates = 'active_streak_dates_v2';
+  static const String _keyCompletedHabitsPrefix = 'completed_habits_';
   static const String _keyBadges = 'unlocked_badges';
   static const String _keyTilawahPage = 'tilawah_current_page';
   static const String _keyTilawahJuz = 'tilawah_current_juz';
@@ -55,6 +57,14 @@ class StorageService {
 
   String getLastActiveDate() => _prefs.getString(_keyLastActiveDate) ?? _todayKey();
   Future<void> setLastActiveDate(String date) => _prefs.setString(_keyLastActiveDate, date);
+
+  List<String> getActiveDates() => _prefs.getStringList(_keyActiveDates) ?? [];
+  Future<void> setActiveDates(List<String> dates) => _prefs.setStringList(_keyActiveDates, dates);
+
+  List<String> getDailyCompletedHabitIds(String dateKey) =>
+      _prefs.getStringList('$_keyCompletedHabitsPrefix$dateKey') ?? [];
+  Future<void> setDailyCompletedHabitIds(String dateKey, List<String> habitIds) =>
+      _prefs.setStringList('$_keyCompletedHabitsPrefix$dateKey', habitIds);
 
   String getUserName() => _prefs.getString(_keyUserName) ?? 'Sahabat Muslim';
   Future<void> setUserName(String name) => _prefs.setString(_keyUserName, name);

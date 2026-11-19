@@ -6,6 +6,7 @@ import '../habits/habits_screen.dart';
 import '../quran/quran_screen.dart';
 import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
+import '../community/community_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
@@ -22,7 +23,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     HomeScreen(),
     HabitsScreen(),
     QuranScreen(),
-    TasbihScreen(),
+    CommunityScreen(),
     BadgesScreen(),
   ];
 

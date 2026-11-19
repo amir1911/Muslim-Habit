@@ -11,6 +11,11 @@ import '../../providers/qibla_provider.dart';
 import '../quran/quran_screen.dart';
 import '../doa/doa_screen.dart';
 import '../sholat/sholat_screen.dart';
+import '../puasa/puasa_screen.dart';
+import '../dzikir/dzikir_screen.dart';
+import '../../providers/khatam_provider.dart';
+import '../khatam/khatam_dashboard_screen.dart';
+import '../khatam/khatam_reading_screen.dart';
 import '../../core/theme/home_time_theme.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
@@ -175,13 +180,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // Streak badge
-                  _greenBadge(icon: '🔥', value: '${provider.streakCount}'),
-                  const SizedBox(width: 6),
+                  // Streak badge (Dinamis & Proporsional)
+                  _headerStatBadge(
+                    icon: const Text('🔥', style: TextStyle(fontSize: 13, height: 1.1)),
+                    value: '${provider.streakCount}',
+                  ),
+                  const SizedBox(width: 8),
 
-                  // XP/Stars badge
-                  _greenBadge(icon: '⭐', value: '${provider.userPoints}'),
-                  const SizedBox(width: 6),
+                  // XP/Stars badge (Dinamis & Proporsional)
+                  _headerStatBadge(
+                    icon: const Icon(Icons.star_rounded, color: Color(0xFFFBBF24), size: 16),
+                    value: '${provider.userPoints}',
+                  ),
+                  const SizedBox(width: 8),
 
                   // Bell
                   Container(
@@ -400,33 +411,40 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _greenBadge({required String icon, required String value}) {
+  Widget _headerStatBadge({required Widget icon, required String value}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: _timeTheme.badgeBackgroundColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.15),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 3,
-            offset: const Offset(0, 1),
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 12)),
-          const SizedBox(width: 4),
+          icon,
+          const SizedBox(width: 5),
           Text(
             value,
-            style: GoogleFonts.balooTammudu2(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12.5,
               fontWeight: FontWeight.w800,
               color: _timeTheme.badgeTextColor,
-              height: 1.1,
+              height: 1.0,
+              letterSpacing: 0.2,
             ),
           ),
         ],
@@ -633,7 +651,15 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(builder: (_) => const QuranScreen()),
         ),
       },
-      {'label': 'Dzikir', 'asset': 'assets/icon/Image (Dzikir).png', 'icon': Icons.spa_rounded},
+      {
+        'label': 'Dzikir',
+        'asset': 'assets/icon/Image (Dzikir).png',
+        'icon': Icons.spa_rounded,
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DzikirScreen()),
+        ),
+      },
       {
         'label': 'Doa',
         'asset': 'assets/icon/Image (Doa).png',
@@ -643,7 +669,15 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(builder: (_) => const DoaScreen()),
         ),
       },
-      {'label': 'Puasa', 'asset': 'assets/icon/Image (Malam).png', 'icon': Icons.nightlight_round},
+      {
+        'label': 'Puasa',
+        'asset': 'assets/icon/Image (Malam).png',
+        'icon': Icons.nightlight_round,
+        'onTap': () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const PuasaScreen()),
+        ),
+      },
     ];
 
     return SingleChildScrollView(
@@ -810,6 +844,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ────────────── QURAN TRACKER ──────────────
   Widget _buildQuranTracker() {
+    final khatamProv = context.watch<KhatamProvider>();
+    final hasKhatam = khatamProv.hasActivePlan;
+    final plan = khatamProv.activePlan;
+
+    final title = hasKhatam ? 'Juz ${plan?.currentJuz} (Mode Khatam)' : _currentSurah;
+    final subtitle = hasKhatam
+        ? 'Progres ${(plan?.progressPercentage ?? 0).round()}% • Target ${plan?.dailyJuzTarget ?? 1} Juz/hari'
+        : 'Halaman $_quranPageReading dari $_totalQuranPages';
+    final progressVal = hasKhatam
+        ? ((plan?.progressPercentage ?? 0.0) / 100.0).clamp(0.0, 1.0)
+        : (_quranPageReading / _totalQuranPages).clamp(0.0, 1.0);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       decoration: BoxDecoration(
@@ -834,7 +880,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _currentSurah,
+                      title,
                       style: GoogleFonts.balooTammudu2(
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -842,7 +888,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     Text(
-                      'Halaman $_quranPageReading dari $_totalQuranPages',
+                      subtitle,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: const Color(0xFF5E6B52),
@@ -855,11 +901,20 @@ class _HomeScreenState extends State<HomeScreen> {
               // Lanjut button
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    if (_quranPageReading < _totalQuranPages) {
-                      _quranPageReading++;
-                    }
-                  });
+                  if (hasKhatam && plan != null) {
+                    khatamProv.loadAyahsForJuz(plan.currentJuz);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => KhatamReadingScreen(juzNumber: plan.currentJuz),
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const QuranScreen()),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF557C2B),
@@ -886,7 +941,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
-              value: _quranPageReading / _totalQuranPages,
+              value: progressVal,
               backgroundColor: const Color(0xFFE8EEE0),
               valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF557C2B)),
               minHeight: 6,
