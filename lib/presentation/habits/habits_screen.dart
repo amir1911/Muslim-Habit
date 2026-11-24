@@ -1,322 +1,395 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
+import 'kalender_planning_screen.dart';
+import 'widgets/edit_plan_bottom_sheet.dart';
 
-class HabitsScreen extends StatelessWidget {
+/// HabbitDashboardScreen (Laman Utama Habbit Tracker)
+/// Alias HabitsScreen untuk kompatibilitas dengan MainNavigationShell
+class HabitsScreen extends StatefulWidget {
   const HabitsScreen({super.key});
 
   @override
+  State<HabitsScreen> createState() => _HabitsScreenState();
+}
+
+class _HabitsScreenState extends State<HabitsScreen> {
+  // Tanggal aktif simulasi di strip mingguan
+  int _selectedDayIndex = 4; // index 4 -> Jumat (24 April)
+
+  @override
   Widget build(BuildContext context) {
-    final habitProvider = context.watch<HabitProvider>();
-    final todayFormatted = DateFormat('EEEE, d MMMM yyyy', 'id_ID').format(DateTime.now());
+    final habitProv = context.watch<HabitProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.creamBackground,
-      appBar: AppBar(
-        title: Text(
-          'Muslim Habit',
-          style: GoogleFonts.balooTammudu2(
-            fontWeight: FontWeight.w800,
-            fontSize: 22,
-            color: AppColors.primaryGreen,
+      backgroundColor: const Color(0xFFF7F6EE),
+      appBar: _buildAppBar(context, habitProv),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+          children: [
+            // 1. Dua Kartu Ringkasan Atas (Sejajar)
+            _buildTopSummaryCards(habitProv),
+            const SizedBox(height: 14),
+
+            // 2. Kartu Progres Utama (Hero Card)
+            _buildHeroProgressCard(habitProv),
+            const SizedBox(height: 14),
+
+            // 3. Kartu Kalender Mingguan
+            _buildWeeklyCalendarCard(context),
+            const SizedBox(height: 16),
+
+            // 4. Baris Tombol Fitur ("Fitur-Fitur")
+            _buildFeatureButtonsRow(context),
+            const SizedBox(height: 18),
+
+            // 5. Bagian "Sebentar Lagi..."
+            _buildUpcomingSection(context, habitProv),
+            const SizedBox(height: 18),
+
+            // 6. Bagian "Program Aktif"
+            _buildActiveProgramSection(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ==========================================
+  // APP BAR
+  // ==========================================
+  PreferredSizeWidget _buildAppBar(BuildContext context, HabitProvider habitProv) {
+    return AppBar(
+      backgroundColor: const Color(0xFFF7F6EE),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      leading: IconButton(
+        icon: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFE2E6DF)),
+          ),
+          child: const Icon(
+            Icons.chevron_left_rounded,
+            color: Color(0xFF2E5714),
+            size: 24,
           ),
         ),
-        actions: [
-          // Streak Counter Chip
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
+        onPressed: () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        },
+      ),
+      title: Text(
+        'Habbit',
+        style: GoogleFonts.plusJakartaSans(
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF2E5714),
+        ),
+      ),
+      actions: [
+        // Pill Streak Api Kuning
+        Container(
+          margin: const EdgeInsets.only(right: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2E5714),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.local_fire_department_rounded,
+                color: Color(0xFFFFB300),
+                size: 16,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${habitProv.streakCount}',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Pill Poin Bintang Kuning
+        Container(
+          margin: const EdgeInsets.only(right: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: const Color(0xFF55822B),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star_rounded,
+                color: Color(0xFFFFD700),
+                size: 16,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${habitProv.userPoints}',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Tombol Bulat Lonceng Notifikasi
+        Container(
+          margin: const EdgeInsets.only(right: 14),
+          width: 34,
+          height: 34,
+          decoration: const BoxDecoration(
+            color: Color(0xFF2E5714),
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: const Icon(
+              Icons.notifications_outlined,
               color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.streakFire.withValues(alpha: 0.3)),
+              size: 18,
+            ),
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notifikasi pengingat ibadah aktif'),
+                  duration: Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ==========================================
+  // 1. DUA KARTU RINGKASAN ATAS (SEJAJAR)
+  // ==========================================
+  Widget _buildTopSummaryCards(HabitProvider habitProv) {
+    return Row(
+      children: [
+        // Kartu Kiri (Hijau Tua) - Fokus Ibadahku & Maskot Nunu
+        Expanded(
+          child: Container(
+            height: 86,
+            padding: const EdgeInsets.fromLTRB(14, 12, 10, 10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF2E5714),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.streakFire.withValues(alpha: 0.1),
+                  color: const Color(0xFF2E5714).withValues(alpha: 0.15),
                   blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: Row(
               children: [
-                const Text('🔥', style: TextStyle(fontSize: 14)),
-                const SizedBox(width: 4),
-                Text(
-                  '${habitProvider.streakCount} Hari',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 13,
-                    color: AppColors.streakFire,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-        children: [
-          // Greeting & Hijri Date Bar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      todayFormatted,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textLight,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Assalamu\'alaikum, ${habitProvider.userName}',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textDark,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.greenSurface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.primaryDarkGreen),
-                    const SizedBox(width: 4),
-                    Text(
-                      '28 Rabiul Awwal',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDarkGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // GAMIFIED CAMEL BUDDY INTERACTIVE CARD
-          _buildCamelBuddyCard(context, habitProvider),
-          const SizedBox(height: 20),
-
-          // PROGRESS OVERVIEW RING & STATS
-          _buildDailyProgressCard(habitProvider),
-          const SizedBox(height: 20),
-
-          // CATEGORY SELECTOR CHIPS (Semua, Wajib, Sunnah)
-          _buildCategoryFilter(habitProvider),
-          const SizedBox(height: 16),
-
-          // HABIT CHECKLIST SECTION
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Target Hari Ini',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textDark,
-                ),
-              ),
-              Text(
-                '${habitProvider.completedHabitsCount} dari ${habitProvider.totalHabitsCount} Selesai',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryGreen,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Habit Cards
-          ...habitProvider.habits.map((habit) => _buildHabitItemCard(context, habitProvider, habit)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCamelBuddyCard(BuildContext context, HabitProvider provider) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF789B55), Color(0xFF648742)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryGreen.withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(18),
-      child: Row(
-        children: [
-          // 3D Camel Avatar
-          Container(
-            width: 76,
-            height: 76,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
-            ),
-            child: ClipOval(
-              child: Image.asset(
-                'assets/images/image 52.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Image.asset(
-                  'assets/images/image 52.png',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Center(
-                    child: Text('🐪', style: TextStyle(fontSize: 38)),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 16),
-
-          // Camel Speech Bubble & Status
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'Jamal • Level ${provider.userLevel}',
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Fokus Ibadahku',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withValues(alpha: 0.8),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Nunu',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
                         ),
                       ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '${provider.userPoints} XP',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFFFFD54F),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  provider.mascotMessage,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    height: 1.35,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                // Ilustrasi Maskot Unta Nunu
+                Image.asset(
+                  'assets/images/mascot_nunu.png',
+                  height: 64,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.pets_rounded,
+                    color: Colors.white70,
+                    size: 38,
                   ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+
+        // Kartu Kanan (Putih) - My Streak & Api Oranye
+        Expanded(
+          child: Container(
+            height: 86,
+            padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE8ECE4)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'My Streak',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF75856B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${habitProv.streakCount} days',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF2E5714),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Ikon Api Oranye Besar
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF2E6),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.local_fire_department_rounded,
+                    color: Color(0xFFF07026),
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildDailyProgressCard(HabitProvider provider) {
-    final pct = (provider.progressFraction * 100).toInt();
+  // ==========================================
+  // 2. KARTU PROGRES UTAMA (HERO CARD)
+  // ==========================================
+  Widget _buildHeroProgressCard(HabitProvider habitProv) {
+    final progressFraction = habitProv.progressFraction;
+    final displayPercent = habitProv.dailyProgressPercent;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.beigeAccent),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E5714), Color(0xFF9BC366)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E5714).withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          // Circular Progress
-          SizedBox(
-            width: 56,
-            height: 56,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                CircularProgressIndicator(
-                  value: provider.progressFraction,
-                  strokeWidth: 6,
-                  backgroundColor: AppColors.greenSurface,
-                  color: AppColors.primaryGreen,
-                  strokeCap: StrokeCap.round,
+          // Circular Progress Indicator Tebal
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 54,
+                height: 54,
+                child: CircularProgressIndicator(
+                  value: progressFraction > 0 ? progressFraction : 0.05,
+                  strokeWidth: 6.5,
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
-                Center(
-                  child: Text(
-                    '$pct%',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.primaryGreen,
-                    ),
-                  ),
+              ),
+              Text(
+                '$displayPercent%',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(width: 18),
 
-          // Progress text
+          // Teks Target Hari Ini
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Konsistensi Harian',
+                  'Target Hari Ini',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '${provider.completedHabitsCount} dari ${provider.totalHabitsCount} ibadah telah selesai hari ini',
+                  '${habitProv.totalHabitsCount} habbit di Jadwal',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    color: AppColors.textMedium,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -327,138 +400,661 @@ class HabitsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoryFilter(HabitProvider provider) {
-    return Row(
-      children: [
-        _buildFilterChip(provider, 'all', 'Semua'),
-        const SizedBox(width: 8),
-        _buildFilterChip(provider, 'wajib', 'Shalat Fardhu'),
-        const SizedBox(width: 8),
-        _buildFilterChip(provider, 'sunnah', 'Amalan Sunnah'),
-      ],
-    );
-  }
+  // ==========================================
+  // 3. KARTU KALENDER MINGGUAN
+  // ==========================================
+  Widget _buildWeeklyCalendarCard(BuildContext context) {
+    const daysData = [
+      {'day': 'Sen', 'date': '20', 'done': true},
+      {'day': 'Sel', 'date': '21', 'done': true},
+      {'day': 'Rab', 'date': '22', 'done': true},
+      {'day': 'Kam', 'date': '23', 'done': true},
+      {'day': 'Jum', 'date': '24', 'done': false}, // Active
+      {'day': 'Sab', 'date': '25', 'done': false},
+      {'day': 'Min', 'date': '26', 'done': false},
+    ];
 
-  Widget _buildFilterChip(HabitProvider provider, String key, String label) {
-    final isSelected = provider.selectedCategory == key;
-
-    return GestureDetector(
-      onTap: () => provider.setCategory(key),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryGreen : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.primaryGreen : AppColors.beigeAccent,
-          ),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : AppColors.textMedium,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHabitItemCard(BuildContext context, HabitProvider provider, HabitItem habit) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: habit.isCompleted ? AppColors.greenAccent : AppColors.beigeAccent,
-          width: habit.isCompleted ? 1.5 : 1,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE8ECE4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: habit.isCompleted ? AppColors.greenSurface : AppColors.creamBackground,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Icon(
-            habit.icon,
-            color: habit.isCompleted ? AppColors.primaryGreen : AppColors.textMedium,
-            size: 22,
-          ),
-        ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                habit.title,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                  decoration: habit.isCompleted ? TextDecoration.lineThrough : null,
-                  color: habit.isCompleted ? AppColors.textMedium : AppColors.textDark,
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Tanggal Masehi & Hijriah di kiri, jam & link di kanan
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Jumat, 24 April 2026',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF2E5714),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '7 Dhu al-Qi\'dah 1447 H',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF75856B),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            if (habit.streak > 0) ...[
-              const SizedBox(width: 6),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: AppColors.streakFire.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.wb_sunny_outlined,
+                        color: Color(0xFF55822B),
+                        size: 15,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '10:00',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF2E5714),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const KalenderPlanningScreen(),
+                        ),
+                      );
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    child: Text(
+                      'Lihat Kalender >',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF55822B),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Strip 7 Hari (Sen - Min)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(daysData.length, (index) {
+              final item = daysData[index];
+              final isSelected = index == _selectedDayIndex;
+
+              return InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedDayIndex = index;
+                  });
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: 40,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFF2E5714)
+                        : const Color(0xFFF7F9F5),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isSelected
+                          ? const Color(0xFF2E5714)
+                          : const Color(0xFFE5EDE0),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        item['day'] as String,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF75856B),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        item['date'] as String,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                          color: isSelected
+                              ? Colors.white
+                              : const Color(0xFF2E5714),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              );
+            }),
+          ),
+          const SizedBox(height: 10),
+
+          // Footer: Tombol Kanan Bawah "EditJadwal"
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              onTap: () => EditPlanBottomSheet.show(context),
+              borderRadius: BorderRadius.circular(6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('🔥', style: TextStyle(fontSize: 10)),
-                    const SizedBox(width: 2),
+                    const Icon(
+                      Icons.edit_calendar_rounded,
+                      size: 14,
+                      color: Color(0xFF55822B),
+                    ),
+                    const SizedBox(width: 4),
                     Text(
-                      '${habit.streak}',
+                      'EditJadwal',
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.streakFire,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF55822B),
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ],
-        ),
-        subtitle: Text(
-          '${habit.timeSuggestion} • +${habit.points} XP',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 12,
-            color: AppColors.textLight,
-          ),
-        ),
-        trailing: GestureDetector(
-          onTap: () => provider.toggleHabit(habit.id),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: habit.isCompleted ? AppColors.primaryGreen : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: habit.isCompleted ? AppColors.primaryGreen : AppColors.textMuted,
-                width: 2,
-              ),
             ),
-            child: habit.isCompleted
-                ? const Icon(Icons.check_rounded, color: Colors.white, size: 20)
-                : null,
           ),
-        ),
+        ],
       ),
     );
   }
+
+  // ==========================================
+  // 4. BARIS TOMBOL FITUR ("Fitur-Fitur")
+  // ==========================================
+  Widget _buildFeatureButtonsRow(BuildContext context) {
+    final features = [
+      {'label': 'Sholat', 'icon': Icons.mosque_rounded},
+      {'label': 'Al-Quran', 'icon': Icons.menu_book_rounded},
+      {'label': 'Dzikir', 'icon': Icons.blur_circular_rounded},
+      {'label': 'Doa', 'icon': Icons.pan_tool_alt_rounded},
+      {'label': 'Puasa', 'icon': Icons.nightlight_round},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Fitur-Fitur',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF2E5714),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: features.map((feat) {
+            return Expanded(
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                child: InkWell(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    final label = feat['label'] as String;
+                    if (label == 'Al-Quran') {
+                      // Buka halaman Al-Quran atau tampilkan navigasi
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Buka Menu AI-Quran dari bar navigasi'),
+                          duration: Duration(milliseconds: 1200),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Membuka Fitur $label'),
+                          duration: const Duration(milliseconds: 1000),
+                        ),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF55822B),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF55822B).withValues(alpha: 0.2),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          feat['icon'] as IconData,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          feat['label'] as String,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  // ==========================================
+  // 5. BAGIAN "Sebentar Lagi..."
+  // ==========================================
+  Widget _buildUpcomingSection(BuildContext context, HabitProvider habitProv) {
+    final upcoming = habitProv.upcomingHabits;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Sebentar Lagi...',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF2E5714),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const KalenderPlanningScreen(),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                child: Text(
+                  'See More',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF55822B),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        if (upcoming.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE8ECE4)),
+            ),
+            child: Center(
+              child: Text(
+                'Tidak ada jadwal ibadah terdekat',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  color: const Color(0xFF75856B),
+                ),
+              ),
+            ),
+          )
+        else
+          ...upcoming.map((item) => _buildUpcomingCard(context, item, habitProv)),
+      ],
+    );
+  }
+
+  Widget _buildUpcomingCard(
+    BuildContext context,
+    HabitItem item,
+    HabitProvider habitProv,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE8ECE4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Ikon Masjid / Kategori dalam Kotak Bulat Hijau Muda
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF2E3),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.mosque_rounded,
+              color: Color(0xFF55822B),
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+
+          // Judul & Jam Jadwal
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF2E5714),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: Color(0xFF75856B),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      item.scheduledTime,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF75856B),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Toggle Notifikasi Lonceng
+          IconButton(
+            icon: Icon(
+              item.isMuted
+                  ? Icons.notifications_off_outlined
+                  : Icons.notifications_active_rounded,
+              color: item.isMuted
+                  ? const Color(0xFFA0ABA0)
+                  : const Color(0xFF55822B),
+              size: 20,
+            ),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              habitProv.toggleMute(item.id);
+            },
+          ),
+
+          // Chevron Kanan
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: Color(0xFFA0ABA0),
+            size: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================
+  // 6. BAGIAN "Program Aktif"
+  // ==========================================
+  Widget _buildActiveProgramSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Program Aktif',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF2E5714),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Membuka Komunitas MuslimHabit'),
+                    duration: Duration(milliseconds: 1000),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.group_outlined,
+                      size: 15,
+                      color: Color(0xFF55822B),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Komunitas',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF55822B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+
+        // Kartu Hijau Tua Program Aktif
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2E5714),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5714).withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // Baris Atas: Thumbnail, Judul, Lonceng, Chevron
+              Row(
+                children: [
+                  // Lingkaran Avatar / Thumbnail
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.mosque_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+
+                  // Judul Program
+                  Expanded(
+                    child: Text(
+                      'Target baru sholat dhuha s...',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                  // Lonceng & Panah Kanan
+                  const Icon(
+                    Icons.notifications_none_rounded,
+                    color: Colors.white70,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Colors.white70,
+                    size: 22,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Baris Bawah: Badge 1 Minggu, 100 XP, 0/7 Sholat Dhuha
+              Row(
+                children: [
+                  // Pill Durasi
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '1 Minggu',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Pill XP
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Color(0xFFFFD700),
+                          size: 13,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '100 XP',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+
+                  // Teks Progress Target
+                  Text(
+                    '0/7 Sholat Dhuha',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+/// Alias HabbitDashboardScreen agar sesuai penamaan di instruksi
+typedef HabbitDashboardScreen = HabitsScreen;

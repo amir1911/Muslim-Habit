@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -6,12 +7,15 @@ import '../../providers/khatam_provider.dart';
 import 'khatam_target_modal.dart';
 import 'khatam_dashboard_screen.dart';
 
+/// Halaman Pengaturan Target Mode Khatam Al-Qur'an (ModeKhatamSetupScreen)
 class KhatamSetupScreen extends StatefulWidget {
   const KhatamSetupScreen({super.key});
 
   @override
   State<KhatamSetupScreen> createState() => _KhatamSetupScreenState();
 }
+
+typedef ModeKhatamSetupScreen = KhatamSetupScreen;
 
 class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
   DateTime _startDate = DateTime.now();
@@ -89,9 +93,9 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4A7C59),
+              primary: Color(0xFF55822B),
               onPrimary: Colors.white,
-              onSurface: Color(0xFF1B432C),
+              onSurface: Color(0xFF264E0B),
             ),
           ),
           child: child!,
@@ -104,7 +108,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
   }
 
   Future<void> _openTargetModal() async {
-    final result = await KhatamTargetModal.show(
+    final result = await TargetKhatamBottomSheet.show(
       context,
       initialQuantity: _targetQuantity,
       initialUnit: _targetUnit,
@@ -118,7 +122,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
         _targetPeriodValue = result.periodValue;
         _targetPeriodUnit = result.periodUnit;
 
-        // Hitung perkiraan hari
+        // Hitung durasi total hari
         final daily = _calculatedDailyJuz;
         _targetDurationDays = (30 / daily).ceil().clamp(1, 365);
       });
@@ -149,7 +153,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF55822B),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -185,301 +189,308 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
   Widget build(BuildContext context) {
     final dateStr = DateFormat('dd/MM/yyyy').format(_startDate);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9FAF8),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        centerTitle: true,
-        title: Text(
-          'Mode Khatam',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
-          ),
-        ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Color(0xFF55822B),
+        statusBarIconBrightness: Brightness.light,
       ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
-          children: [
-            // ── ATUR TARGET KHATAM SECTION ──
-            Text(
-              'Atur Target Khatam',
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF1B432C),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF7F6EE),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF55822B),
+          elevation: 0,
+          leading: IconButton(
+            icon: Container(
+              width: 36,
+              height: 36,
+              decoration: const BoxDecoration(
+                color: Color(0xFF84B74E),
+                shape: BoxShape.circle,
               ),
+              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 26),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Rencanakan perjalanan spiritual Anda dengan disiplin dan ketenangan.',
-              style: GoogleFonts.inter(
-                fontSize: 12.5,
-                color: const Color(0xFF6B7280),
-                height: 1.4,
-              ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          centerTitle: true,
+          title: Text(
+            'Mode Khatam',
+            style: GoogleFonts.inter(
+              fontSize: 18.5,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
             ),
-
-            const SizedBox(height: 18),
-
-            // Two Form Fields (Tanggal Mulai & Target Durasi)
-            Row(
-              children: [
-                // Tanggal Mulai
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tanggal mulai',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4B5563),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      GestureDetector(
-                        onTap: _selectStartDate,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFD1D5DB)),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                dateStr,
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF1F2937),
-                                ),
-                              ),
-                              const Icon(Icons.calendar_today_outlined, size: 17, color: Color(0xFF6B7280)),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+          ),
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+            children: [
+              // ── ATUR TARGET KHATAM SECTION ──
+              Text(
+                'Atur Target Khatam',
+                style: GoogleFonts.inter(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF264E0B),
                 ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'Rencanakan perjalanan spiritual Anda dengan disiplin dan ketenangan.',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: const Color(0xFF6B7280),
+                  height: 1.4,
+                ),
+              ),
 
-                const SizedBox(width: 14),
+              const SizedBox(height: 20),
 
-                // Target Durasi
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Target durasi',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4B5563),
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      GestureDetector(
-                        onTap: _openTargetModal,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: const Color(0xFFD1D5DB)),
+              // ── TWO FORM FIELDS (Tanggal Mulai & Target Durasi) ──
+              Row(
+                children: [
+                  // Tanggal Mulai
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tanggal mulai',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF374151),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '$_targetDurationDays hari ($_dailyTargetLabel)',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 7),
+                        GestureDetector(
+                          onTap: _selectStartDate,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: const Color(0xFFCCD7C9), width: 1.2),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  dateStr,
                                   style: GoogleFonts.inter(
-                                    fontSize: 12,
+                                    fontSize: 13.5,
                                     fontWeight: FontWeight.w600,
                                     color: const Color(0xFF1F2937),
                                   ),
                                 ),
-                              ),
-                              const Icon(Icons.timer_outlined, size: 17, color: Color(0xFF6B7280)),
-                            ],
+                                const Icon(Icons.calendar_today_outlined, size: 18, color: Color(0xFF4B5563)),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
 
-            const SizedBox(height: 22),
+                  const SizedBox(width: 14),
 
-            // ── KARTU TARGET HARIAN PUTIH ──
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
+                  // Target Durasi
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Target durasi',
+                          style: GoogleFonts.inter(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF374151),
+                          ),
+                        ),
+                        const SizedBox(height: 7),
+                        GestureDetector(
+                          onTap: _openTargetModal,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: const Color(0xFFCCD7C9), width: 1.2),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '$_targetDurationDays hari (1Juz/hari)',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF1F2937),
+                                    ),
+                                  ),
+                                ),
+                                const Icon(Icons.alarm_add_outlined, size: 19, color: Color(0xFF4B5563)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              child: Column(
+
+              const SizedBox(height: 20),
+
+              // ── KARTU TARGET HARIAN PUTIH ──
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'Target Harian',
+                      style: GoogleFonts.inter(
+                        fontSize: 13.5,
+                        color: const Color(0xFF6B7280),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _dailyTargetLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 29,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF264E0B),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.menu_book_outlined, size: 16, color: Color(0xFF6B7280)),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Juz 1 - Juz 30',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: const Color(0xFF4B5563),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: 14,
+                          width: 1,
+                          color: const Color(0xFFD1D5DB),
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.access_time_rounded, size: 16, color: Color(0xFF6B7280)),
+                            const SizedBox(width: 6),
+                            Text(
+                              '± $_estimatedReadingMinutes Menit/hari',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: const Color(0xFF4B5563),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 26),
+
+              // ── PENGINGAT SPIRITUAL SECTION ──
+              Row(
                 children: [
+                  const Icon(Icons.notifications_none_rounded, color: const Color(0xFF264E0B), size: 22),
+                  const SizedBox(width: 8),
                   Text(
-                    'Target Harian',
+                    'Pengigat Spritual',
                     style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: const Color(0xFF6B7280),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _dailyTargetLabel,
-                    style: GoogleFonts.inter(
-                      fontSize: 30,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1B432C),
+                      color: const Color(0xFF264E0B),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.menu_book_outlined, size: 15, color: Color(0xFF6B7280)),
-                          const SizedBox(width: 5),
-                          Text(
-                            'Juz 1 - Juz 30',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: const Color(0xFF6B7280),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: 14,
-                        width: 1,
-                        color: const Color(0xFFD1D5DB),
-                        margin: const EdgeInsets.symmetric(horizontal: 14),
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.access_time_rounded, size: 15, color: Color(0xFF6B7280)),
-                          const SizedBox(width: 5),
-                          Text(
-                            '± $_estimatedReadingMinutes Menit/hari',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: const Color(0xFF6B7280),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 26),
+              const SizedBox(height: 14),
 
-            // ── PENGINGAT SPIRITUAL SECTION ──
-            Row(
-              children: [
-                const Icon(Icons.notifications_active_outlined, color: Color(0xFF4A7C59), size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  'Pengingat Spiritual',
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF1B432C),
+              // Item 1: Ba'da Maghrib
+              _buildReminderCard(
+                icon: Icons.nightlight_round,
+                title: "Ba'da Maghrib",
+                subtitle: 'Murojaah sebelum beristirahat',
+                isEnabled: _reminderMaghrib,
+                onChanged: (val) => setState(() => _reminderMaghrib = val),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Item 2: Ba'da Fajr
+              _buildReminderCard(
+                icon: Icons.wb_sunny_outlined,
+                title: "Ba'da Fajr",
+                subtitle: 'Waktu terbaik untuk menghafal',
+                isEnabled: _reminderFajr,
+                onChanged: (val) => setState(() => _reminderFajr = val),
+              ),
+
+              const SizedBox(height: 34),
+
+              // ── TOMBOL MULAI PERJALANAN ──
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF55822B),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(26),
+                    ),
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 14),
-
-            // Item 1: Ba'da Maghrib
-            _buildReminderCard(
-              icon: Icons.nightlight_round,
-              title: "Ba'da Maghrib",
-              subtitle: 'Murojaah sebelum beristirahat',
-              isEnabled: _reminderMaghrib,
-              onChanged: (val) => setState(() => _reminderMaghrib = val),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Item 2: Ba'da Fajr
-            _buildReminderCard(
-              icon: Icons.wb_sunny_outlined,
-              title: "Ba'da Fajr",
-              subtitle: 'Waktu terbaik untuk menghafal',
-              isEnabled: _reminderFajr,
-              onChanged: (val) => setState(() => _reminderFajr = val),
-            ),
-
-            const SizedBox(height: 36),
-
-            // ── TOMBOL MULAI PERJALANAN ──
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A7C59),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: _startPlan,
-                child: Text(
-                  'Mulai Perjalanan',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                  onPressed: _startPlan,
+                  child: Text(
+                    'Mulai Perjalanan',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -499,7 +510,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -508,14 +519,14 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
       child: Row(
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE5E7EB)),
+              border: Border.all(color: const Color(0xFFE2E7DF), width: 1.2),
             ),
-            child: Icon(icon, color: const Color(0xFF4A7C59), size: 22),
+            child: Icon(icon, color: const Color(0xFF264E0B), size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -527,7 +538,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF1B432C),
+                    color: const Color(0xFF1F2937),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -545,7 +556,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
             value: isEnabled,
             onChanged: onChanged,
             activeColor: Colors.white,
-            activeTrackColor: const Color(0xFF1B432C),
+            activeTrackColor: const Color(0xFF264E0B),
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: const Color(0xFFD1D5DB),
           ),

@@ -243,5 +243,46 @@ class StorageService {
   bool hasCompletedOnboarding() => _prefs.getBool(_keyHasCompletedOnboarding) ?? false;
   Future<void> setCompletedOnboarding(bool completed) =>
       _prefs.setBool(_keyHasCompletedOnboarding, completed);
+
+  // ── Gamifikasi & Maskot Nunu Persistence ──
+  static const String _keyEquippedCostume = 'nunu_equipped_costume';
+  static const String _keyOwnedCostumes = 'nunu_owned_costumes';
+  static const String _keyFriendshipPoints = 'nunu_friendship_points';
+  static const String _keyFriendshipLevel = 'nunu_friendship_level';
+  static const String _keyBoosterExpiresAt = 'nunu_booster_expires_at';
+  static const String _keyOwnedPotions = 'nunu_owned_potions_json';
+  static const String _keyOwnedRewards = 'nunu_owned_rewards';
+
+  String getEquippedCostume() => _prefs.getString(_keyEquippedCostume) ?? 'normal';
+  Future<void> setEquippedCostume(String costumeId) =>
+      _prefs.setString(_keyEquippedCostume, costumeId);
+
+  List<String> getOwnedCostumes() =>
+      _prefs.getStringList(_keyOwnedCostumes) ?? ['normal', 'sorban_emas'];
+  Future<void> setOwnedCostumes(List<String> list) =>
+      _prefs.setStringList(_keyOwnedCostumes, list);
+
+  int getFriendshipPoints() => _prefs.getInt(_keyFriendshipPoints) ?? 75;
+  Future<void> setFriendshipPoints(int pts) =>
+      _prefs.setInt(_keyFriendshipPoints, pts);
+
+  int getFriendshipLevel() => _prefs.getInt(_keyFriendshipLevel) ?? 4;
+  Future<void> setFriendshipLevel(int lvl) =>
+      _prefs.setInt(_keyFriendshipLevel, lvl);
+
+  int? getBoosterExpiresAt() => _prefs.getInt(_keyBoosterExpiresAt);
+  Future<void> setBoosterExpiresAt(int? timestampMs) async {
+    if (timestampMs == null) {
+      await _prefs.remove(_keyBoosterExpiresAt);
+    } else {
+      await _prefs.setInt(_keyBoosterExpiresAt, timestampMs);
+    }
+  }
+
+  List<String> getOwnedRewards() =>
+      _prefs.getStringList(_keyOwnedRewards) ?? [];
+  Future<void> setOwnedRewards(List<String> list) =>
+      _prefs.setStringList(_keyOwnedRewards, list);
 }
+
 

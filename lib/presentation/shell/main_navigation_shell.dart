@@ -8,16 +8,40 @@ import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
 import '../community/community_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
+import '../../features/mascot/screens/mascot_hub_screen.dart';
 
 class MainNavigationShell extends StatefulWidget {
-  const MainNavigationShell({super.key});
+  final int initialIndex;
+  const MainNavigationShell({super.key, this.initialIndex = 0});
+
+  /// Static helper to switch tabs on the active MainNavigationShell from any child widget
+  static bool switchToTab(BuildContext context, int index) {
+    final state = context.findAncestorStateOfType<_MainNavigationShellState>();
+    if (state != null) {
+      state.switchTab(index);
+      return true;
+    }
+    return false;
+  }
 
   @override
   State<MainNavigationShell> createState() => _MainNavigationShellState();
 }
 
 class _MainNavigationShellState extends State<MainNavigationShell> {
-  int _currentIndex = 0;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+  }
+
+  void switchTab(int index) {
+    if (mounted && _currentIndex != index) {
+      setState(() => _currentIndex = index);
+    }
+  }
 
   final List<Widget> _screens = const [
     HomeScreen(),
@@ -94,7 +118,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
+        MaterialPageRoute(builder: (_) => const MascotHubScreen()),
       ),
       child: Container(
         width: 54,

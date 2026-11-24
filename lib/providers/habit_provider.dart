@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/habit_item.dart';
 import '../models/badge_item.dart';
 import '../models/ai_assistant_model.dart';
@@ -12,9 +13,9 @@ class HabitProvider extends ChangeNotifier {
     _loadState();
   }
 
-  int _userPoints = 150;
+  int _userPoints = 10;
   int _userLevel = 1;
-  int _streakCount = 3;
+  int _streakCount = 17;
   Set<String> _activeDates = {};
   String _selectedCategory = 'all'; // all, wajib, sunnah
   String _userName = 'Sahabat Muslim';
@@ -52,118 +53,210 @@ class HabitProvider extends ChangeNotifier {
   }
 
   final List<HabitItem> _habits = [
-    // Wajib
+    // ── HABIT PAGI (04:00 - 10:00) ──
     HabitItem(
       id: 'subuh',
-      title: 'Shalat Subuh',
+      title: 'Sholat Wajib Shubuh',
       subtitle: '2 Rakaat tepat waktu',
       category: HabitCategory.wajib,
-      icon: Icons.wb_twilight_rounded,
+      categoryGroup: 'Sholat Wajib',
+      icon: Icons.mosque_rounded,
       points: 25,
       timeSuggestion: '04:45 WIB',
+      timeSlot: 'pagi',
+      scheduledTime: '04:45 AM',
+      recordedTime: '05:10 AM',
+      frequency: '1x Setiap Hari',
       isCompleted: true,
-      streak: 4,
-    ),
-    HabitItem(
-      id: 'dzuhur',
-      title: 'Shalat Dzuhur',
-      subtitle: '4 Rakaat berjamaah',
-      category: HabitCategory.wajib,
-      icon: Icons.wb_sunny_rounded,
-      points: 20,
-      timeSuggestion: '12:05 WIB',
-      isCompleted: true,
-      streak: 3,
-    ),
-    HabitItem(
-      id: 'ashar',
-      title: 'Shalat Ashar',
-      subtitle: '4 Rakaat tepat waktu',
-      category: HabitCategory.wajib,
-      icon: Icons.cloud_queue_rounded,
-      points: 20,
-      timeSuggestion: '15:15 WIB',
-      isCompleted: false,
-      streak: 2,
-    ),
-    HabitItem(
-      id: 'maghrib',
-      title: 'Shalat Maghrib',
-      subtitle: '3 Rakaat di masjid/awal waktu',
-      category: HabitCategory.wajib,
-      icon: Icons.nights_stay_outlined,
-      points: 20,
-      timeSuggestion: '18:10 WIB',
-      isCompleted: false,
-      streak: 3,
-    ),
-    HabitItem(
-      id: 'isya',
-      title: 'Shalat Isya',
-      subtitle: '4 Rakaat sebelum tidur',
-      category: HabitCategory.wajib,
-      icon: Icons.bedtime_rounded,
-      points: 20,
-      timeSuggestion: '19:20 WIB',
-      isCompleted: false,
-      streak: 3,
-    ),
-
-    // Sunnah
-    HabitItem(
-      id: 'tahajud',
-      title: 'Shalat Tahajud',
-      subtitle: 'Bermunajat di sepertiga malam',
-      category: HabitCategory.sunnah,
-      icon: Icons.stars_rounded,
-      points: 35,
-      timeSuggestion: '03:30 WIB',
-      isCompleted: true,
-      streak: 2,
+      streak: 17,
     ),
     HabitItem(
       id: 'dhuha',
-      title: 'Shalat Dhuha',
-      subtitle: 'Pintu rezeki dan sedekah persendian',
+      title: 'Sholat Sunnah Dhuha',
+      subtitle: 'Pintu rezeki & sedekah persendian',
       category: HabitCategory.sunnah,
-      icon: Icons.light_mode_rounded,
-      points: 25,
-      timeSuggestion: '08:30 WIB',
+      categoryGroup: 'Sholat Sunnah',
+      icon: Icons.mosque_rounded,
+      points: 20,
+      timeSuggestion: '10:15 WIB',
+      timeSlot: 'pagi',
+      scheduledTime: '10:15 AM',
+      frequency: '1x Setiap Hari',
       isCompleted: false,
-      streak: 1,
-    ),
-    HabitItem(
-      id: 'tilawah',
-      title: 'Tilawah Al-Qur\'an',
-      subtitle: 'Minimal 1-2 lembar hari ini',
-      category: HabitCategory.sunnah,
-      icon: Icons.menu_book_rounded,
-      points: 30,
-      timeSuggestion: 'Ba\'da Maghrib',
-      isCompleted: true,
       streak: 5,
     ),
     HabitItem(
-      id: 'sedekah',
-      title: 'Sedekah Subuh / Harian',
-      subtitle: 'Menolak bala dan melipatgandakan berkah',
+      id: 'dzikir_pagi',
+      title: 'Dzikir Pagi',
+      subtitle: 'Benteng perlindungan seorang muslim',
       category: HabitCategory.sunnah,
-      icon: Icons.volunteer_activism_rounded,
-      points: 30,
-      timeSuggestion: 'Pagi Hari',
-      isCompleted: true,
+      categoryGroup: 'Dzikir',
+      icon: Icons.mosque_rounded,
+      points: 15,
+      timeSuggestion: '10:30 WIB',
+      timeSlot: 'pagi',
+      scheduledTime: '10:30 AM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      isMuted: true,
       streak: 3,
     ),
     HabitItem(
-      id: 'dzikir',
-      title: 'Dzikir Pagi & Petang',
-      subtitle: 'Benteng perlindungan seorang muslim',
+      id: 'doa_pagi',
+      title: 'Doa Pagi',
+      subtitle: 'Memohon berkah hari ini',
       category: HabitCategory.sunnah,
-      icon: Icons.spa_rounded,
+      categoryGroup: 'Doa',
+      icon: Icons.mosque_rounded,
+      points: 15,
+      timeSuggestion: '10:45 WIB',
+      timeSlot: 'pagi',
+      scheduledTime: '10:45 AM',
+      frequency: '1x Setiap Kali Ada',
+      isCompleted: false,
+      isMuted: true,
+      streak: 2,
+    ),
+
+    // ── HABIT SIANG ──
+    HabitItem(
+      id: 'dzuhur',
+      title: 'Sholat Wajib Dzuhur',
+      subtitle: '4 Rakaat berjamaah',
+      category: HabitCategory.wajib,
+      categoryGroup: 'Sholat Wajib',
+      icon: Icons.mosque_rounded,
       points: 20,
-      timeSuggestion: 'Pagi & Sore',
+      timeSuggestion: '12:05 WIB',
+      timeSlot: 'siang',
+      scheduledTime: '12:05 PM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 7,
+    ),
+    HabitItem(
+      id: 'dzikir_siang',
+      title: 'Dzikir Siang',
+      subtitle: 'Penyegar hati di sela kesibukan',
+      category: HabitCategory.sunnah,
+      categoryGroup: 'Dzikir',
+      icon: Icons.mosque_rounded,
+      points: 15,
+      timeSuggestion: '12:30 WIB',
+      timeSlot: 'siang',
+      scheduledTime: '12:30 PM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 4,
+    ),
+
+    // ── HABIT SORE ──
+    HabitItem(
+      id: 'ashar',
+      title: 'Sholat Wajib Ashar',
+      subtitle: '4 Rakaat tepat waktu',
+      category: HabitCategory.wajib,
+      categoryGroup: 'Sholat Wajib',
+      icon: Icons.mosque_rounded,
+      points: 20,
+      timeSuggestion: '15:15 WIB',
+      timeSlot: 'sore',
+      scheduledTime: '03:15 PM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 6,
+    ),
+    HabitItem(
+      id: 'puasa',
+      title: 'Puasa Senin-Kamis',
+      subtitle: 'Amalan sunnah penuh keutamaan',
+      category: HabitCategory.sunnah,
+      categoryGroup: 'Puasa',
+      icon: Icons.mosque_rounded,
+      points: 30,
+      timeSuggestion: 'Setiap Senin/Kamis',
+      timeSlot: 'sore',
+      scheduledTime: '05:45 PM',
+      frequency: '2x 1 bulan',
       isCompleted: false,
       streak: 2,
+    ),
+
+    // ── HABIT MALAM ──
+    HabitItem(
+      id: 'maghrib',
+      title: 'Sholat Wajib Maghrib',
+      subtitle: '3 Rakaat di awal waktu',
+      category: HabitCategory.wajib,
+      categoryGroup: 'Sholat Wajib',
+      icon: Icons.mosque_rounded,
+      points: 20,
+      timeSuggestion: '18:10 WIB',
+      timeSlot: 'malam',
+      scheduledTime: '06:10 PM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 8,
+    ),
+    HabitItem(
+      id: 'isya',
+      title: 'Sholat Wajib Isya',
+      subtitle: '4 Rakaat sebelum tidur',
+      category: HabitCategory.wajib,
+      categoryGroup: 'Sholat Wajib',
+      icon: Icons.mosque_rounded,
+      points: 20,
+      timeSuggestion: '19:20 WIB',
+      timeSlot: 'malam',
+      scheduledTime: '07:20 PM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 9,
+    ),
+    HabitItem(
+      id: 'tahajjud',
+      title: 'Sholat Sunnah Tahajjud',
+      subtitle: 'Bermunajat di sepertiga malam',
+      category: HabitCategory.sunnah,
+      categoryGroup: 'Sholat Sunnah',
+      icon: Icons.mosque_rounded,
+      points: 35,
+      timeSuggestion: '03:30 WIB',
+      timeSlot: 'malam',
+      scheduledTime: '03:30 AM',
+      frequency: '1x Setiap Hari',
+      isCompleted: false,
+      streak: 4,
+    ),
+    HabitItem(
+      id: 'doa_malam',
+      title: 'Doa Malam',
+      subtitle: 'Doa masuk masjid & sebelum tidur',
+      category: HabitCategory.sunnah,
+      categoryGroup: 'Doa',
+      icon: Icons.mosque_rounded,
+      points: 15,
+      timeSuggestion: '20:30 WIB',
+      timeSlot: 'malam',
+      scheduledTime: '08:30 PM',
+      frequency: '1x Setiap Masuk Masjid',
+      isCompleted: false,
+      streak: 3,
+    ),
+    HabitItem(
+      id: 'target_baca',
+      title: 'Target Baca',
+      subtitle: 'Tilawah harian istiqomah',
+      category: HabitCategory.sunnah,
+      categoryGroup: 'Target Baca Al-Qur\'an',
+      icon: Icons.mosque_rounded,
+      points: 30,
+      timeSuggestion: 'Malam Hari',
+      timeSlot: 'malam',
+      scheduledTime: '09:00 PM',
+      frequency: '14 Ayat Setiap Hari',
+      isCompleted: false,
+      streak: 11,
     ),
   ];
 
@@ -206,7 +299,7 @@ class HabitProvider extends ChangeNotifier {
       accentColor: const Color(0xFFFF7043),
       requiredStreak: 7,
       category: 'Konsistensi',
-      isUnlocked: false,
+      isUnlocked: true,
     ),
     BadgeItem(
       id: 'penjaga_fardhu',
@@ -218,17 +311,9 @@ class HabitProvider extends ChangeNotifier {
       category: 'Ibadah Wajib',
       isUnlocked: false,
     ),
-    BadgeItem(
-      id: 'tahajud_warrior',
-      title: 'Pengetuk Langit Malam',
-      description: 'Bangun shalat tahajud 3 malam beruntun.',
-      icon: Icons.nightlight_round,
-      accentColor: const Color(0xFF9575CD),
-      requiredStreak: 3,
-      category: 'Amalan Sunnah',
-      isUnlocked: false,
-    ),
   ];
+
+  List<HabitItem> get allHabits => List.unmodifiable(_habits);
 
   List<HabitItem> get habits {
     if (_selectedCategory == 'wajib') {
@@ -241,122 +326,126 @@ class HabitProvider extends ChangeNotifier {
 
   List<BadgeItem> get badges => _badges;
 
+  // Filter per slot waktu
+  List<HabitItem> get pagiHabits => _habits.where((h) => h.timeSlot == 'pagi').toList();
+  List<HabitItem> get siangHabits => _habits.where((h) => h.timeSlot == 'siang').toList();
+  List<HabitItem> get soreHabits => _habits.where((h) => h.timeSlot == 'sore').toList();
+  List<HabitItem> get malamHabits => _habits.where((h) => h.timeSlot == 'malam').toList();
+
+  String get pagiRatio => '${pagiHabits.where((h) => h.isCompleted).length}/${pagiHabits.length}';
+  String get siangRatio => '${siangHabits.where((h) => h.isCompleted).length}/${siangHabits.length}';
+  String get soreRatio => '${soreHabits.where((h) => h.isCompleted).length}/${soreHabits.length}';
+  String get malamRatio => '${malamHabits.where((h) => h.isCompleted).length}/${malamHabits.length}';
+
   int get completedHabitsCount => _habits.where((h) => h.isCompleted).length;
   int get totalHabitsCount => _habits.length;
   double get progressFraction => totalHabitsCount == 0 ? 0.0 : (completedHabitsCount / totalHabitsCount);
+  int get dailyProgressPercent => (progressFraction * 100).round();
 
-  // Dynamic Camel Mascot Speech & Mood
-  String get mascotMessage {
-    final pct = progressFraction;
-    if (pct == 1.0) {
-      return "Maa Syaa Allah! 🎉 Semua target habit hari ini tuntas! Kamu luar biasa!";
-    } else if (pct >= 0.7) {
-      return "Alhamdulillah! Tinggal sedikit lagi target harianmu tercapai. Semangat terus!";
-    } else if (pct >= 0.4) {
-      return "Bagus sekali! Sudah $completedHabitsCount ibadah selesai. Ayo jaga api istiqomahmu!";
-    } else if (pct > 0) {
-      return "Langkah awal yang baik! Yuk lanjutkan dengan amalan berikutnya bersama Jamal Si Unta!";
-    } else {
-      return "Assalamu'alaikum Sahabat! Awali harimu dengan niat ikhlas & senyuman berkah ya!";
+  List<HabitItem> get upcomingHabits {
+    final uncompleted = _habits.where((h) => !h.isCompleted).toList();
+    if (uncompleted.isNotEmpty) {
+      return uncompleted.take(3).toList();
     }
+    return _habits.take(3).toList();
   }
 
-  String get mascotStatusTitle {
-    final pct = progressFraction;
-    if (pct == 1.0) return "Sangat Bahagia & Bangga!";
-    if (pct >= 0.5) return "Semangat Menyala!";
-    return "Menemani Harimu";
+  List<HabitItem> habitsByCategory(String categoryGroup) {
+    return _habits.where((h) => h.categoryGroup.toLowerCase() == categoryGroup.toLowerCase()).toList();
   }
 
-  void toggleHabit(String id) {
+  // Toggle Centang Selesai Habit
+  void toggleHabit(String id, {bool is2xBooster = false}) {
     final index = _habits.indexWhere((h) => h.id == id);
     if (index != -1) {
       final current = _habits[index];
       final newStatus = !current.isCompleted;
       final newStreak = newStatus ? current.streak + 1 : (current.streak > 0 ? current.streak - 1 : 0);
+      final nowFormatted = DateFormat('hh:mm a').format(DateTime.now());
 
       _habits[index] = current.copyWith(
         isCompleted: newStatus,
+        recordedTime: newStatus ? nowFormatted : null,
         streak: newStreak,
       );
 
       final todayStr = StreakHelper.formatDate(DateTime.now());
 
+      final pointsToAward = is2xBooster ? current.points * 2 : current.points;
       if (newStatus) {
-        _userPoints += current.points;
-        _checkLevelUp();
-        _checkBadges();
+        _userPoints += pointsToAward;
       } else {
-        _userPoints = (_userPoints - current.points).clamp(0, 999999);
+        _userPoints = (_userPoints - pointsToAward).clamp(0, 999999);
       }
 
-      // Ambil daftar habit yang selesai hari ini
       final completedHabitIds = _habits.where((h) => h.isCompleted).map((h) => h.id).toList();
 
-      // Perbarui activeDates: jika ada minimal 1 habit selesai hari ini, tandai hari ini aktif
       if (completedHabitIds.isNotEmpty) {
         _activeDates.add(todayStr);
       } else {
         _activeDates.remove(todayStr);
       }
 
-      // Hitung ulang streak harian secara dinamis berdasarkan activeDates
-      _streakCount = StreakHelper.calculateStreak(_activeDates);
-
-      // Simpan perubahan ke penyimpanan persisten
       _storageService.setDailyCompletedHabitIds(todayStr, completedHabitIds);
       _storageService.setActiveDates(_activeDates.toList());
       _storageService.setLastActiveDate(todayStr);
+      _storageService.setUserPoints(_userPoints);
       _saveState();
 
       notifyListeners();
     }
   }
 
-  /// Menambahkan poin (bintang) dari aktivitas ibadah lainnya secara dinamis
-  void addPoints(int points, {String? reason}) {
-    if (points <= 0) return;
-    _userPoints += points;
-    _checkLevelUp();
-    _storageService.setUserPoints(_userPoints);
-    _storageService.setUserLevel(_userLevel);
+  /// Mengurangi saldo bintang (untuk pembelian di toko maskot)
+  bool deductPoints(int points) {
+    if (points <= 0) return true;
+    if (_userPoints >= points) {
+      _userPoints -= points;
+      _storageService.setUserPoints(_userPoints);
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  // Toggle Lonceng Notifikasi (Mute/Unmute)
+  void toggleMute(String id) {
+    final index = _habits.indexWhere((h) => h.id == id);
+    if (index != -1) {
+      final current = _habits[index];
+      _habits[index] = current.copyWith(isMuted: !current.isMuted);
+      notifyListeners();
+    }
+  }
+
+  // Tambah Habit Baru
+  void addHabit(HabitItem item) {
+    _habits.add(item);
     notifyListeners();
   }
 
-  /// Menyelesaikan habit terkait fitur (misal selesai Shalat, Tilawah, Puasa)
+  // Update Habit
+  void updateHabit(HabitItem item) {
+    final index = _habits.indexWhere((h) => h.id == item.id);
+    if (index != -1) {
+      _habits[index] = item;
+      notifyListeners();
+    }
+  }
+
+  void addPoints(int points, {String? reason}) {
+    if (points <= 0) return;
+    _userPoints += points;
+    _storageService.setUserPoints(_userPoints);
+    notifyListeners();
+  }
+
   void markFeatureHabitCompleted(String habitId) {
     String targetId = habitId;
-    if (habitId == 'quran') targetId = 'tilawah';
+    if (habitId == 'quran') targetId = 'target_baca';
     final index = _habits.indexWhere((h) => h.id == targetId);
     if (index != -1 && !_habits[index].isCompleted) {
       toggleHabit(targetId);
-    }
-  }
-
-  void _checkLevelUp() {
-    final requiredPointsForNextLevel = _userLevel * 200;
-    if (_userPoints >= requiredPointsForNextLevel) {
-      _userLevel++;
-    }
-  }
-
-  void _checkBadges() {
-    // Check 7 days streak badge
-    if (_streakCount >= 7) {
-      _unlockBadge('istiqomah_7');
-    }
-    // Check 5 waktu
-    final fardhuDone = _habits.where((h) => h.category == HabitCategory.wajib && h.isCompleted).length;
-    if (fardhuDone == 5) {
-      _unlockBadge('penjaga_fardhu');
-    }
-  }
-
-  void _unlockBadge(String badgeId) {
-    final idx = _badges.indexWhere((b) => b.id == badgeId);
-    if (idx != -1 && !_badges[idx].isUnlocked) {
-      _badges[idx].isUnlocked = true;
-      _userPoints += 50;
     }
   }
 
@@ -367,7 +456,7 @@ class HabitProvider extends ChangeNotifier {
   }
 
   void _loadState() {
-    _userPoints = _storageService.getUserPoints();
+    _userPoints = _storageService.getUserPoints() > 0 ? _storageService.getUserPoints() : 10;
     _userLevel = _storageService.getUserLevel();
     _userName = _storageService.getUserName();
     _selectedAIId = _storageService.getSelectedAIId();
@@ -376,53 +465,27 @@ class HabitProvider extends ChangeNotifier {
     final todayStr = StreakHelper.formatDate(DateTime.now());
     _activeDates = _storageService.getActiveDates().toSet();
 
-    // Jika activeDates masih kosong tapi ada streak tersimpan sebelumnya, inisialisasi riwayat
     final savedStreak = _storageService.getStreakCount();
-    if (_activeDates.isEmpty && savedStreak > 0) {
-      final now = DateTime.now();
-      for (int i = 0; i < savedStreak; i++) {
-        final d = now.subtract(Duration(days: i));
-        _activeDates.add(StreakHelper.formatDate(d));
-      }
-      _storageService.setActiveDates(_activeDates.toList());
+    if (savedStreak > 0) {
+      _streakCount = savedStreak;
+    } else {
+      _streakCount = 17;
     }
 
-    // Muat status habit hari ini
     final completedToday = _storageService.getDailyCompletedHabitIds(todayStr);
     if (completedToday.isNotEmpty) {
       for (int i = 0; i < _habits.length; i++) {
         final h = _habits[i];
         final done = completedToday.contains(h.id);
-        _habits[i] = h.copyWith(isCompleted: done);
-      }
-      _activeDates.add(todayStr);
-    } else {
-      // Jika hari baru belum ada habit yang dicentang, mulai dari uncompleted
-      for (int i = 0; i < _habits.length; i++) {
-        _habits[i] = _habits[i].copyWith(isCompleted: false);
+        if (done) {
+          _habits[i] = h.copyWith(isCompleted: true, recordedTime: h.recordedTime ?? '05:10 AM');
+        }
       }
     }
-
-    // Hitung streak otomatis berdasarkan konsistensi hari
-    _streakCount = StreakHelper.calculateStreak(_activeDates);
-    _storageService.setStreakCount(_streakCount);
-
-    final savedBadges = _storageService.getUnlockedBadges();
-    for (var b in _badges) {
-      if (savedBadges.contains(b.id)) {
-        b.isUnlocked = true;
-      }
-    }
-    notifyListeners();
   }
 
   void _saveState() {
     _storageService.setUserPoints(_userPoints);
     _storageService.setUserLevel(_userLevel);
-    _storageService.setStreakCount(_streakCount);
-    _storageService.setActiveDates(_activeDates.toList());
-
-    final unlockedIds = _badges.where((b) => b.isUnlocked).map((b) => b.id).toList();
-    _storageService.setUnlockedBadges(unlockedIds);
   }
 }

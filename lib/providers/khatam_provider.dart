@@ -386,6 +386,29 @@ class KhatamProvider extends ChangeNotifier {
     }
   }
 
+  /// Menandai Juz selesai dibaca dan memperbarui progres khatam
+  Future<void> markJuzComplete(int juzNumber) async {
+    if (_activePlan == null) return;
+    final updatedCompleted = Set<int>.from(_activePlan!.completedJuzList)..add(juzNumber);
+    final nextJuzVal = (juzNumber < 30) ? juzNumber + 1 : 30;
+    final totalProgress = (updatedCompleted.length / 30.0 * 100).clamp(0.0, 100.0);
+
+    final updatedPlan = _activePlan!.copyWith(
+      currentJuz: nextJuzVal,
+      completedJuzList: updatedCompleted,
+      progressPercentage: totalProgress,
+    );
+
+    _activePlan = updatedPlan;
+    await _khatamService.savePlan(updatedPlan);
+
+    if (_habitProvider != null) {
+      _habitProvider!.markFeatureHabitCompleted('tilawah');
+    }
+
+    notifyListeners();
+  }
+
   /// Toggle Audio Play / Pause untuk Ayat
   Future<void> toggleAudio(JuzAyahEntry? entry) async {
     final target = entry ?? (_flattenedAyahs.isNotEmpty && _currentAyahIndex < _flattenedAyahs.length

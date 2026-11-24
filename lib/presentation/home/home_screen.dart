@@ -16,7 +16,9 @@ import '../dzikir/dzikir_screen.dart';
 import '../../providers/khatam_provider.dart';
 import '../khatam/khatam_dashboard_screen.dart';
 import '../khatam/khatam_reading_screen.dart';
+import '../shell/main_navigation_shell.dart';
 import '../../core/theme/home_time_theme.dart';
+import '../../features/mascot/screens/mascot_hub_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -316,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const CompanionHubScreen()),
+                          MaterialPageRoute(builder: (_) => const MascotHubScreen()),
                         );
                       },
                       child: Column(
@@ -646,10 +648,14 @@ class _HomeScreenState extends State<HomeScreen> {
         'label': 'Al-Quran',
         'asset': 'assets/icon/Vector.png',
         'icon': Icons.menu_book_rounded,
-        'onTap': () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const QuranScreen()),
-        ),
+        'onTap': () {
+          if (!MainNavigationShell.switchToTab(context, 2)) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const QuranScreen()),
+            );
+          }
+        },
       },
       {
         'label': 'Dzikir',
@@ -910,10 +916,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const QuranScreen()),
-                    );
+                    if (!MainNavigationShell.switchToTab(context, 2)) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const QuranScreen()),
+                      );
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(

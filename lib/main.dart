@@ -24,6 +24,7 @@ import 'providers/dzikir_provider.dart';
 import 'providers/khatam_provider.dart';
 import 'providers/community_provider.dart';
 import 'features/ai_companion/providers/ai_chat_provider.dart';
+import 'features/mascot/providers/mascot_provider.dart';
 import 'presentation/splash/animated_splash_screen.dart';
 
 void main() async {
@@ -100,6 +101,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (_) => CommunityProvider()),
         ChangeNotifierProvider(create: (_) => AIChatProvider()),
+        ChangeNotifierProvider(create: (_) => MascotProvider(storageService)),
       ],
       child: const MuslimHabitApp(),
     ),

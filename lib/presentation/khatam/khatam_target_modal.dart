@@ -25,6 +25,7 @@ class KhatamTargetResult {
   }
 }
 
+/// Modal Bottom Sheet Picker Target (TargetKhatamBottomSheet)
 class KhatamTargetModal extends StatefulWidget {
   final int initialQuantity;
   final String initialUnit;
@@ -63,11 +64,16 @@ class KhatamTargetModal extends StatefulWidget {
   State<KhatamTargetModal> createState() => _KhatamTargetModalState();
 }
 
+typedef TargetKhatamBottomSheet = KhatamTargetModal;
+
 class _KhatamTargetModalState extends State<KhatamTargetModal> {
   late int _quantity;
   late String _unit; // 'juz' atau 'ayat'
   late int _periodValue;
   late String _periodUnit; // 'hari' atau 'minggu'
+
+  late FixedExtentScrollController _quantityScrollController;
+  late FixedExtentScrollController _periodScrollController;
 
   @override
   void initState() {
@@ -76,249 +82,299 @@ class _KhatamTargetModalState extends State<KhatamTargetModal> {
     _unit = widget.initialUnit.toLowerCase();
     _periodValue = widget.initialPeriodValue;
     _periodUnit = widget.initialPeriodUnit.toLowerCase();
+
+    final initialQIndex = _unit == 'juz'
+        ? (_quantity - 1).clamp(0, 29)
+        : (_quantity ~/ 10 - 1).clamp(0, 30);
+    final initialPIndex = (_periodValue - 1).clamp(0, 59);
+
+    _quantityScrollController = FixedExtentScrollController(initialItem: initialQIndex);
+    _periodScrollController = FixedExtentScrollController(initialItem: initialPIndex);
+  }
+
+  @override
+  void dispose() {
+    _quantityScrollController.dispose();
+    _periodScrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: const BoxDecoration(
-        color: Color(0xFFFBFBF9),
+        color: Color(0xFFF7F6EE),
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Drag indicator handle
-          Container(
-            width: 44,
-            height: 4,
-            decoration: BoxDecoration(
-              color: const Color(0xFFD6DCD3),
-              borderRadius: BorderRadius.circular(2),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle atas
+            Container(
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFD6DCD3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 18),
+            const SizedBox(height: 18),
 
-          // Header
-          Text(
-            'Atur Target Khatam',
-            style: GoogleFonts.inter(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF1B432C),
+            // Header
+            Text(
+              'Atur Target Khatam',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1B432C),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Pilih Target Anda',
-            style: GoogleFonts.inter(
-              fontSize: 13.5,
-              color: const Color(0xFF6B7280),
+            const SizedBox(height: 4),
+            Text(
+              'Pilih Target Anda',
+              style: GoogleFonts.inter(
+                fontSize: 13.5,
+                color: const Color(0xFF6B7280),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // ── KOTAK PEMILIH TARGET (SESUAI GAMBAR REFERENSI KETIGA) ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEBF2DF).withValues(alpha: 0.55),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                // 1. Selector Angka Kuantitas
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildNumberStepper(
-                        value: _quantity,
-                        min: 1,
-                        max: _unit == 'juz' ? 30 : 286,
-                        onChanged: (val) => setState(() => _quantity = val),
-                      ),
-                      const SizedBox(width: 8),
-                      // Unit Switcher (Juz / Ayat)
-                      Column(
-                        children: [
-                          _buildUnitChip(
-                            label: 'Juz',
-                            isSelected: _unit == 'juz',
-                            onTap: () => setState(() {
-                              _unit = 'juz';
-                              if (_quantity > 30) _quantity = 1;
-                            }),
+            // ── AREA PICKER (KOTAK HIJAU MUDA LEMBUT #EBF2E1) ──
+            Container(
+              height: 130,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEBF2E1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  // 1. Selector Angka & Unit Kuantitas (Kiri)
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Wheel Scroll Angka Kuantitas
+                        SizedBox(
+                          width: 48,
+                          child: ListWheelScrollView.useDelegate(
+                            controller: _quantityScrollController,
+                            itemExtent: 44,
+                            physics: const FixedExtentScrollPhysics(),
+                            perspective: 0.003,
+                            diameterRatio: 1.5,
+                            onSelectedItemChanged: (index) {
+                              setState(() {
+                                _quantity = _unit == 'juz' ? (index + 1) : ((index + 1) * 10);
+                              });
+                            },
+                            childDelegate: ListWheelChildBuilderDelegate(
+                              builder: (context, index) {
+                                final val = _unit == 'juz' ? (index + 1) : ((index + 1) * 10);
+                                final isSelected = val == _quantity;
+                                return Center(
+                                  child: Text(
+                                    '$val',
+                                    style: GoogleFonts.inter(
+                                      fontSize: isSelected ? 34 : 16,
+                                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                                      color: isSelected
+                                          ? const Color(0xFF264E0B)
+                                          : const Color(0xFFA0AF95),
+                                    ),
+                                  ),
+                                );
+                              },
+                              childCount: _unit == 'juz' ? 30 : 30,
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          _buildUnitChip(
-                            label: 'Ayat',
-                            isSelected: _unit == 'ayat',
-                            onTap: () => setState(() {
-                              _unit = 'ayat';
-                              if (_quantity <= 5) _quantity = 50;
-                            }),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+                        ),
+                        const SizedBox(width: 10),
 
-                // Pemisah "/"
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    '/',
-                    style: GoogleFonts.inter(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w300,
-                      color: const Color(0xFF1B432C),
+                        // Unit Switcher Vertikal (Juz / Ayat)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildUnitChip(
+                              label: 'Juz',
+                              isSelected: _unit == 'juz',
+                              onTap: () {
+                                setState(() {
+                                  _unit = 'juz';
+                                  _quantity = 1;
+                                  _quantityScrollController.jumpToItem(0);
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 6),
+                            _buildUnitChip(
+                              label: 'Ayat',
+                              isSelected: _unit == 'ayat',
+                              onTap: () {
+                                setState(() {
+                                  _unit = 'ayat';
+                                  _quantity = 20;
+                                  _quantityScrollController.jumpToItem(1);
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ),
 
-                // 2. Selector Periode (Hari / Minggu)
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildNumberStepper(
-                        value: _periodValue,
-                        min: 1,
-                        max: 60,
-                        onChanged: (val) => setState(() => _periodValue = val),
+                  // Tanda Garis Miring Tebal "/" di Tengah
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      '/',
+                      style: GoogleFonts.inter(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF264E0B),
                       ),
-                      const SizedBox(width: 8),
-                      // Period Switcher (Hari / Minggu)
-                      Column(
-                        children: [
-                          _buildUnitChip(
-                            label: 'Hari',
-                            isSelected: _periodUnit == 'hari',
-                            onTap: () => setState(() => _periodUnit = 'hari'),
+                    ),
+                  ),
+
+                  // 2. Selector Angka & Unit Periode (Kanan)
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Wheel Scroll Angka Periode
+                        SizedBox(
+                          width: 48,
+                          child: ListWheelScrollView.useDelegate(
+                            controller: _periodScrollController,
+                            itemExtent: 44,
+                            physics: const FixedExtentScrollPhysics(),
+                            perspective: 0.003,
+                            diameterRatio: 1.5,
+                            onSelectedItemChanged: (index) {
+                              setState(() {
+                                _periodValue = index + 1;
+                              });
+                            },
+                            childDelegate: ListWheelChildBuilderDelegate(
+                              builder: (context, index) {
+                                final val = index + 1;
+                                final isSelected = val == _periodValue;
+                                return Center(
+                                  child: Text(
+                                    '$val',
+                                    style: GoogleFonts.inter(
+                                      fontSize: isSelected ? 34 : 16,
+                                      fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                                      color: isSelected
+                                          ? const Color(0xFF264E0B)
+                                          : const Color(0xFFA0AF95),
+                                    ),
+                                  ),
+                                );
+                              },
+                              childCount: 60,
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          _buildUnitChip(
-                            label: 'Minggu',
-                            isSelected: _periodUnit == 'minggu',
-                            onTap: () => setState(() => _periodUnit = 'minggu'),
-                          ),
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(width: 10),
+
+                        // Periode Switcher Vertikal (Hari / Minggu)
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _buildUnitChip(
+                              label: 'Hari',
+                              isSelected: _periodUnit == 'hari',
+                              onTap: () => setState(() => _periodUnit = 'hari'),
+                            ),
+                            const SizedBox(height: 6),
+                            _buildUnitChip(
+                              label: 'Minggu',
+                              isSelected: _periodUnit == 'minggu',
+                              onTap: () => setState(() => _periodUnit = 'minggu'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            // ── TOMBOL AKSI: SETEL TARGET (HIJAU TUA) ──
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF386616),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
                   ),
                 ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 28),
-
-          // Tombol Setel Target
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF456B2D),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(
-                  context,
-                  KhatamTargetResult(
-                    quantity: _quantity,
-                    unit: _unit,
-                    periodValue: _periodValue,
-                    periodUnit: _periodUnit,
+                onPressed: () {
+                  Navigator.pop(
+                    context,
+                    KhatamTargetResult(
+                      quantity: _quantity,
+                      unit: _unit,
+                      periodValue: _periodValue,
+                      periodUnit: _periodUnit,
+                    ),
+                  );
+                },
+                child: Text(
+                  'Setel Target',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
                   ),
-                );
-              },
-              child: Text(
-                'Setel Target',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
                 ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Tombol Batal
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFEDEBE3),
-                foregroundColor: const Color(0xFF4B5563),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+            // ── TOMBOL AKSI: BATAL (ABU-ABU KEHIJAUAN) ──
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE2E7D7),
+                  foregroundColor: const Color(0xFF264E0B),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(26),
+                  ),
                 ),
-              ),
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Batal',
-                style: GoogleFonts.inter(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Batal',
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF264E0B),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildNumberStepper({
-    required int value,
-    required int min,
-    required int max,
-    required ValueChanged<int> onChanged,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (value < max) onChanged(value + 1);
-          },
-          child: Text(
-            '${value < max ? value + 1 : ""}',
-            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade400),
-          ),
-        ),
-        Text(
-          '$value',
-          style: GoogleFonts.inter(
-            fontSize: 40,
-            fontWeight: FontWeight.w800,
-            color: const Color(0xFF2C4C20),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            if (value > min) onChanged(value - 1);
-          },
-          child: Text(
-            '${value > min ? value - 1 : ""}',
-            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade400),
-          ),
-        ),
-      ],
     );
   }
 
@@ -330,18 +386,18 @@ class _KhatamTargetModalState extends State<KhatamTargetModal> {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF456B2D) : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          color: isSelected ? const Color(0xFF386616) : const Color(0xFFE4ECE0),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
           label,
           style: GoogleFonts.inter(
             fontSize: 12.5,
             fontWeight: FontWeight.w700,
-            color: isSelected ? Colors.white : const Color(0xFF6B7280),
+            color: isSelected ? Colors.white : const Color(0xFF4B5563),
           ),
         ),
       ),

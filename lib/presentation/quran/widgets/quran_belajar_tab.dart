@@ -8,6 +8,10 @@ import '../../../providers/tilawah_provider.dart';
 import '../../tilawah/tilawah_screen.dart';
 import '../pendeteksi_bacaan_screen.dart';
 import '../surah_detail_screen.dart';
+import '../hapalan_ai_quran_screen.dart';
+import '../../../providers/khatam_provider.dart';
+import '../../khatam/khatam_dashboard_screen.dart';
+import '../../khatam/khatam_setup_screen.dart';
 
 class QuranBelajarTab extends StatelessWidget {
   const QuranBelajarTab({super.key});
@@ -41,9 +45,14 @@ class QuranBelajarTab extends StatelessWidget {
           icon: Icons.track_changes_rounded,
           title: "Mode Khataman",
           onTap: () {
+            final khatamProv = context.read<KhatamProvider>();
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const TilawahScreen()),
+              MaterialPageRoute(
+                builder: (_) => khatamProv.hasActivePlan
+                    ? const KhatamDashboardScreen()
+                    : const KhatamSetupScreen(),
+              ),
             );
           },
         ),
@@ -53,7 +62,10 @@ class QuranBelajarTab extends StatelessWidget {
           context: context,
           icon: Icons.psychology_rounded,
           title: "Mode Hapalan",
-          onTap: () => _showModeHapalanModal(context),
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const HapalanAiQuranScreen()),
+          ),
         ),
         const SizedBox(height: 24),
 
@@ -293,9 +305,14 @@ class QuranBelajarTab extends StatelessWidget {
 
     return InkWell(
       onTap: () {
+        final khatamProv = context.read<KhatamProvider>();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const TilawahScreen()),
+          MaterialPageRoute(
+            builder: (_) => khatamProv.hasActivePlan
+                ? const KhatamDashboardScreen()
+                : const KhatamSetupScreen(),
+          ),
         );
       },
       borderRadius: BorderRadius.circular(18),
