@@ -64,7 +64,7 @@ class _DoaCategoryDetailScreenState extends State<DoaCategoryDetailScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(68),
         child: AppBar(
-          backgroundColor: const Color(0xFF557C2B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: Padding(
             padding: const EdgeInsets.only(left: 12),

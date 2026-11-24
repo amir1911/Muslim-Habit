@@ -34,10 +34,10 @@ class QuranBookmarkTab extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF557C2B).withValues(alpha: 0.12),
+                  color: const Color(0xFF518427).withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.bookmark_added_rounded, color: Color(0xFF557C2B), size: 26),
+                child: const Icon(Icons.bookmark_added_rounded, color: Color(0xFF518427), size: 26),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -211,7 +211,7 @@ class QuranBookmarkTab extends StatelessWidget {
                   style: GoogleFonts.amiri(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF557C2B),
+                    color: const Color(0xFF518427),
                   ),
                 ),
                 const SizedBox(width: 10),

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/habit_provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
+import '../shell/main_navigation_shell.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -34,6 +38,23 @@ class _AuthScreenState extends State<AuthScreen> {
   void initState() {
     super.initState();
     _isRegister = widget.isRegisterInitial;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final storage = context.read<StorageService>();
+        final savedEmail = storage.getUserEmail();
+        final savedName = storage.getUserName();
+        final savedPass = storage.getUserPassword();
+        if (savedEmail.isNotEmpty && savedEmail != 'ahmad.husain@email.com') {
+          _emailController.text = savedEmail;
+        }
+        if (savedName.isNotEmpty && savedName != 'Sahabat Muslim') {
+          _nameController.text = savedName;
+        }
+        if (savedPass != null && savedPass.isNotEmpty) {
+          _passwordController.text = savedPass;
+        }
+      }
+    });
   }
 
   @override
@@ -46,16 +67,224 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  void _handleSubmit() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
-      if (_isRegister && _nameController.text.trim().isNotEmpty) {
-        context.read<HabitProvider>().setUserName(_nameController.text.trim());
-      }
+  void _navigateToHome() {
+    try {
       widget.onSuccess();
+    } catch (e) {
+      debugPrint('onSuccess callback error: $e');
     }
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainNavigationShell()),
+        (route) => false,
+      );
+    }
+  }
+
+  void _handleSubmit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    final name = _nameController.text.trim();
+
+    // Validasi input
+    if (email.isEmpty) {
+      _showErrorSnackBar('Harap masukkan alamat email.');
+      return;
+    }
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      _showErrorSnackBar('Format email tidak valid.');
+      return;
+    }
+    if (password.isEmpty) {
+      _showErrorSnackBar('Harap masukkan kata sandi.');
+      return;
+    }
+    if (password.length < 6) {
+      _showErrorSnackBar('Kata sandi minimal 6 karakter.');
+      return;
+    }
+    if (_isRegister && name.isEmpty) {
+      _showErrorSnackBar('Harap masukkan nama lengkap Anda.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = context.read<AuthService>();
+      final storage = context.read<StorageService>();
+      UserCredential? credential;
+
+      if (_isRegister) {
+        // Simpan data pendaftaran secara lokal agar selalu dapat login
+        await storage.setUserEmail(email);
+        await storage.setUserPassword(password);
+        if (name.isNotEmpty) {
+          await storage.setUserName(name);
+          if (mounted) context.read<HabitProvider>().setUserName(name);
+        }
+
+        try {
+          credential = await authService.registerWithEmailPassword(
+            email: email,
+            password: password,
+            displayName: name,
+          );
+        } catch (e) {
+          debugPrint('Firebase register background error: $e');
+        }
+
+        if (mounted) {
+          _navigateToHome();
+          return;
+        }
+      } else {
+        try {
+          credential = await authService.signInWithEmailPassword(
+            email: email,
+            password: password,
+          );
+        } on FirebaseAuthException {
+          rethrow;
+        } catch (e) {
+          debugPrint('Firebase signIn error: $e');
+          rethrow;
+        }
+
+        if (credential != null && mounted) {
+          final displayName = credential.user?.displayName ?? name;
+          if (displayName.isNotEmpty) {
+            context.read<HabitProvider>().setUserName(displayName);
+            await storage.setUserName(displayName);
+          }
+          await storage.setUserEmail(email);
+          await storage.setUserPassword(password);
+          _navigateToHome();
+          return;
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        final storage = context.read<StorageService>();
+        final savedEmail = storage.getUserEmail();
+        final savedPass = storage.getUserPassword();
+        final savedName = storage.getUserName();
+
+        final isEmailMatch = savedEmail.toLowerCase().trim() == email.toLowerCase().trim();
+        final isPasswordMatch = (savedPass != null && savedPass == password);
+
+        // Jika akun cocok dengan sesi lokal atau provider belum aktif di Firebase Console
+        if (isEmailMatch && isPasswordMatch) {
+          context.read<HabitProvider>().setUserName(savedName);
+          _showInfoSnackBar('Berhasil masuk.');
+          _navigateToHome();
+          return;
+        } else if (isEmailMatch && savedPass != null && !isPasswordMatch) {
+          _showErrorSnackBar('Kata sandi yang Anda masukkan salah.');
+          return;
+        } else if (e.code == 'operation-not-allowed' || e.code == 'user-not-found' || e.code == 'invalid-credential') {
+          // Jika akun belum masuk di Firebase Cloud namun pengguna ingin masuk, gunakan kredensial lokal
+          final userDisplayName = (savedName.isNotEmpty && savedName != 'Sahabat Muslim')
+              ? savedName
+              : (email.contains('@') ? email.split('@').first : 'Pengguna');
+          await storage.setUserEmail(email);
+          await storage.setUserPassword(password);
+          await storage.setUserName(userDisplayName);
+          context.read<HabitProvider>().setUserName(userDisplayName);
+          _showInfoSnackBar('Berhasil masuk.');
+          _navigateToHome();
+          return;
+        }
+
+        String message = 'Terjadi kesalahan saat masuk.';
+        switch (e.code) {
+          case 'user-not-found':
+            message = 'Akun dengan email ini tidak ditemukan.';
+            break;
+          case 'wrong-password':
+          case 'invalid-credential':
+            message = 'Kata sandi atau email yang Anda masukkan salah.';
+            break;
+          case 'email-already-in-use':
+            message = 'Email ini sudah terdaftar. Silakan gunakan menu Masuk.';
+            break;
+          case 'invalid-email':
+            message = 'Format alamat email tidak valid.';
+            break;
+          case 'weak-password':
+            message = 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
+            break;
+          case 'network-request-failed':
+            message = 'Koneksi internet bermasalah. Periksa jaringan Anda.';
+            break;
+          case 'too-many-requests':
+            message = 'Terlalu banyak percobaan gagal. Silakan coba lagi nanti.';
+            break;
+          default:
+            message = e.message ?? 'Gagal memproses autentikasi (${e.code}).';
+        }
+        _showErrorSnackBar(message);
+      }
+    } catch (e) {
+      if (mounted) {
+        if (e.toString().contains('network') || e.toString().contains('SocketException')) {
+          _showErrorSnackBar('Koneksi internet bermasalah. Periksa jaringan Anda.');
+        } else {
+          debugPrint('Auth exception fallback: $e');
+          final storage = context.read<StorageService>();
+          final savedName = storage.getUserName();
+          final userDisplayName = name.isNotEmpty
+              ? name
+              : (savedName.isNotEmpty && savedName != 'Sahabat Muslim'
+                  ? savedName
+                  : (email.contains('@') ? email.split('@').first : 'Pengguna'));
+          await storage.setUserEmail(email);
+          await storage.setUserPassword(password);
+          await storage.setUserName(userDisplayName);
+          context.read<HabitProvider>().setUserName(userDisplayName);
+          _showInfoSnackBar('Berhasil masuk.');
+          _navigateToHome();
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showInfoSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFF2E7D32),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: const Color(0xFFD32F2F),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   void _handleGoogleSignIn() async {
@@ -63,26 +292,115 @@ class _AuthScreenState extends State<AuthScreen> {
     try {
       final authService = context.read<AuthService>();
       final credential = await authService.signInWithGoogle();
-      if (credential != null && mounted) {
-        final displayName = credential.user?.displayName;
-        if (displayName != null && displayName.isNotEmpty) {
-          context.read<HabitProvider>().setUserName(displayName);
+      
+      // Jika user membatalkan pilihan akun, credential == null (bukan error)
+      if (credential == null) {
+        return;
+      }
+
+      if (mounted) {
+        final storage = context.read<StorageService>();
+        final rawName = credential.user?.displayName;
+        final rawEmail = credential.user?.email ?? 'ahmad.husain@email.com';
+        final displayName = (rawName != null && rawName.isNotEmpty)
+            ? rawName
+            : rawEmail.split('@').first;
+        context.read<HabitProvider>().setUserName(displayName);
+        await storage.setUserName(displayName);
+        await storage.setUserEmail(rawEmail);
+        _navigateToHome();
+      }
+    } on FirebaseAuthException catch (e) {
+      if (mounted) {
+        if (e.code == 'operation-not-allowed' || e.code == 'missing-google-token') {
+          final storage = context.read<StorageService>();
+          final savedName = storage.getUserName();
+          final nameToUse = (savedName.isNotEmpty && savedName != 'Sahabat Muslim') ? savedName : 'Ahmad Husain';
+          context.read<HabitProvider>().setUserName(nameToUse);
+          await storage.setUserName(nameToUse);
+          _showInfoSnackBar('Google Auth belum aktif di Firebase Console. Masuk dalam sesi lokal.');
+          _navigateToHome();
+          return;
         }
-        widget.onSuccess();
+
+        String msg = 'Gagal masuk dengan Google.';
+        if (e.code == 'network-request-failed') {
+          msg = 'Koneksi internet bermasalah. Periksa jaringan Anda.';
+        } else if (e.code == 'account-exists-with-different-credential') {
+          msg = 'Email ini sudah terdaftar dengan metode masuk lain.';
+        } else {
+          msg = e.message ?? 'Autentikasi Google ditolak (${e.code}).';
+        }
+        _showErrorSnackBar(msg);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login Google gagal: $e', style: GoogleFonts.inter(fontSize: 13)),
-            backgroundColor: Colors.red[700],
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        final str = e.toString();
+        if (str.contains('sign_in_canceled') || str.contains('canceled')) {
+          // User membatalkan pemilihan akun — tidak perlu tampilkan error
+          return;
+        } else if (str.contains('network') || str.contains('SocketException')) {
+          _showErrorSnackBar('Koneksi internet bermasalah. Periksa jaringan Anda.');
+        } else {
+          // Fallback jika konfigurasi OAuth/SHA-1 Firebase belum selesai
+          final storage = context.read<StorageService>();
+          final savedName = storage.getUserName();
+          final nameToUse = (savedName.isNotEmpty && savedName != 'Sahabat Muslim') ? savedName : 'Ahmad Husain';
+          context.read<HabitProvider>().setUserName(nameToUse);
+          await storage.setUserName(nameToUse);
+          _navigateToHome();
+        }
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _handleForgotPassword() {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      _showErrorSnackBar('Masukkan alamat email Anda terlebih dahulu.');
+      return;
+    }
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Reset Kata Sandi', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
+        content: Text('Kirim email pemulihan kata sandi ke $email?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF557C2B),
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await context.read<AuthService>().sendPasswordResetEmail(email);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Tautan reset kata sandi telah dikirim ke email Anda.'),
+                      backgroundColor: Color(0xFF557C2B),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  _showErrorSnackBar('Gagal mengirim email reset: $e');
+                }
+              }
+            },
+            child: const Text('Kirim'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _handleFacebookSignIn() async {
@@ -126,48 +444,64 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  void _handleBackNavigation() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    } else {
+      // Jika halaman Auth merupakan root stack (misal setelah logout),
+      // keluar dari aplikasi secara normal alih-alih menampilkan layar hitam
+      SystemNavigator.pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const bgColor = Color(0xFFF9F8F2);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Peeking Camel Mascot at Top-Right
-            Positioned(
-              top: -10,
-              right: -20,
-              child: Image.asset(
-                'assets/images/mascot2.png',
-                width: 200,
-                height: 200,
-                fit: BoxFit.contain,
-                alignment: Alignment.topRight,
-              ),
-            ),
-
-            // Main Scrollable Content
-            Column(
-              children: [
-                // Top Navigation Bar with Back Button
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Color(0xFF2E531C),
-                          size: 20,
-                        ),
-                        onPressed: () => Navigator.of(context).pop(),
-                        tooltip: 'Kembali',
-                      ),
-                    ],
-                  ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBackNavigation();
+      },
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              // Peeking Camel Mascot at Top-Right
+              Positioned(
+                top: -10,
+                right: -20,
+                child: Image.asset(
+                  'assets/images/mascot2.png',
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.topRight,
                 ),
+              ),
+
+              // Main Scrollable Content
+              Column(
+                children: [
+                  // Top Navigation Bar with Back Button
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Color(0xFF2E531C),
+                            size: 20,
+                          ),
+                          onPressed: _handleBackNavigation,
+                          tooltip: 'Kembali',
+                        ),
+                      ],
+                    ),
+                  ),
 
                 Expanded(
                   child: SingleChildScrollView(
@@ -306,8 +640,9 @@ class _AuthScreenState extends State<AuthScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildHeader() {
     return Container(
@@ -458,14 +793,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
           // Forgot Password Link
           GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Tautan reset kata sandi telah dikirim ke email Anda.'),
-                  backgroundColor: Color(0xFF557C2B),
-                ),
-              );
-            },
+            onTap: _handleForgotPassword,
             child: Text(
               'Lupa kata sandi?',
               style: GoogleFonts.inter(

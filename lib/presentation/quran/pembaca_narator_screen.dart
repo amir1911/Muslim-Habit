@@ -79,7 +79,7 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F2),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7023),
+        backgroundColor: const Color(0xFF518427),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -167,7 +167,7 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
             style: GoogleFonts.inter(
               fontSize: 13.5,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? const Color(0xFF4A7023) : const Color(0xFF42562E),
+              color: isSelected ? const Color(0xFF518427) : const Color(0xFF3D6318),
             ),
           ),
         ),
@@ -235,7 +235,7 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
                   isDownloaded ? '114/114 diunduh' : '0/114 diunduh',
                   style: GoogleFonts.inter(
                     fontSize: 11.5,
-                    color: isDownloaded ? const Color(0xFF4A7023) : Colors.grey[500],
+                    color: isDownloaded ? const Color(0xFF518427) : Colors.grey[500],
                   ),
                 ),
               ],
@@ -257,17 +257,17 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
               height: 40,
               decoration: BoxDecoration(
                 color: isDownloaded
-                    ? const Color(0xFF4A7023).withValues(alpha: 0.12)
+                    ? const Color(0xFF518427).withValues(alpha: 0.12)
                     : const Color(0xFFF0F4E8),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isDownloaded ? const Color(0xFF4A7023) : const Color(0xFFD0DCB8),
+                  color: isDownloaded ? const Color(0xFF518427) : const Color(0xFFD0DCB8),
                   width: 1.5,
                 ),
               ),
               child: Icon(
                 isDownloaded ? Icons.check_rounded : Icons.download_rounded,
-                color: const Color(0xFF4A7023),
+                color: const Color(0xFF518427),
                 size: 20,
               ),
             ),
@@ -294,7 +294,7 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7023),
+              backgroundColor: const Color(0xFF518427),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
@@ -304,7 +304,7 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
                 SnackBar(
                   content: Text('$name dipilih sebagai qari aktif.',
                       style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                  backgroundColor: const Color(0xFF4A7023),
+                  backgroundColor: const Color(0xFF518427),
                   duration: const Duration(seconds: 2),
                 ),
               );

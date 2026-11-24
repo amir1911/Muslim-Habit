@@ -5,6 +5,13 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
+import '../quran/quran_screen.dart';
+import '../doa/doa_screen.dart';
+import '../sholat/sholat_screen.dart';
+import '../puasa/puasa_screen.dart';
+import '../dzikir/dzikir_screen.dart';
+import '../shell/main_navigation_shell.dart';
+import '../../features/mascot/screens/mascot_hub_screen.dart';
 import 'kalender_planning_screen.dart';
 import 'widgets/edit_plan_bottom_sheet.dart';
 
@@ -132,7 +139,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           margin: const EdgeInsets.only(right: 6),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: const Color(0xFF55822B),
+            color: const Color(0xFF518427),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -190,131 +197,156 @@ class _HabitsScreenState extends State<HabitsScreen> {
   // 1. DUA KARTU RINGKASAN ATAS (SEJAJAR)
   // ==========================================
   Widget _buildTopSummaryCards(HabitProvider habitProv) {
-    return Row(
-      children: [
-        // Kartu Kiri (Hijau Tua) - Fokus Ibadahku & Maskot Nunu
-        Expanded(
-          child: Container(
-            height: 86,
-            padding: const EdgeInsets.fromLTRB(14, 12, 10, 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2E5714),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF2E5714).withValues(alpha: 0.15),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+    return SizedBox(
+      height: 96,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Kartu Kiri (Hijau Tua) - Fokus Ibadahku & Maskot Nunu
+          Expanded(
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MascotHubScreen()),
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2E5714),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF2E5714).withValues(alpha: 0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Fokus Ibadahku',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withValues(alpha: 0.8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Fokus Ibadahku',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withValues(alpha: 0.8),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Nunu',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    // Ilustrasi Maskot Unta Nunu
+                    SizedBox(
+                      width: 54,
+                      height: 54,
+                      child: Image.asset(
+                        'assets/images/mascot_nunu.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.pets_rounded,
+                          color: Colors.white70,
+                          size: 32,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Nunu',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                // Ilustrasi Maskot Unta Nunu
-                Image.asset(
-                  'assets/images/mascot_nunu.png',
-                  height: 64,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.pets_rounded,
-                    color: Colors.white70,
-                    size: 38,
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
+          const SizedBox(width: 12),
 
-        // Kartu Kanan (Putih) - My Streak & Api Oranye
-        Expanded(
-          child: Container(
-            height: 86,
-            padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE8ECE4)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'My Streak',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF75856B),
+          // Kartu Kanan (Putih) - My Streak & Api Oranye
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE8ECE4)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'My Streak',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF75856B),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${habitProv.streakCount} days',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: const Color(0xFF2E5714),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${habitProv.streakCount} days',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF2E5714),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                // Ikon Api Oranye Besar
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFF2E6),
-                    shape: BoxShape.circle,
+                  const SizedBox(width: 4),
+                  // Ikon Api Oranye Besar
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFFF2E6),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.local_fire_department_rounded,
+                      color: Color(0xFFF07026),
+                      size: 26,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.local_fire_department_rounded,
-                    color: Color(0xFFF07026),
-                    size: 28,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -405,13 +437,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
   // ==========================================
   Widget _buildWeeklyCalendarCard(BuildContext context) {
     const daysData = [
-      {'day': 'Sen', 'date': '20', 'done': true},
-      {'day': 'Sel', 'date': '21', 'done': true},
-      {'day': 'Rab', 'date': '22', 'done': true},
-      {'day': 'Kam', 'date': '23', 'done': true},
-      {'day': 'Jum', 'date': '24', 'done': false}, // Active
-      {'day': 'Sab', 'date': '25', 'done': false},
-      {'day': 'Min', 'date': '26', 'done': false},
+      {'day': 'Sen', 'date': '20', 'arabic': '۳'},
+      {'day': 'Sel', 'date': '21', 'arabic': '٤'},
+      {'day': 'Rab', 'date': '22', 'arabic': '٥'},
+      {'day': 'Kam', 'date': '23', 'arabic': '٦'},
+      {'day': 'Jum', 'date': '24', 'arabic': '۷'}, // Active
+      {'day': 'Sab', 'date': '25', 'arabic': '۸'},
+      {'day': 'Min', 'date': '26', 'arabic': '۹'},
     ];
 
     return Container(
@@ -466,7 +498,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                     children: [
                       const Icon(
                         Icons.wb_sunny_outlined,
-                        color: Color(0xFF55822B),
+                        color: Color(0xFF518427),
                         size: 15,
                       ),
                       const SizedBox(width: 4),
@@ -496,7 +528,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF55822B),
+                        color: const Color(0xFF518427),
                       ),
                     ),
                   ),
@@ -521,18 +553,13 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 },
                 borderRadius: BorderRadius.circular(10),
                 child: Container(
-                  width: 40,
+                  width: 42,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? const Color(0xFF2E5714)
-                        : const Color(0xFFF7F9F5),
+                        ? const Color(0xFF518427)
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF2E5714)
-                          : const Color(0xFFE5EDE0),
-                    ),
                   ),
                   child: Column(
                     children: [
@@ -546,7 +573,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                               : const Color(0xFF75856B),
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 3),
                       Text(
                         item['date'] as String,
                         style: GoogleFonts.plusJakartaSans(
@@ -555,6 +582,17 @@ class _HabitsScreenState extends State<HabitsScreen> {
                           color: isSelected
                               ? Colors.white
                               : const Color(0xFF2E5714),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item['arabic'] as String,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected
+                              ? Colors.white.withValues(alpha: 0.85)
+                              : const Color(0xFFA0ABA0),
                         ),
                       ),
                     ],
@@ -576,19 +614,19 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
-                      Icons.edit_calendar_rounded,
-                      size: 14,
-                      color: Color(0xFF55822B),
-                    ),
-                    const SizedBox(width: 4),
                     Text(
                       'EditJadwal',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF55822B),
+                        color: const Color(0xFF2E5714),
                       ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.edit_square,
+                      size: 15,
+                      color: Color(0xFF2E5714),
                     ),
                   ],
                 ),
@@ -605,11 +643,55 @@ class _HabitsScreenState extends State<HabitsScreen> {
   // ==========================================
   Widget _buildFeatureButtonsRow(BuildContext context) {
     final features = [
-      {'label': 'Sholat', 'icon': Icons.mosque_rounded},
-      {'label': 'Al-Quran', 'icon': Icons.menu_book_rounded},
-      {'label': 'Dzikir', 'icon': Icons.blur_circular_rounded},
-      {'label': 'Doa', 'icon': Icons.pan_tool_alt_rounded},
-      {'label': 'Puasa', 'icon': Icons.nightlight_round},
+      {
+        'label': 'Sholat',
+        'asset': 'assets/icon/shalat.png',
+        'icon': Icons.mosque_outlined,
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SholatScreen()),
+            ),
+      },
+      {
+        'label': 'Al-Quran',
+        'asset': 'assets/icon/Vector.png',
+        'icon': Icons.menu_book_rounded,
+        'onTap': () {
+          if (!MainNavigationShell.switchToTab(context, 2)) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const QuranScreen()),
+            );
+          }
+        },
+      },
+      {
+        'label': 'Dzikir',
+        'asset': 'assets/icon/Image (Dzikir).png',
+        'icon': Icons.spa_rounded,
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DzikirScreen()),
+            ),
+      },
+      {
+        'label': 'Doa',
+        'asset': 'assets/icon/Image (Doa).png',
+        'icon': Icons.volunteer_activism_rounded,
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const DoaScreen()),
+            ),
+      },
+      {
+        'label': 'Puasa',
+        'asset': 'assets/icon/Image (Malam).png',
+        'icon': Icons.nightlight_round,
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const PuasaScreen()),
+            ),
+      },
     ];
 
     return Column(
@@ -627,61 +709,57 @@ class _HabitsScreenState extends State<HabitsScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: features.map((feat) {
+            final asset = feat['asset'] as String?;
+            final icon = feat['icon'] as IconData;
+            final label = feat['label'] as String;
+            final onTap = feat['onTap'] as VoidCallback;
             return Expanded(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 child: InkWell(
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    final label = feat['label'] as String;
-                    if (label == 'Al-Quran') {
-                      // Buka halaman Al-Quran atau tampilkan navigasi
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Buka Menu AI-Quran dari bar navigasi'),
-                          duration: Duration(milliseconds: 1200),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Membuka Fitur $label'),
-                          duration: const Duration(milliseconds: 1000),
-                        ),
-                      );
-                    }
+                    onTap();
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF55822B),
+                      color: const Color(0xFF518427),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF55822B).withValues(alpha: 0.2),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
+                          color: const Color(0xFF518427).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          feat['icon'] as IconData,
-                          color: Colors.white,
-                          size: 24,
-                        ),
+                        if (asset != null)
+                          Image.asset(
+                            asset,
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                Icon(icon, color: Colors.white, size: 28),
+                          )
+                        else
+                          Icon(icon, color: Colors.white, size: 28),
                         const SizedBox(height: 6),
                         Text(
-                          feat['label'] as String,
-                          style: GoogleFonts.plusJakartaSans(
+                          label,
+                          style: GoogleFonts.inter(
                             fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -732,7 +810,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF55822B),
+                    color: const Color(0xFF518427),
                   ),
                 ),
               ),
@@ -797,7 +875,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
             ),
             child: const Icon(
               Icons.mosque_rounded,
-              color: Color(0xFF55822B),
+              color: Color(0xFF518427),
               size: 22,
             ),
           ),
@@ -847,7 +925,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   : Icons.notifications_active_rounded,
               color: item.isMuted
                   ? const Color(0xFFA0ABA0)
-                  : const Color(0xFF55822B),
+                  : const Color(0xFF518427),
               size: 20,
             ),
             onPressed: () {
@@ -903,7 +981,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                     const Icon(
                       Icons.group_outlined,
                       size: 15,
-                      color: Color(0xFF55822B),
+                      color: Color(0xFF518427),
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -911,7 +989,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF55822B),
+                        color: const Color(0xFF518427),
                       ),
                     ),
                   ],

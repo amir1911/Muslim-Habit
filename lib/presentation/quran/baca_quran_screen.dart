@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../models/surah_item.dart';
@@ -142,15 +143,23 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
       });
     }
 
-    return Scaffold(
-      backgroundColor: scaffoldBg,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    // Berikan margin aman di atas area system navigation bar (3-button maupun gesture)
+    final playerBottomMargin = bottomInset + 16.0;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Transparan agar hijau header menyatu ke status bar
+        statusBarIconBrightness: Brightness.light, // Ikon status bar putih
+        statusBarBrightness: Brightness.dark, // iOS status bar putih
+      ),
+      child: Scaffold(
+        backgroundColor: scaffoldBg,
+        body: Stack(
           children: [
             Column(
               children: [
-                // ── 1. HEADER HIJAU ISLAMI (Sesuai Screenshot) ──
+                // ── 1. HEADER HIJAU ISLAMI (Full Width & Full Top Status Bar) ──
                 _buildIslamicHeader(context, prov),
 
                 // ── 2. PROGRESS MEMBACA (Sesuai Screenshot) ──
@@ -173,11 +182,11 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              CircularProgressIndicator(color: Color(0xFF557C2B)),
+                              CircularProgressIndicator(color: Color(0xFF518427)),
                               SizedBox(height: 16),
                               Text(
                                 'Memuat ayat Al-Qur\'an...',
-                                style: TextStyle(color: Color(0xFF557C2B)),
+                                style: TextStyle(color: Color(0xFF518427)),
                               ),
                             ],
                           ),
@@ -189,7 +198,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
                               : ListView.builder(
                                   controller: _scrollController,
                                   physics: const BouncingScrollPhysics(),
-                                  padding: const EdgeInsets.only(bottom: 120),
+                                  padding: EdgeInsets.only(bottom: playerBottomMargin + 110),
                                   itemCount: detail.ayahs.length + 1, // +1 untuk Header Bismillah
                                   itemBuilder: (ctx, index) {
                                     if (index == 0) {
@@ -237,12 +246,12 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
               ],
             ),
 
-            // ── 5. FLOATING AUDIO PLAYER (Di bagian bawah layar) ──
+            // ── 5. FLOATING AUDIO PLAYER (Dinaikkan di atas Navigation Bar) ──
             if (!prov.isLoading && detail != null && detail.ayahs.isNotEmpty)
               Positioned(
                 left: 0,
                 right: 0,
-                bottom: 24,
+                bottom: playerBottomMargin,
                 child: AudioPlayerPanel(
                   currentAyah: prov.currentAudioAyah,
                   totalAyahs: totalAyahs,
@@ -269,12 +278,15 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
     );
   }
 
-  // ────────────── 1. HEADER HIJAU ISLAMI ──────────────
+  // ────────────── 1. HEADER HIJAU ISLAMI (Full Width & Status Bar Safe) ──────────────
   Widget _buildIslamicHeader(BuildContext context, BacaQuranProvider prov) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      width: double.infinity,
+      padding: EdgeInsets.fromLTRB(14, topPadding + 6, 14, 8),
       decoration: const BoxDecoration(
-        color: Color(0xFF4A7522), // Hijau Islami elegan sesuai referensi
+        color: Color(0xFF518427), // Hijau Islami elegan membentang penuh ke status bar
       ),
       child: Row(
         children: [
@@ -282,25 +294,25 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(
-              width: 38,
-              height: 38,
-              decoration: const BoxDecoration(
-                color: Color(0xFF7EAC47), // Hijau muda bulat
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
+               width: 38,
+               height: 38,
+               decoration: const BoxDecoration(
+                 color: Color(0xFF7EAC47), // Hijau muda bulat
+                 shape: BoxShape.circle,
+               ),
+               child: const Icon(
+                 Icons.arrow_back_ios_new_rounded,
+                 color: Colors.white,
+                 size: 18,
+               ),
             ),
           ),
           const SizedBox(width: 12),
 
-          // Nama Surah di Tengah
+          // Judul AI-Qur'an di Tengah
           Expanded(
             child: Text(
-              "Al-Qur'an",
+              "AI-Qur'an",
               textAlign: TextAlign.center,
               style: GoogleFonts.inter(
                 fontSize: 18,
@@ -372,7 +384,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ],
@@ -386,7 +398,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
               value: progressVal,
               minHeight: 5,
               backgroundColor: const Color(0xFFE2E9D8),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A7522)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
             ),
           ),
         ],
@@ -406,7 +418,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
       ),
       child: Row(
         children: [
-          const Icon(Icons.menu_book_rounded, color: Color(0xFF4A7522), size: 22),
+          const Icon(Icons.menu_book_rounded, color: Color(0xFF518427), size: 22),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -422,14 +434,14 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
                 ),
                 Text(
                   '${widget.surah.nameLatin} — Ayat $_lastReadToResume',
-                  style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF557C2B)),
+                  style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF518427)),
                 ),
               ],
             ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7522),
+              backgroundColor: const Color(0xFF518427),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               elevation: 0,
@@ -472,18 +484,19 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
           Text(
             'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
             textAlign: TextAlign.center,
+            textDirection: TextDirection.rtl,
             style: GoogleFonts.amiri(
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: isDark ? const Color(0xFFD4E157) : const Color(0xFF1E3710),
               height: 2.0,
-            ),
+            ).copyWith(locale: const Locale('ar')),
           ),
           const SizedBox(height: 6),
           Container(
             width: 80,
             height: 1.5,
-            color: const Color(0xFF557C2B).withValues(alpha: 0.35),
+            color: const Color(0xFF518427).withValues(alpha: 0.35),
           ),
         ],
       ),
@@ -511,7 +524,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Coba Lagi'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7522),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
               ),
             ),
@@ -633,7 +646,7 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
                         trailing: const Icon(
                           Icons.arrow_forward_ios_rounded,
                           size: 14,
-                          color: Color(0xFF557C2B),
+                          color: Color(0xFF518427),
                         ),
                         onTap: () {
                           Navigator.pop(context);

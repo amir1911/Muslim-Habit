@@ -77,7 +77,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -329,7 +329,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
                       );
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 elevation: 0,
@@ -367,7 +367,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFF518427) : const Color(0xFFE2E8F0),
             width: isSelected ? 1.5 : 1.0,
           ),
           boxShadow: [
@@ -409,7 +409,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? const Color(0xFF4A7C59) : Colors.grey.shade300,
+                  color: isSelected ? const Color(0xFF518427) : Colors.grey.shade300,
                   width: 2,
                 ),
               ),
@@ -420,7 +420,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
                         height: 12,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xFF4A7C59),
+                          color: Color(0xFF518427),
                         ),
                       ),
                     )
@@ -463,7 +463,7 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
           child: Container(
             margin: const EdgeInsets.all(2.5),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF4A7C59) : Colors.transparent,
+              color: isSelected ? const Color(0xFF518427) : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(

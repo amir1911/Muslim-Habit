@@ -38,7 +38,7 @@ class _QuranScreenState extends State<QuranScreen> {
             // ── SCROLLABLE BODY ──
             Expanded(
               child: RefreshIndicator(
-                color: const Color(0xFF557C2B),
+                color: const Color(0xFF518427),
                 onRefresh: () => quranProv.loadSurahList(),
                 child: CustomScrollView(
                   physics: const AlwaysScrollableScrollPhysics(
@@ -173,7 +173,7 @@ class _QuranScreenState extends State<QuranScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF557C2B),
+        color: const Color(0xFF518427),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -214,7 +214,7 @@ class _QuranScreenState extends State<QuranScreen> {
                 duration: const Duration(milliseconds: 180),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF557C2B) : Colors.transparent,
+                  color: isSelected ? const Color(0xFF518427) : Colors.transparent,
                   borderRadius: BorderRadius.circular(18),
                 ),
                 child: Text(
@@ -222,7 +222,7 @@ class _QuranScreenState extends State<QuranScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 12.5,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? Colors.white : const Color(0xFF42562E),
+                    color: isSelected ? Colors.white : const Color(0xFF3D6318),
                   ),
                 ),
               ),
@@ -305,7 +305,7 @@ class _QuranScreenState extends State<QuranScreen> {
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: const Color(0xFF557C2B),
+                                color: const Color(0xFF518427),
                               ),
                             ),
                           ],
@@ -448,7 +448,7 @@ class _QuranScreenState extends State<QuranScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isCurrent ? const Color(0xFF4A7C59) : const Color(0xFFE8EEE0),
+          color: isCurrent ? const Color(0xFF518427) : const Color(0xFFE8EEE0),
           width: isCurrent ? 1.5 : 1,
         ),
         boxShadow: [
@@ -496,7 +496,7 @@ class _QuranScreenState extends State<QuranScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4A7C59),
+                              color: const Color(0xFF518427),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
@@ -531,7 +531,7 @@ class _QuranScreenState extends State<QuranScreen> {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 13,
-                color: isCurrent ? const Color(0xFF4A7C59) : const Color(0xFFB0BAA5),
+                color: isCurrent ? const Color(0xFF518427) : const Color(0xFFB0BAA5),
               ),
             ],
           ),
@@ -547,7 +547,7 @@ class _QuranScreenState extends State<QuranScreen> {
         child: Padding(
           padding: EdgeInsets.all(32),
           child: Center(
-            child: CircularProgressIndicator(color: Color(0xFF557C2B)),
+            child: CircularProgressIndicator(color: Color(0xFF518427)),
           ),
         ),
       );

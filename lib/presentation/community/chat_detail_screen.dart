@@ -71,7 +71,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leadingWidth: 40,
         leading: IconButton(
@@ -196,7 +196,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF4A7C59),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ),
@@ -209,7 +209,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isMe ? const Color(0xFF4A7C59) : Colors.white,
+                color: isMe ? const Color(0xFF518427) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -264,8 +264,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 14,
-              backgroundColor: const Color(0xFF4A7C59).withValues(alpha: 0.2),
-              child: const Icon(Icons.person, size: 16, color: Color(0xFF4A7C59)),
+              backgroundColor: const Color(0xFF518427).withValues(alpha: 0.2),
+              child: const Icon(Icons.person, size: 16, color: Color(0xFF518427)),
             ),
           ],
         ],
@@ -341,7 +341,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: _isComposing ? const Color(0xFF4A7C59) : const Color(0xFFCBD5E1),
+                color: _isComposing ? const Color(0xFF518427) : const Color(0xFFCBD5E1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.arrow_upward_rounded, color: Colors.white, size: 22),

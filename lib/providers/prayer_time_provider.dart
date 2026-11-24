@@ -5,6 +5,7 @@ import '../models/prayer_schedule.dart';
 import '../services/prayer_time_service.dart';
 import '../services/storage_service.dart';
 import '../services/widget_update_service.dart';
+import '../services/adzan_service.dart';
 
 class PrayerTimeProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -18,6 +19,7 @@ class PrayerTimeProvider extends ChangeNotifier {
   PrayerTimeProvider(this._storageService, [PrayerTimeService? prayerTimeService]) {
     _prayerTimeService = prayerTimeService ?? PrayerTimeService(_storageService);
     _currentCity = _storageService.getSavedPrayerCity();
+    AdzanService().init(_storageService);
     loadTodayPrayer();
   }
 
@@ -136,10 +138,14 @@ class PrayerTimeProvider extends ChangeNotifier {
         nextPrayerTime:     next['time'] ?? '--:--',
         timezone:           'WIB',
       );
+
+      // ── Sinkronkan jadwal dengan AdzanService untuk pemutaran otomatis ──
+      AdzanService().updateScheduleAndSyncAlarms(result, _storageService);
     } catch (e) {
       _errorMessage = 'Gagal memuat jadwal sholat: $e';
       // Tetap gunakan fallback jika belum ada schedule
       _schedule ??= PrayerSchedule.defaultSchedule(targetCity);
+      AdzanService().updateScheduleAndSyncAlarms(_schedule!, _storageService);
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -50,7 +50,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
       case HafalanGrade.sangatBaik:
         return const Color(0xFF2E7D32); // Hijau pekat
       case HafalanGrade.baik:
-        return const Color(0xFF4F8426); // Hijau aplikasi
+        return const Color(0xFF518427); // Hijau aplikasi
       case HafalanGrade.perluLatihan:
         return const Color(0xFFE65100); // Oranye
       case HafalanGrade.ulangiHafalan:
@@ -328,7 +328,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF4F8426),
+                              color: const Color(0xFF518427),
                             ),
                           ),
                         ),
@@ -568,7 +568,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
                       widget.onRetry();
                     },
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFF4F8426), width: 1.5),
+                      side: const BorderSide(color: Color(0xFF518427), width: 1.5),
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -576,7 +576,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
                     ),
                     icon: const Icon(
                       Icons.refresh_rounded,
-                      color: Color(0xFF4F8426),
+                      color: Color(0xFF518427),
                       size: 20,
                     ),
                     label: Text(
@@ -584,7 +584,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
                       style: GoogleFonts.inter(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF4F8426),
+                        color: const Color(0xFF518427),
                       ),
                     ),
                   ),
@@ -600,7 +600,7 @@ class _HapalanResultSheetState extends State<HapalanResultSheet> {
                         widget.onNextAyah();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F8426),
+                        backgroundColor: const Color(0xFF518427),
                         padding: const EdgeInsets.symmetric(vertical: 13),
                         elevation: 0,
                         shape: RoundedRectangleBorder(

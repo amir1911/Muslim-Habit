@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/habit_provider.dart';
 import '../shell/main_navigation_shell.dart';
@@ -76,6 +77,28 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
 
     // Start auto-playing the intro animation
     _controller.forward();
+
+    // Periksa apakah user sudah login sebelumnya
+    _checkExistingAuthSession();
+  }
+
+  void _checkExistingAuthSession() {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Jika sudah login, tunggu intro sejenak lalu arahkan langsung ke Home
+        Future.delayed(const Duration(milliseconds: 2200), () {
+          if (mounted) {
+            final hasCompleted = context.read<HabitProvider>().hasCompletedOnboarding;
+            if (hasCompleted) {
+              _navigateToMainApp();
+            } else {
+              _navigateToOnboarding();
+            }
+          }
+        });
+      }
+    } catch (_) {}
   }
 
   @override

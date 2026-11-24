@@ -98,7 +98,7 @@ class _TidakPuasaScreenState extends State<TidakPuasaScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4A7C59),
+                  color: const Color(0xFF518427),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(Icons.nightlight_round, color: Colors.white, size: 24),
@@ -177,7 +177,7 @@ class _TidakPuasaScreenState extends State<TidakPuasaScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFF4A7C59), width: 1.5),
+                  borderSide: const BorderSide(color: Color(0xFF518427), width: 1.5),
                 ),
               ),
             ),
@@ -188,7 +188,7 @@ class _TidakPuasaScreenState extends State<TidakPuasaScreen> {
             ElevatedButton(
               onPressed: _saveSkipped,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 elevation: 0,
@@ -256,7 +256,7 @@ class _TidakPuasaScreenState extends State<TidakPuasaScreen> {
           color: isSelected ? const Color(0xFFDCFCE7) : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFE2E8F0),
+            color: isSelected ? const Color(0xFF518427) : const Color(0xFFE2E8F0),
             width: isSelected ? 1.5 : 1.0,
           ),
           boxShadow: [

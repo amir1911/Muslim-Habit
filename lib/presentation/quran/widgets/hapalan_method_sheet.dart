@@ -202,7 +202,7 @@ class _HafalanMethodSheetState extends State<HafalanMethodSheet> {
                         ],
                       ),
 
-                      const Icon(Icons.arrow_forward_rounded, color: Color(0xFF4F8426)),
+                      const Icon(Icons.arrow_forward_rounded, color: Color(0xFF518427)),
 
                       // Sampai Ayat
                       Column(
@@ -281,7 +281,7 @@ class _HafalanMethodSheetState extends State<HafalanMethodSheet> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F8426),
+                    backgroundColor: const Color(0xFF518427),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -326,7 +326,7 @@ class _HafalanMethodSheetState extends State<HafalanMethodSheet> {
           color: isSelected ? const Color(0xFFF1F7EC) : const Color(0xFFFAFAFA),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF4F8426) : const Color(0xFFE5E7EB),
+            color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
             width: isSelected ? 1.8 : 1.0,
           ),
         ),
@@ -335,7 +335,7 @@ class _HafalanMethodSheetState extends State<HafalanMethodSheet> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFF4F8426) : const Color(0xFFE5E7EB),
+                color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -370,7 +370,7 @@ class _HafalanMethodSheetState extends State<HafalanMethodSheet> {
             ),
             Icon(
               isSelected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
-              color: isSelected ? const Color(0xFF4F8426) : const Color(0xFF9CA3AF),
+              color: isSelected ? const Color(0xFF518427) : const Color(0xFF9CA3AF),
               size: 20,
             ),
           ],

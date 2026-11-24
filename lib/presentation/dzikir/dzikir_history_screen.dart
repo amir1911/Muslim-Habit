@@ -35,7 +35,7 @@ class _DzikirHistoryScreenState extends State<DzikirHistoryScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -59,7 +59,7 @@ class _DzikirHistoryScreenState extends State<DzikirHistoryScreen> {
       ),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFF4A7C59)))
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFF518427)))
             : _history.isEmpty
                 ? Center(
                     child: Column(
@@ -108,7 +108,7 @@ class _DzikirHistoryScreenState extends State<DzikirHistoryScreen> {
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(
-                                child: Icon(Icons.check_circle_rounded, color: Color(0xFF4A7C59), size: 24),
+                                child: Icon(Icons.check_circle_rounded, color: Color(0xFF518427), size: 24),
                               ),
                             ),
                             const SizedBox(width: 14),
@@ -129,7 +129,7 @@ class _DzikirHistoryScreenState extends State<DzikirHistoryScreen> {
                                     '${item.categoryName} • ${item.count}x / ${item.target}x',
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
-                                      color: const Color(0xFF5D7F42),
+                                      color: const Color(0xFF518427),
                                     ),
                                   ),
                                   const SizedBox(height: 2),

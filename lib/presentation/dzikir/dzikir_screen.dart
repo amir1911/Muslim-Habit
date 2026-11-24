@@ -51,7 +51,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -165,7 +165,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4A7C59),
+                    color: const Color(0xFF518427),
                   ),
                 ),
               ),
@@ -182,7 +182,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
           // ── SECTION KATEGORI UTAMA ──
           Row(
             children: [
-              const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF4A7C59), size: 18),
+              const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF518427), size: 18),
               const SizedBox(width: 8),
               Text(
                 'Kategori',
@@ -220,7 +220,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF4A7C59), size: 18),
+                    const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF518427), size: 18),
                     const SizedBox(width: 8),
                     Text(
                       'Kategori Lainnya',
@@ -257,11 +257,11 @@ class _DzikirScreenState extends State<DzikirScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF386641), // Rich forest sage green
+        color: const Color(0xFF518427), // Rich forest sage green
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF386641).withValues(alpha: 0.28),
+            color: const Color(0xFF518427).withValues(alpha: 0.28),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -309,7 +309,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
                 onPressed: () => _openCategory(targetCategory),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF386641),
+                  foregroundColor: const Color(0xFF518427),
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -359,11 +359,11 @@ class _DzikirScreenState extends State<DzikirScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF5D7F42), // Green tone as in Figma reference
+        color: const Color(0xFF518427), // Green tone as in Figma reference
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF5D7F42).withValues(alpha: 0.22),
+            color: const Color(0xFF518427).withValues(alpha: 0.22),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -441,7 +441,7 @@ class _DzikirScreenState extends State<DzikirScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF5D7F42),
+        color: const Color(0xFF518427),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Material(

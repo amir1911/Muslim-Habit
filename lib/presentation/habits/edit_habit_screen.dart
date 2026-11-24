@@ -77,7 +77,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF55822B),
+              backgroundColor: const Color(0xFF518427),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
@@ -91,7 +91,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Habbit "${updated.title}" berhasil diperbarui!'),
-                  backgroundColor: const Color(0xFF55822B),
+                  backgroundColor: const Color(0xFF518427),
                 ),
               );
             },
@@ -133,13 +133,13 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF55822B),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F6EE),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: IconButton(
             icon: Container(
@@ -181,7 +181,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 4,
           shape: const CircleBorder(),
           onPressed: () {

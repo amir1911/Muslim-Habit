@@ -18,7 +18,7 @@ class DzikirCategoryScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -48,9 +48,9 @@ class DzikirCategoryScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A7C59).withValues(alpha: 0.08),
+                color: const Color(0xFF518427).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF4A7C59).withValues(alpha: 0.2)),
+                border: Border.all(color: const Color(0xFF518427).withValues(alpha: 0.2)),
               ),
               child: Row(
                 children: [
@@ -58,7 +58,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A7C59),
+                      color: const Color(0xFF518427),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Center(
@@ -75,7 +75,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1B432C),
+                            color: const Color(0xFF1E3310),
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -83,7 +83,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                           category.description,
                           style: GoogleFonts.inter(
                             fontSize: 12,
-                            color: const Color(0xFF4A7C59),
+                            color: const Color(0xFF518427),
                           ),
                         ),
                       ],
@@ -121,7 +121,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF4A7C59),
+                      color: const Color(0xFF518427),
                     ),
                   ),
                 ),
@@ -169,7 +169,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                               width: 32,
                               height: 32,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF4A7C59).withValues(alpha: 0.1),
+                                color: const Color(0xFF518427).withValues(alpha: 0.1),
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
@@ -178,7 +178,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                                   style: GoogleFonts.inter(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF4A7C59),
+                                    color: const Color(0xFF518427),
                                   ),
                                 ),
                               ),
@@ -193,7 +193,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF1B432C),
+                                      color: const Color(0xFF1E3310),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -204,7 +204,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       fontStyle: FontStyle.italic,
-                                      color: const Color(0xFF5D7F42),
+                                      color: const Color(0xFF518427),
                                     ),
                                   ),
                                 ],
@@ -237,7 +237,7 @@ class DzikirCategoryScreen extends StatelessWidget {
                             textDirection: TextDirection.rtl,
                             style: GoogleFonts.amiri(
                               fontSize: 18,
-                              color: const Color(0xFF1B432C),
+                              color: const Color(0xFF1E3310),
                             ),
                           ),
                         ),

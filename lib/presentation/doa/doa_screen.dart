@@ -38,7 +38,7 @@ class _DoaScreenState extends State<DoaScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
         child: AppBar(
-          backgroundColor: const Color(0xFF557C2B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: Padding(
             padding: const EdgeInsets.only(left: 12),
@@ -109,7 +109,7 @@ class _DoaScreenState extends State<DoaScreen> {
       ),
       body: doaProvider.isLoading && doaProvider.allDoa.isEmpty
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF557C2B)),
+              child: CircularProgressIndicator(color: Color(0xFF518427)),
             )
           : Column(
               children: [
@@ -136,7 +136,7 @@ class _DoaScreenState extends State<DoaScreen> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: _selectedTabIndex == 0
-                                    ? const Color(0xFF557C2B)
+                                    ? const Color(0xFF518427)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -165,7 +165,7 @@ class _DoaScreenState extends State<DoaScreen> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: _selectedTabIndex == 1
-                                    ? const Color(0xFF557C2B)
+                                    ? const Color(0xFF518427)
                                     : Colors.transparent,
                                 borderRadius: BorderRadius.circular(20),
                               ),

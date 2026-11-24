@@ -116,10 +116,10 @@ class AyahPickerSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFF8FAFC),
+                      color: isSelected ? const Color(0xFF518427) : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF4A7C59) : Colors.grey.shade200,
+                        color: isSelected ? const Color(0xFF518427) : Colors.grey.shade200,
                         width: isSelected ? 1.5 : 1.0,
                       ),
                     ),

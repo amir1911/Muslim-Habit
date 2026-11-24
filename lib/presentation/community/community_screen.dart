@@ -37,7 +37,7 @@ class CommunityScreen extends StatelessWidget {
             // ── BODY CONTENT ──
             Expanded(
               child: RefreshIndicator(
-                color: const Color(0xFF4A7C59),
+                color: const Color(0xFF518427),
                 onRefresh: () => provider.refreshAll(),
                 child: isTemanTab
                     ? _buildTabTemanContent(context, provider)
@@ -82,7 +82,7 @@ class CommunityScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF4A7C59),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -139,7 +139,7 @@ class CommunityScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A7C59),
+                color: const Color(0xFF518427),
                 shape: BoxShape.circle,
               ),
               child: Stack(
@@ -191,7 +191,7 @@ class CommunityScreen extends StatelessWidget {
                 onTap: () => provider.switchTab(0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: provider.selectedTab == 0 ? const Color(0xFF4A7C59) : Colors.transparent,
+                    color: provider.selectedTab == 0 ? const Color(0xFF518427) : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   alignment: Alignment.center,
@@ -211,7 +211,7 @@ class CommunityScreen extends StatelessWidget {
                 onTap: () => provider.switchTab(1),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: provider.selectedTab == 1 ? const Color(0xFF4A7C59) : Colors.transparent,
+                    color: provider.selectedTab == 1 ? const Color(0xFF518427) : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   alignment: Alignment.center,
@@ -359,7 +359,7 @@ class CommunityScreen extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF4A7C59),
+                            color: const Color(0xFF518427),
                           ),
                         ),
                       ),
@@ -433,7 +433,7 @@ class CommunityScreen extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF4A7C59),
+              color: const Color(0xFF518427),
             ),
           ),
         ),
@@ -578,7 +578,7 @@ class CommunityScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF4A7C59), Color(0xFF2D5A3C)],
+                      colors: [Color(0xFF518427), Color(0xFF2D5A3C)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -655,7 +655,7 @@ class CommunityScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF4A7C59),
+                    const Color(0xFF518427),
                     const Color(0xFF2D5A3C),
                   ],
                   begin: Alignment.topLeft,
@@ -738,7 +738,7 @@ class CommunityScreen extends StatelessWidget {
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF4A7C59),
+                          color: const Color(0xFF518427),
                         ),
                       ),
                     ],
@@ -767,11 +767,11 @@ class CommunityScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF4A7C59),
+          color: const Color(0xFF518427),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4A7C59).withValues(alpha: 0.3),
+              color: const Color(0xFF518427).withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),

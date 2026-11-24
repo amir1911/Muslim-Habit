@@ -40,7 +40,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF4A7C59),
+              primary: Color(0xFF518427),
               onPrimary: Colors.white,
             ),
           ),
@@ -91,7 +91,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               return ListTile(
                 title: Text(opt, style: GoogleFonts.inter(fontSize: 14)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF4A7C59))
+                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF518427))
                     : null,
                 onTap: () {
                   setState(() {
@@ -140,7 +140,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               return ListTile(
                 title: Text('$minutes Menit', style: GoogleFonts.inter(fontSize: 14)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF4A7C59))
+                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF518427))
                     : null,
                 onTap: () {
                   setState(() {
@@ -185,7 +185,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               return ListTile(
                 title: Text('$m Menit Sebelum', style: GoogleFonts.inter(fontSize: 14)),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF4A7C59))
+                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF518427))
                     : null,
                 onTap: () {
                   setState(() {
@@ -244,7 +244,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -307,7 +307,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
                       child: Checkbox(
                         value: _applyToAll,
                         onChanged: (val) => setState(() => _applyToAll = val ?? true),
-                        activeColor: const Color(0xFF4A7C59),
+                        activeColor: const Color(0xFF518427),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                       ),
                     ),
@@ -333,7 +333,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
             ElevatedButton(
               onPressed: _confirmAndSave,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 elevation: 0,
@@ -443,7 +443,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
             children: [
               Row(
                 children: [
-                  const Icon(Icons.alarm_on_rounded, size: 18, color: Color(0xFF4A7C59)),
+                  const Icon(Icons.alarm_on_rounded, size: 18, color: Color(0xFF518427)),
                   const SizedBox(width: 8),
                   Text(
                     'Alarm Sahur',
@@ -458,7 +458,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               Switch(
                 value: _config.sahurAlarmEnabled,
                 onChanged: (val) => setState(() => _config = _config.copyWith(sahurAlarmEnabled: val)),
-                activeColor: const Color(0xFF4A7C59),
+                activeColor: const Color(0xFF518427),
               ),
             ],
           ),
@@ -510,7 +510,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
-                const Icon(Icons.hourglass_bottom_rounded, size: 16, color: Color(0xFF4A7C59)),
+                const Icon(Icons.hourglass_bottom_rounded, size: 16, color: Color(0xFF518427)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
@@ -523,7 +523,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
                   onChanged: _config.sahurAlarmEnabled
                       ? (val) => setState(() => _config = _config.copyWith(imsakWarningEnabled: val))
                       : null,
-                  activeColor: const Color(0xFF4A7C59),
+                  activeColor: const Color(0xFF518427),
                 ),
               ],
             ),
@@ -558,7 +558,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
             children: [
               Row(
                 children: [
-                  const Icon(Icons.nightlight_round, size: 18, color: Color(0xFF4A7C59)),
+                  const Icon(Icons.nightlight_round, size: 18, color: Color(0xFF518427)),
                   const SizedBox(width: 8),
                   Text(
                     'Alarm Iftar',
@@ -573,7 +573,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               Switch(
                 value: _config.iftarAlarmEnabled,
                 onChanged: (val) => setState(() => _config = _config.copyWith(iftarAlarmEnabled: val)),
-                activeColor: const Color(0xFF4A7C59),
+                activeColor: const Color(0xFF518427),
               ),
             ],
           ),
@@ -646,7 +646,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: const Color(0xFF4A7C59)),
+            Icon(icon, size: 16, color: const Color(0xFF518427)),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -659,7 +659,7 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
               style: GoogleFonts.inter(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFF4A7C59),
+                color: const Color(0xFF518427),
               ),
             ),
             const SizedBox(width: 4),

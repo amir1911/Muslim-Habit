@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 enum HomeTimeThemeType {
-  morningDay, // 04.00 - 14.59 (langit biru cerah dan matahari)
-  sunset,     // 15.00 - 17.59 (langit sunset berwarna jingga)
-  night,      // 18.00 - 03.59 (langit malam dengan bulan dan bintang)
+  morning, // 04.00 - 09.59 (pagi hari cerah)
+  day,     // 10.00 - 14.59 (siang hari cerah dan matahari)
+  sunset,  // 15.00 - 17.59 (langit sunset berwarna jingga)
+  night,   // 18.00 - 03.59 (langit malam dengan bulan dan bintang)
 }
 
 class HomeTimeTheme {
@@ -74,13 +75,16 @@ class HomeTimeTheme {
   });
 
   /// Factory untuk mendeteksi waktu lokal perangkat:
-  /// - Pagi dan siang: 04.00 - 14.59
+  /// - Pagi: 04.00 - 09.59
+  /// - Siang: 10.00 - 14.59
   /// - Sore: 15.00 - 17.59
   /// - Malam: 18.00 - 03.59
   factory HomeTimeTheme.fromDateTime(DateTime time) {
     final hour = time.hour;
-    if (hour >= 4 && hour < 15) {
-      return HomeTimeTheme.morningDay();
+    if (hour >= 4 && hour < 10) {
+      return HomeTimeTheme.morning();
+    } else if (hour >= 10 && hour < 15) {
+      return HomeTimeTheme.day();
     } else if (hour >= 15 && hour < 18) {
       return HomeTimeTheme.sunset();
     } else {
@@ -88,10 +92,40 @@ class HomeTimeTheme {
     }
   }
 
-  /// 1. Pagi & Siang (04.00 - 14.59) - Langit biru cerah & padang rumput hijau
-  factory HomeTimeTheme.morningDay() {
+  /// 1. Pagi (04.00 - 09.59) - Suasana pagi cerah
+  factory HomeTimeTheme.morning() {
     return const HomeTimeTheme(
-      type: HomeTimeThemeType.morningDay,
+      type: HomeTimeThemeType.morning,
+      backgroundImage: 'assets/images/home_bg_morning.png',
+      greetingColor: Color(0xFF1E3710),
+      userNameColor: Color(0xFF1E3710),
+      badgeBackgroundColor: Color(0xFF4A7220),
+      badgeTextColor: Colors.white,
+      bellBackgroundColor: Color(0xFF4A7220),
+      bellIconColor: Colors.white,
+      ayahCardBg: Color(0xBFFFFFFF), // White 75%
+      ayahCardBorder: Color(0xD9FFFFFF),
+      ayahTextColor: Color(0xFF1E3710),
+      ayahTranslationColor: Color(0xFF334B22),
+      ayahSurahColor: Color(0xFF557C2B),
+      ayahBadgeBg: Color(0xFFE8F5E9),
+      prayerGradient: [Color(0xFF7CB83E), Color(0xFF538622)],
+      prayerTagBg: Color(0x2E000000),
+      prayerNextTextColor: Colors.white,
+      prayerTimeColor: Colors.white,
+      prayerCompassBg: Color(0x33FFFFFF),
+      prayerCompassBorder: Color(0x4DFFFFFF),
+      prayerCompassIconColor: Colors.white,
+      speechBubbleBg: Colors.white,
+      speechTextColor: Color(0xFF233615),
+      bottomFadeColor: Color(0xFFF9F8F2),
+    );
+  }
+
+  /// 2. Siang (10.00 - 14.59) - Langit biru cerah & padang rumput hijau
+  factory HomeTimeTheme.day() {
+    return const HomeTimeTheme(
+      type: HomeTimeThemeType.day,
       backgroundImage: 'assets/images/home_bg_day.png',
       greetingColor: Color(0xFF1E3710),
       userNameColor: Color(0xFF1E3710),
@@ -118,7 +152,7 @@ class HomeTimeTheme {
     );
   }
 
-  /// 2. Sore (15.00 - 17.59) - Sunset jingga keemasan
+  /// 3. Sore (15.00 - 17.59) - Sunset jingga keemasan
   factory HomeTimeTheme.sunset() {
     return const HomeTimeTheme(
       type: HomeTimeThemeType.sunset,
@@ -148,7 +182,7 @@ class HomeTimeTheme {
     );
   }
 
-  /// 3. Malam (18.00 - 03.59) - Langit malam bulan & bintang biru gelap
+  /// 4. Malam (18.00 - 03.59) - Langit malam bulan & bintang biru gelap
   factory HomeTimeTheme.night() {
     return const HomeTimeTheme(
       type: HomeTimeThemeType.night,

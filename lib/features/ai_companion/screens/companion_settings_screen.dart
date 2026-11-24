@@ -177,7 +177,7 @@ class CompanionSettingsScreen extends StatelessWidget {
           color: const Color(0xFFEEF7E4),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, size: 20, color: const Color(0xFF557C2B)),
+        child: Icon(icon, size: 20, color: const Color(0xFF518427)),
       ),
       title: Text(
         title,
@@ -222,7 +222,7 @@ class CompanionSettingsScreen extends StatelessWidget {
             Image.asset(companion.imagePath, width: 40, height: 40),
             const SizedBox(width: 10),
             Text(companion.name,
-                style: const TextStyle(color: Color(0xFF557C2B))),
+                style: const TextStyle(color: Color(0xFF518427))),
           ],
         ),
         content: Text(
@@ -233,7 +233,7 @@ class CompanionSettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Tutup',
-                style: TextStyle(color: Color(0xFF557C2B))),
+                style: TextStyle(color: Color(0xFF518427))),
           ),
         ],
       ),
@@ -273,7 +273,7 @@ class CompanionSettingsScreen extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Tutup',
-                style: TextStyle(color: Color(0xFF557C2B))),
+                style: TextStyle(color: Color(0xFF518427))),
           ),
         ],
       ),

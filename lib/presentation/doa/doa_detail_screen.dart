@@ -21,7 +21,7 @@ class DoaDetailScreen extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: AppBar(
-          backgroundColor: const Color(0xFF557C2B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: Padding(
             padding: const EdgeInsets.only(left: 12),
@@ -104,14 +104,14 @@ class DoaDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF557C2B), Color(0xFF405D20)],
+                  colors: [Color(0xFF518427), Color(0xFF405D20)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(22),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF557C2B).withValues(alpha: 0.3),
+                    color: const Color(0xFF518427).withValues(alpha: 0.3),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -251,14 +251,14 @@ class DoaDetailScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.spellcheck_rounded, size: 16, color: Color(0xFF557C2B)),
+                        const Icon(Icons.spellcheck_rounded, size: 16, color: Color(0xFF518427)),
                         const SizedBox(width: 6),
                         Text(
                           'TRANSLITERASI LATIN',
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF557C2B),
+                            color: const Color(0xFF518427),
                             letterSpacing: 1.0,
                           ),
                         ),

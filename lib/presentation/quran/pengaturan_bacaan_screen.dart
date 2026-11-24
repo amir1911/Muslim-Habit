@@ -34,7 +34,7 @@ class _PengaturanBacaanScreenState extends State<PengaturanBacaanScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F8F2),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7023),
+        backgroundColor: const Color(0xFF518427),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
           onPressed: () => Navigator.pop(context),
@@ -112,7 +112,7 @@ class _PengaturanBacaanScreenState extends State<PengaturanBacaanScreen> {
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? const Color(0xFF4A7023) : const Color(0xFF42562E),
+              color: isSelected ? const Color(0xFF518427) : const Color(0xFF3D6318),
             ),
           ),
         ),
@@ -155,18 +155,18 @@ class _PengaturanBacaanScreenState extends State<PengaturanBacaanScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(Icons.text_decrease_rounded, size: 18, color: Color(0xFF4A7023)),
+                  const Icon(Icons.text_decrease_rounded, size: 18, color: Color(0xFF518427)),
                   Expanded(
                     child: Slider(
                       value: _arabicFontSize,
                       min: 16,
                       max: 40,
                       divisions: 6,
-                      activeColor: const Color(0xFF4A7023),
+                      activeColor: const Color(0xFF518427),
                       onChanged: (val) => setState(() => _arabicFontSize = val),
                     ),
                   ),
-                  const Icon(Icons.text_increase_rounded, size: 18, color: Color(0xFF4A7023)),
+                  const Icon(Icons.text_increase_rounded, size: 18, color: Color(0xFF518427)),
                 ],
               ),
             ],
@@ -280,7 +280,7 @@ class _PengaturanBacaanScreenState extends State<PengaturanBacaanScreen> {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF4A7023),
+            activeColor: const Color(0xFF518427),
           ),
         ],
       ),

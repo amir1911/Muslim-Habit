@@ -100,7 +100,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                 color: Color(0xFFFEF7D6),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check_circle_rounded, color: Color(0xFF4A7C59), size: 38),
+              child: const Icon(Icons.check_circle_rounded, color: Color(0xFF518427), size: 38),
             ),
             const SizedBox(height: 16),
             Text(
@@ -123,8 +123,8 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                 Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF4A7C59),
-                      side: const BorderSide(color: Color(0xFF4A7C59)),
+                      foregroundColor: const Color(0xFF518427),
+                      side: const BorderSide(color: Color(0xFF518427)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
@@ -142,7 +142,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF4A7C59),
+                      backgroundColor: const Color(0xFF518427),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -197,7 +197,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7C59),
+              backgroundColor: const Color(0xFF518427),
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -256,7 +256,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7C59),
+              backgroundColor: const Color(0xFF518427),
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -285,7 +285,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -384,7 +384,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                       style: GoogleFonts.inter(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF4A7C59),
+                        color: const Color(0xFF518427),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -422,7 +422,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                   height: 250,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF8BA677).withValues(alpha: 0.35),
+                    color: const Color(0xFF7DAD50).withValues(alpha: 0.35),
                   ),
                   padding: const EdgeInsets.all(14),
                   child: Container(
@@ -431,7 +431,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF4A7C59).withValues(alpha: 0.15),
+                          color: const Color(0xFF518427).withValues(alpha: 0.15),
                           blurRadius: 20,
                           spreadRadius: 2,
                         ),
@@ -441,7 +441,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                     child: Container(
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Color(0xFF4A6B2F),
+                        color: Color(0xFF3D6318),
                       ),
                       child: Center(
                         child: _showFingerprintMode
@@ -565,11 +565,11 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF5D7F42),
+                  color: const Color(0xFF518427),
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF5D7F42).withValues(alpha: 0.3),
+                      color: const Color(0xFF518427).withValues(alpha: 0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -588,7 +588,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
                       child: const Center(
                         child: Icon(
                           Icons.stars_rounded,
-                          color: Color(0xFF4A6B2F),
+                          color: Color(0xFF3D6318),
                           size: 28,
                         ),
                       ),
@@ -656,7 +656,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFE5E7EB),
+            color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
@@ -681,7 +681,7 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 9),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFE5E7EB),
+            color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -725,10 +725,10 @@ class _DzikirTasbihScreenState extends State<DzikirTasbihScreen>
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF456B2D) : const Color(0xFF55684D).withValues(alpha: 0.38),
+          color: isActive ? const Color(0xFF3D6318) : const Color(0xFF3D5520).withValues(alpha: 0.38),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: isActive ? const Color(0xFF6B994D).withValues(alpha: 0.5) : Colors.transparent,
+            color: isActive ? const Color(0xFF6BA335).withValues(alpha: 0.5) : Colors.transparent,
             width: 1.2,
           ),
           boxShadow: [

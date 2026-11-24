@@ -172,7 +172,7 @@ class ReadingSettingsSheet extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ],
@@ -180,7 +180,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 3.5,
-              activeTrackColor: const Color(0xFF557C2B),
+              activeTrackColor: const Color(0xFF518427),
               thumbColor: const Color(0xFF3B6114),
             ),
             child: Slider(
@@ -211,7 +211,7 @@ class ReadingSettingsSheet extends StatelessWidget {
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ],
@@ -219,7 +219,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 3.5,
-              activeTrackColor: const Color(0xFF557C2B),
+              activeTrackColor: const Color(0xFF518427),
               thumbColor: const Color(0xFF3B6114),
             ),
             child: Slider(
@@ -237,7 +237,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             value: showTajwid,
-            activeColor: const Color(0xFF557C2B),
+            activeColor: const Color(0xFF518427),
             title: Text(
               'Tampilkan Tajwid Berwarna',
               style: GoogleFonts.inter(
@@ -261,13 +261,13 @@ class ReadingSettingsSheet extends StatelessWidget {
                 Navigator.pop(context);
                 TajwidLegendSheet.show(context);
               },
-              icon: const Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFF557C2B)),
+              icon: const Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFF518427)),
               label: Text(
                 'Lihat Panduan Warna Tajwid',
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ),
@@ -276,7 +276,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
             value: showTranslation,
-            activeColor: const Color(0xFF557C2B),
+            activeColor: const Color(0xFF518427),
             title: Text(
               'Tampilkan Terjemahan',
               style: GoogleFonts.inter(
@@ -313,9 +313,9 @@ class ReadingSettingsSheet extends StatelessWidget {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      backgroundColor: isSel ? const Color(0xFF557C2B) : Colors.transparent,
+                      backgroundColor: isSel ? const Color(0xFF518427) : Colors.transparent,
                       side: BorderSide(
-                        color: isSel ? const Color(0xFF557C2B) : const Color(0xFFD0DCC4),
+                        color: isSel ? const Color(0xFF518427) : const Color(0xFFD0DCC4),
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -357,7 +357,7 @@ class ReadingSettingsSheet extends StatelessWidget {
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: selected ? const Color(0xFF557C2B) : const Color(0xFFDDE7D3),
+              color: selected ? const Color(0xFF518427) : const Color(0xFFDDE7D3),
               width: selected ? 2.2 : 1.0,
             ),
           ),

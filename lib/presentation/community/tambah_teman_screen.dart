@@ -32,7 +32,7 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
           'Tautan undangan berhasil disalin ke clipboard! 📋',
           style: GoogleFonts.inter(fontSize: 13),
         ),
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -110,7 +110,7 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
                           backgroundColor: const Color(0xFFE2E8F0),
                           child: Text(
                             req.displayName[0].toUpperCase(),
-                            style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: const Color(0xFF4A7C59)),
+                            style: GoogleFonts.inter(fontWeight: FontWeight.w700, color: const Color(0xFF518427)),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -145,12 +145,12 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Permintaan pertemanan diterima! 🤝'),
-                                backgroundColor: const Color(0xFF4A7C59),
+                                backgroundColor: const Color(0xFF518427),
                               ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF4A7C59),
+                            backgroundColor: const Color(0xFF518427),
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -176,7 +176,7 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -248,11 +248,11 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A7C59),
+                color: const Color(0xFF518427),
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4A7C59).withValues(alpha: 0.3),
+                    color: const Color(0xFF518427).withValues(alpha: 0.3),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -420,10 +420,10 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A7C59).withValues(alpha: 0.12),
+                color: const Color(0xFF518427).withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: const Color(0xFF4A7C59), size: 20),
+              child: Icon(icon, color: const Color(0xFF518427), size: 20),
             ),
             const SizedBox(height: 8),
             Text(
@@ -471,7 +471,7 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
               style: GoogleFonts.inter(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: const Color(0xFF4A7C59),
+                color: const Color(0xFF518427),
               ),
             ),
           ),
@@ -504,7 +504,7 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('${user.displayName} berhasil ditambahkan sebagai teman! 🌿'),
-                  backgroundColor: const Color(0xFF4A7C59),
+                  backgroundColor: const Color(0xFF518427),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -512,10 +512,10 @@ class _TambahTemanScreenState extends State<TambahTemanScreen> {
             icon: Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF4A7C59).withValues(alpha: 0.1),
+                color: const Color(0xFF518427).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.person_add_alt_1_rounded, size: 18, color: Color(0xFF4A7C59)),
+              child: const Icon(Icons.person_add_alt_1_rounded, size: 18, color: Color(0xFF518427)),
             ),
           ),
         ],
@@ -581,7 +581,7 @@ class _SearchFriendSheetState extends State<_SearchFriendSheet> {
             decoration: InputDecoration(
               hintText: 'Ketik nama atau username...',
               hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
-              prefixIcon: const Icon(Icons.search, color: Color(0xFF4A7C59)),
+              prefixIcon: const Icon(Icons.search, color: Color(0xFF518427)),
               filled: true,
               fillColor: const Color(0xFFF1F5F9),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -607,7 +607,7 @@ class _SearchFriendSheetState extends State<_SearchFriendSheet> {
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: const Color(0xFFE2E8F0),
-                          child: Text(u.displayName[0], style: GoogleFonts.inter(color: const Color(0xFF4A7C59))),
+                          child: Text(u.displayName[0], style: GoogleFonts.inter(color: const Color(0xFF518427))),
                         ),
                         title: Text(u.displayName, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                         subtitle: Text(u.activeStatusString, style: GoogleFonts.inter(fontSize: 12)),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Sage & Olive Greens
-  static const Color primaryGreen = Color(0xFF789B55);
-  static const Color primaryDarkGreen = Color(0xFF5A783A);
-  static const Color primaryLightGreen = Color(0xFF90B369);
-  static const Color greenAccent = Color(0xFFB5CF8C);
-  static const Color greenSurface = Color(0xFFEBF2DF);
+  // ── Primary Brand Green (warna utama Muslim Habit) ──
+  static const Color primaryGreen = Color(0xFF518427);       // #518427 – warna utama baru
+  static const Color primaryDarkGreen = Color(0xFF3D6318);   // turunan gelap #518427
+  static const Color primaryLightGreen = Color(0xFF6BA335);  // turunan terang #518427
+  static const Color greenAccent = Color(0xFFA3C87A);        // aksen hijau muda
+  static const Color greenSurface = Color(0xFFE8F3D6);       // permukaan hijau sangat terang
 
   // Warm Creams & Beiges
   static const Color creamBackground = Color(0xFFF9F8F2);

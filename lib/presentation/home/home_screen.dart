@@ -18,6 +18,7 @@ import '../khatam/khatam_dashboard_screen.dart';
 import '../khatam/khatam_reading_screen.dart';
 import '../shell/main_navigation_shell.dart';
 import '../../core/theme/home_time_theme.dart';
+import '../../services/adzan_service.dart';
 import '../../features/mascot/screens/mascot_hub_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 
@@ -74,6 +75,82 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
+                // ── Banner Adzan Aktif (Bila Berkumandang) ──
+                ListenableBuilder(
+                  listenable: AdzanService(),
+                  builder: (context, _) {
+                    if (!AdzanService().isPlaying) return const SizedBox.shrink();
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 18),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF518427), Color(0xFF3D6318)],
+                        ),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF518427).withValues(alpha: 0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.volume_up_rounded, color: Colors.white, size: 22),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Adzan ${AdzanService().currentPrayerName ?? "Salat"} Berkumandang',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Waktu salat telah tiba. Mari tunaikan ibadah.',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    color: Colors.white.withValues(alpha: 0.85),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => AdzanService().stopAdzan(),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFF518427),
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: Text(
+                              'Hentikan',
+                              style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+
                 // Fitur-Fitur
                 _buildSectionTitle('Fitur-Fitur'),
                 const SizedBox(height: 12),
@@ -719,11 +796,11 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 58,
             height: 58,
             decoration: BoxDecoration(
-              color: const Color(0xFF557C2B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF557C2B).withValues(alpha: 0.3),
+                  color: const Color(0xFF518427).withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -815,9 +892,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: 14,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: done ? const Color(0xFF557C2B) : Colors.white,
+                          color: done ? const Color(0xFF518427) : Colors.white,
                           border: Border.all(
-                            color: done ? const Color(0xFF557C2B) : const Color(0xFFB0C09A),
+                            color: done ? const Color(0xFF518427) : const Color(0xFFB0C09A),
                             width: 1.5,
                           ),
                         ),
@@ -925,7 +1002,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF557C2B),
+                  backgroundColor: const Color(0xFF518427),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   minimumSize: const Size(80, 36),
@@ -951,7 +1028,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: LinearProgressIndicator(
               value: progressVal,
               backgroundColor: const Color(0xFFE8EEE0),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF557C2B)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
               minHeight: 6,
             ),
           ),
@@ -1009,7 +1086,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: const Color(0xFFEFF7E0),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(habit.icon, color: const Color(0xFF557C2B), size: 24),
+            child: Icon(habit.icon, color: const Color(0xFF518427), size: 24),
           ),
           const SizedBox(width: 12),
 
@@ -1111,7 +1188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Center(
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Color(0xFF557C2B),
+                    color: Color(0xFF518427),
                   ),
                 ),
               )
@@ -1126,7 +1203,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF557C2B),
+                          color: const Color(0xFF518427),
                         ),
                       ),
                       Container(
@@ -1167,7 +1244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF557C2B),
+                      color: const Color(0xFF518427),
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -1248,7 +1325,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF557C2B),
+                          color: const Color(0xFF518427),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(Icons.mosque_rounded, color: Colors.white, size: 22),
@@ -1301,7 +1378,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF557C2B)),
+                              const Icon(Icons.location_on_rounded, size: 14, color: Color(0xFF518427)),
                               const SizedBox(width: 4),
                               Text(
                                 provider.currentCity,
@@ -1312,7 +1389,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              const Icon(Icons.edit_rounded, size: 12, color: Color(0xFF557C2B)),
+                              const Icon(Icons.edit_rounded, size: 12, color: Color(0xFF518427)),
                             ],
                           ),
                         ),
@@ -1325,9 +1402,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? const SizedBox(
                                 width: 18,
                                 height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF557C2B)),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF518427)),
                               )
-                            : const Icon(Icons.refresh_rounded, size: 20, color: Color(0xFF557C2B)),
+                            : const Icon(Icons.refresh_rounded, size: 20, color: Color(0xFF518427)),
                       ),
                     ],
                   ),
@@ -1353,7 +1430,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: isNext ? const Color(0xFFEAF5D8) : Colors.white,
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: isNext ? const Color(0xFF557C2B) : const Color(0xFFE5EAD8),
+                              color: isNext ? const Color(0xFF518427) : const Color(0xFFE5EAD8),
                               width: isNext ? 1.5 : 1,
                             ),
                           ),
@@ -1362,7 +1439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               Icon(
                                 icon,
                                 size: 18,
-                                color: isNext ? const Color(0xFF557C2B) : Colors.grey[600],
+                                color: isNext ? const Color(0xFF518427) : Colors.grey[600],
                               ),
                               const SizedBox(width: 12),
                               Text(
@@ -1378,7 +1455,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF557C2B),
+                                    color: const Color(0xFF518427),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Text(
@@ -1397,7 +1474,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: GoogleFonts.balooTammudu2(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
-                                  color: isNext ? const Color(0xFF557C2B) : const Color(0xFF2D3C21),
+                                  color: isNext ? const Color(0xFF518427) : const Color(0xFF2D3C21),
                                   height: 1.1,
                                 ),
                               ),
@@ -1455,7 +1532,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Contoh: Palembang, Jakarta, Surabaya',
-                  prefixIcon: const Icon(Icons.location_city_rounded, color: Color(0xFF557C2B)),
+                  prefixIcon: const Icon(Icons.location_city_rounded, color: Color(0xFF518427)),
                   filled: true,
                   fillColor: const Color(0xFFEFF7E0),
                   border: OutlineInputBorder(
@@ -1480,7 +1557,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pop(dialogCtx);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF557C2B),
+                backgroundColor: const Color(0xFF518427),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               child: Text('Simpan', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -1519,7 +1596,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF3D6B1C), Color(0xFF557C2B)],
+                        colors: [Color(0xFF3D6B1C), Color(0xFF518427)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -1588,7 +1665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: Border.all(color: const Color(0xFFE8EEE0)),
                     ),
                     child: qProv.isLoading
-                        ? const Center(child: CircularProgressIndicator(color: Color(0xFF557C2B), strokeWidth: 2))
+                        ? const Center(child: CircularProgressIndicator(color: Color(0xFF518427), strokeWidth: 2))
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -1636,141 +1713,167 @@ class _HomeScreenState extends State<HomeScreen> {
         return Consumer<HadithProvider>(
           builder: (ctx, hProv, _) {
             final hadith = hProv.currentHadith;
+            final maxHeight = MediaQuery.of(ctx).size.height * 0.88;
+
             return Container(
+              constraints: BoxConstraints(maxHeight: maxHeight),
               padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
               decoration: const BoxDecoration(
                 color: Color(0xFFF9F8F2),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 12),
-                  Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
-                  const SizedBox(height: 16),
-                  // Header bar
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2D5A0E), Color(0xFF4A7220)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.format_quote_rounded, color: Colors.white, size: 22),
+                    const SizedBox(height: 16),
+                    // Header bar (tetap di atas)
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF2D5A0E), Color(0xFF4A7220)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Hadis Harian',
-                                style: GoogleFonts.inter(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                hadith.takhrij,
-                                style: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  color: Colors.white.withValues(alpha: 0.8),
-                                ),
-                              ),
-                            ],
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.format_quote_rounded, color: Colors.white, size: 22),
                           ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            hadith.grade,
-                            style: GoogleFonts.inter(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Content
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE8EEE0)),
-                    ),
-                    child: hProv.isLoading
-                        ? const Center(child: CircularProgressIndicator(color: Color(0xFF557C2B), strokeWidth: 2))
-                        : Column(
-                            children: [
-                              if (hadith.arabicText.isNotEmpty)
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(
-                                  hadith.arabicText,
-                                  style: GoogleFonts.amiri(
-                                    fontSize: 20,
+                                  'Hadis Harian',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF1E3710),
-                                    height: 1.8,
+                                    color: Colors.white,
                                   ),
-                                  textAlign: TextAlign.right,
                                 ),
-                              if (hadith.arabicText.isNotEmpty) const Divider(height: 20, color: Color(0xFFE8EEE0)),
-                              Text(
-                                hadith.translation.isNotEmpty ? hadith.translation : hadith.arabicText,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontStyle: FontStyle.italic,
-                                  color: const Color(0xFF2D3C21),
-                                  height: 1.65,
+                                Text(
+                                  hadith.takhrij,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.8),
+                                  ),
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Refresh button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          hadithProvider.loadRandomHadith();
-                        },
-                        icon: const Icon(Icons.refresh_rounded, size: 18),
-                        label: Text('Hadis Lain', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF557C2B),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              hadith.grade,
+                              style: GoogleFonts.inter(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Content (dapat di-scroll jika panjang)
+                    Flexible(
+                      child: SingleChildScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFE8EEE0)),
+                          ),
+                          child: hProv.isLoading
+                              ? const Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(24),
+                                    child: CircularProgressIndicator(color: Color(0xFF518427), strokeWidth: 2),
+                                  ),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    if (hadith.arabicText.isNotEmpty)
+                                      Text(
+                                        hadith.arabicText,
+                                        style: GoogleFonts.amiri(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w700,
+                                          color: const Color(0xFF1E3710),
+                                          height: 1.8,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                    if (hadith.arabicText.isNotEmpty)
+                                      const Divider(height: 24, color: Color(0xFFE8EEE0)),
+                                    Text(
+                                      hadith.translation.isNotEmpty ? hadith.translation : hadith.arabicText,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 14,
+                                        fontStyle: FontStyle.italic,
+                                        color: const Color(0xFF2D3C21),
+                                        height: 1.65,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 16),
+                    // Refresh button
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            hadithProvider.loadRandomHadith();
+                          },
+                          icon: const Icon(Icons.refresh_rounded, size: 18),
+                          label: Text('Hadis Lain', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF518427),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             );
           },
@@ -1985,7 +2088,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF557C2B),
+                                        color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF518427),
                                         shape: BoxShape.circle,
                                         boxShadow: [
                                           BoxShadow(
@@ -2004,7 +2107,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: 3,
                                       height: 55,
                                       decoration: BoxDecoration(
-                                        color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF557C2B),
+                                        color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF518427),
                                         borderRadius: BorderRadius.circular(2),
                                       ),
                                     ),
@@ -2022,7 +2125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: isAligned ? const Color(0xFFE8F5E9) : const Color(0xFFEFF7E0),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF557C2B),
+                                  color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF518427),
                                   width: 2,
                                 ),
                               ),
@@ -2031,7 +2134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   'assets/icon/kiblat.png',
                                   width: 26,
                                   height: 26,
-                                  color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF557C2B),
+                                  color: isAligned ? const Color(0xFF2E7D32) : const Color(0xFF518427),
                                 ),
                               ),
                             ),
@@ -2104,7 +2207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: GoogleFonts.balooTammudu2(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF557C2B),
+                                      color: const Color(0xFF518427),
                                       height: 1.1,
                                     ),
                                   ),
@@ -2162,7 +2265,7 @@ class _CompassDialPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     final majorTickPaint = Paint()
-      ..color = const Color(0xFF557C2B)
+      ..color = const Color(0xFF518427)
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
 
@@ -2241,7 +2344,7 @@ class _CircleProgressPainter extends CustomPainter {
 
     // Progress arc
     final fgPaint = Paint()
-      ..color = const Color(0xFF557C2B)
+      ..color = const Color(0xFF518427)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;

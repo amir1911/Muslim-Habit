@@ -183,7 +183,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                               height: 14,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Color(0xFF55822B),
+                                color: Color(0xFF518427),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -284,7 +284,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFFEAF2E3),
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF55822B), width: 1.5),
+              border: Border.all(color: const Color(0xFF518427), width: 1.5),
             ),
             child: ClipOval(
               child: Image.asset(
@@ -292,7 +292,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => const Icon(
                   Icons.pets_rounded,
-                  color: Color(0xFF55822B),
+                  color: Color(0xFF518427),
                 ),
               ),
             ),
@@ -361,7 +361,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF55822B),
+                  color: const Color(0xFF518427),
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(18),
                     topRight: Radius.circular(18),
@@ -407,7 +407,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                   errorBuilder: (_, __, ___) => const Icon(
                     Icons.pets_rounded,
                     size: 16,
-                    color: Color(0xFF55822B),
+                    color: Color(0xFF518427),
                   ),
                 ),
               ),
@@ -493,7 +493,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           const SizedBox(width: 8),
           Container(
             decoration: const BoxDecoration(
-              color: Color(0xFF55822B),
+              color: Color(0xFF518427),
               shape: BoxShape.circle,
             ),
             child: IconButton(

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/prayer_time_provider.dart';
+import '../../services/adzan_service.dart';
 import 'widgets/sholat_app_bar.dart';
 import 'widgets/sholat_category_switch.dart';
 import 'widgets/sholat_date_header.dart';
@@ -133,6 +134,82 @@ class _SholatScreenState extends State<SholatScreen> {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
         physics: const BouncingScrollPhysics(),
         children: [
+          // 0. Banner Adzan Sedang Berkumandang (Bila Aktif)
+          ListenableBuilder(
+            listenable: AdzanService(),
+            builder: (context, _) {
+              if (!AdzanService().isPlaying) return const SizedBox.shrink();
+              return Container(
+                margin: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF518427), Color(0xFF3D6318)],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF518427).withValues(alpha: 0.35),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.volume_up_rounded, color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Adzan ${AdzanService().currentPrayerName ?? "Salat"} Berkumandang',
+                            style: GoogleFonts.inter(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Waktu salat telah tiba. Mari tunaikan ibadah.',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: Colors.white.withValues(alpha: 0.85),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => AdzanService().stopAdzan(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF518427),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: Text(
+                        'Hentikan',
+                        style: GoogleFonts.inter(fontSize: 11.5, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+
           // 1. Category Switch (Wajib | Sunnah)
           SholatCategorySwitch(
             selectedIndex: _categoryIndex,
@@ -180,7 +257,7 @@ class _SholatScreenState extends State<SholatScreen> {
               const Icon(
                 Icons.calendar_today_outlined,
                 size: 16,
-                color: Color(0xFF557C2B),
+                color: Color(0xFF518427),
               ),
               const SizedBox(width: 8),
               Text(

@@ -93,7 +93,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF55822B),
+              primary: Color(0xFF518427),
               onPrimary: Colors.white,
               onSurface: Color(0xFF264E0B),
             ),
@@ -153,7 +153,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF55822B),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -191,13 +191,13 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF55822B),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F6EE),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: IconButton(
             icon: Container(
@@ -471,7 +471,7 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
                 height: 52,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF55822B),
+                    backgroundColor: const Color(0xFF518427),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

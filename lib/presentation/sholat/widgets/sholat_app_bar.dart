@@ -21,7 +21,7 @@ class SholatAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: const Color(0xFF557C2B), // Forest Olive Green
+      backgroundColor: const Color(0xFF518427), // Forest Olive Green
       elevation: 0,
       centerTitle: false,
       leading: Padding(

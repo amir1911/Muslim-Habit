@@ -164,7 +164,7 @@ class _SurahPickerSheetState extends State<SurahPickerSheet> {
               decoration: InputDecoration(
                 hintText: 'Cari nama surah atau nomor...',
                 hintStyle: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade400),
-                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF4A7C59)),
+                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF518427)),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear, size: 18),
@@ -186,7 +186,7 @@ class _SurahPickerSheetState extends State<SurahPickerSheet> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFF4A7C59), width: 1.5),
+                  borderSide: const BorderSide(color: Color(0xFF518427), width: 1.5),
                 ),
               ),
             ),
@@ -207,7 +207,7 @@ class _SurahPickerSheetState extends State<SurahPickerSheet> {
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF4A7C59),
+          color: Color(0xFF518427),
         ),
       );
     }
@@ -232,7 +232,7 @@ class _SurahPickerSheetState extends State<SurahPickerSheet> {
                 icon: const Icon(Icons.refresh_rounded, size: 18),
                 label: const Text('Coba Lagi'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A7C59),
+                  backgroundColor: const Color(0xFF518427),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
@@ -276,7 +276,7 @@ class _SurahPickerSheetState extends State<SurahPickerSheet> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFF1F5F9),
+                    color: isSelected ? const Color(0xFF518427) : const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(

@@ -201,11 +201,11 @@ class QuranBelajarTab extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF557C2B),
+                    color: const Color(0xFF518427),
                     borderRadius: BorderRadius.circular(22),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF557C2B).withValues(alpha: 0.3),
+                        color: const Color(0xFF518427).withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 3),
                       ),
@@ -272,7 +272,7 @@ class QuranBelajarTab extends StatelessWidget {
                 Icon(
                   icon,
                   size: 28,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -361,7 +361,7 @@ class QuranBelajarTab extends StatelessWidget {
                 value: progress,
                 minHeight: 8,
                 backgroundColor: const Color(0xFFE4E9DC),
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF557C2B)),
+                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
               ),
             ),
           ],
@@ -529,10 +529,10 @@ class _PedeteksiBacaanSheetState extends State<_PedeteksiBacaanSheet>
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF557C2B).withValues(alpha: 0.12),
+                  color: const Color(0xFF518427).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.mic_rounded, color: Color(0xFF557C2B), size: 24),
+                child: const Icon(Icons.mic_rounded, color: Color(0xFF518427), size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -620,11 +620,11 @@ class _PedeteksiBacaanSheetState extends State<_PedeteksiBacaanSheet>
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      color: _isListening ? const Color(0xFFE65100) : const Color(0xFF557C2B),
+                      color: _isListening ? const Color(0xFFE65100) : const Color(0xFF518427),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: (_isListening ? const Color(0xFFE65100) : const Color(0xFF557C2B))
+                          color: (_isListening ? const Color(0xFFE65100) : const Color(0xFF518427))
                               .withValues(alpha: 0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
@@ -649,7 +649,7 @@ class _PedeteksiBacaanSheetState extends State<_PedeteksiBacaanSheet>
             style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: _isListening ? const Color(0xFFE65100) : const Color(0xFF557C2B),
+              color: _isListening ? const Color(0xFFE65100) : const Color(0xFF518427),
             ),
           ),
 
@@ -664,7 +664,7 @@ class _PedeteksiBacaanSheetState extends State<_PedeteksiBacaanSheet>
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded, color: Color(0xFF557C2B), size: 26),
+                  const Icon(Icons.check_circle_rounded, color: Color(0xFF518427), size: 26),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -765,10 +765,10 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF557C2B).withValues(alpha: 0.12),
+                  color: const Color(0xFF518427).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.psychology_rounded, color: Color(0xFF557C2B), size: 24),
+                child: const Icon(Icons.psychology_rounded, color: Color(0xFF518427), size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -812,10 +812,10 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isSel ? const Color(0xFF557C2B) : Colors.white,
+                      color: isSel ? const Color(0xFF518427) : Colors.white,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isSel ? const Color(0xFF557C2B) : const Color(0xFFE8EEE0),
+                        color: isSel ? const Color(0xFF518427) : const Color(0xFFE8EEE0),
                       ),
                     ),
                     child: Text(
@@ -870,7 +870,7 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
                           Icon(
                             _blurAyah ? Icons.visibility_rounded : Icons.visibility_off_rounded,
                             size: 16,
-                            color: const Color(0xFF557C2B),
+                            color: const Color(0xFF518427),
                           ),
                           const SizedBox(width: 4),
                           Text(
@@ -878,7 +878,7 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
                             style: GoogleFonts.inter(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: const Color(0xFF557C2B),
+                              color: const Color(0xFF518427),
                             ),
                           ),
                         ],
@@ -909,7 +909,7 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
                   style: GoogleFonts.inter(
                     fontSize: 12.5,
                     fontStyle: _blurAyah ? FontStyle.italic : FontStyle.normal,
-                    color: _blurAyah ? const Color(0xFF557C2B) : Colors.grey[700],
+                    color: _blurAyah ? const Color(0xFF518427) : Colors.grey[700],
                   ),
                 ),
               ],
@@ -957,7 +957,7 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
               Expanded(
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF557C2B),
+                    backgroundColor: const Color(0xFF518427),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
@@ -966,7 +966,7 @@ class _ModeHapalanSheetState extends State<_ModeHapalanSheet> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Alhamdulillah! Catatan hafalan ayat tersimpan.'),
-                        backgroundColor: Color(0xFF557C2B),
+                        backgroundColor: Color(0xFF518427),
                         duration: Duration(seconds: 2),
                       ),
                     );

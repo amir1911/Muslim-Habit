@@ -201,7 +201,7 @@ class _TokoScreenState extends State<TokoScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -237,7 +237,7 @@ class _TokoScreenState extends State<TokoScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -274,7 +274,7 @@ class _TokoScreenState extends State<TokoScreen> {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -346,8 +346,8 @@ class _TokoScreenState extends State<TokoScreen> {
         height: isSelected ? 86 : 76,
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF55822B)
-              : const Color(0xFF55822B).withValues(alpha: 0.85),
+              ? const Color(0xFF518427)
+              : const Color(0xFF518427).withValues(alpha: 0.85),
           borderRadius: BorderRadius.circular(18),
           border: isSelected
               ? Border.all(color: Colors.white.withValues(alpha: 0.9), width: 1.5)
@@ -462,7 +462,7 @@ class _TokoScreenState extends State<TokoScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: const Color(0xFF55822B),
+                              color: const Color(0xFF518427),
                             ),
                           ),
                         ],
@@ -477,7 +477,7 @@ class _TokoScreenState extends State<TokoScreen> {
                 if (isPurchased)
                   const SolidCheckCircle(
                     size: 34,
-                    color: Color(0xFF55822B),
+                    color: Color(0xFF518427),
                   )
                 else
                   DashedCircleButton(
@@ -507,14 +507,14 @@ class _TokoScreenState extends State<TokoScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Berhasil membeli ${item.name}!'),
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
         ),
       );
     } else if (result == 'SUCCESS_FEED') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Nunu meminum ${item.name}! Poin afeksi bertambah!'),
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
         ),
       );
     } else {

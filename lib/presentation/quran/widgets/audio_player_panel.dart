@@ -334,7 +334,7 @@ class _AudioPlayerPanelState extends State<AudioPlayerPanel> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF557C2B) : Colors.white.withValues(alpha: 0.08),
+          color: isActive ? const Color(0xFF518427) : Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(

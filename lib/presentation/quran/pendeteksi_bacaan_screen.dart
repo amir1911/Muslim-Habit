@@ -486,7 +486,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
               _initSpeech();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7C59),
+              backgroundColor: const Color(0xFF518427),
               foregroundColor: Colors.white,
             ),
             child: const Text('Coba Lagi'),
@@ -519,7 +519,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xFF4A7C59),
+      backgroundColor: const Color(0xFF518427),
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
@@ -540,7 +540,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: Container(
-          color: const Color(0xFF4A7C59),
+          color: const Color(0xFF518427),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: Container(
             height: 40,
@@ -624,7 +624,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: Color(0xFF4A7C59)),
+            CircularProgressIndicator(color: Color(0xFF518427)),
             SizedBox(height: 16),
             Text('Mengambil data ayat dari API Al-Qur\'an...'),
           ],
@@ -652,7 +652,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
                 icon: const Icon(Icons.refresh_rounded),
                 label: const Text('Coba Lagi'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A7C59),
+                  backgroundColor: const Color(0xFF518427),
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -973,7 +973,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
     switch (_recordingState) {
       case RecordingState.idle:
         buttonText = 'Sentuh untuk mulai';
-        buttonColor = const Color(0xFF4A7C59);
+        buttonColor = const Color(0xFF518427);
         buttonIcon = Icons.mic_rounded;
         break;
       case RecordingState.listening:
@@ -1145,7 +1145,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.psychology_alt_rounded, color: Color(0xFF4A7C59), size: 20),
+                  const Icon(Icons.psychology_alt_rounded, color: Color(0xFF518427), size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
@@ -1430,7 +1430,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
             IconButton(
               onPressed: _repeatCurrentAyah,
               tooltip: 'Ulangi Ayat',
-              icon: const Icon(Icons.replay_rounded, color: Color(0xFF4A7C59)),
+              icon: const Icon(Icons.replay_rounded, color: Color(0xFF518427)),
               style: IconButton.styleFrom(
                 backgroundColor: const Color(0xFFE8F5E9),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1445,7 +1445,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
                 icon: const Icon(Icons.skip_next_rounded, size: 18),
                 label: const Text('Berikutnya'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A7C59),
+                  backgroundColor: const Color(0xFF518427),
                   foregroundColor: Colors.white,
                   disabledBackgroundColor: Colors.grey.shade200,
                   disabledForegroundColor: Colors.grey.shade400,
@@ -1541,7 +1541,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
             ),
             label: Text(_isAutoplayActive ? 'Stop' : 'Putar Surah'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isAutoplayActive ? const Color(0xFFDC2626) : const Color(0xFF4A7C59),
+              backgroundColor: _isAutoplayActive ? const Color(0xFFDC2626) : const Color(0xFF518427),
               foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -1617,7 +1617,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
         color: isHighlight ? const Color(0xFFF0FDF4) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isHighlight ? const Color(0xFF4A7C59) : const Color(0xFFE2E8F0),
+          color: isHighlight ? const Color(0xFF518427) : const Color(0xFFE2E8F0),
           width: isHighlight ? 1.5 : 1.0,
         ),
       ),
@@ -1633,7 +1633,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
                 width: 30,
                 height: 30,
                 decoration: BoxDecoration(
-                  color: isHighlight ? const Color(0xFF4A7C59) : const Color(0xFFF1F5F9),
+                  color: isHighlight ? const Color(0xFF518427) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -1676,7 +1676,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
                       (_isPlayingAudio && _currentAyahNumber == ayah.ayahNumber)
                           ? Icons.pause_circle_rounded
                           : Icons.play_circle_outline_rounded,
-                      color: const Color(0xFF4A7C59),
+                      color: const Color(0xFF518427),
                       size: 24,
                     ),
                     onPressed: () {
@@ -1693,7 +1693,7 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
                           : Icons.mic_rounded,
                       color: (_recordingState == RecordingState.listening && _currentAyahNumber == ayah.ayahNumber)
                           ? const Color(0xFFDC2626)
-                          : const Color(0xFF4A7C59),
+                          : const Color(0xFF518427),
                       size: 24,
                     ),
                     onPressed: () => _toggleRecording(specificAyahNumber: ayah.ayahNumber),

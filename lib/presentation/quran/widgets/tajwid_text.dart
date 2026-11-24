@@ -268,24 +268,28 @@ class TajwidText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final baseStyle = GoogleFonts.amiri(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w600,
+      color: defaultColor,
+      height: lineHeight,
+    ).copyWith(
+      locale: const Locale('ar'),
+    );
+
     if (!showTajwid) {
       return Text(
         text,
         textAlign: textAlign,
         textDirection: TextDirection.rtl,
-        style: GoogleFonts.amiri(
-          fontSize: fontSize,
-          fontWeight: FontWeight.w600,
-          color: defaultColor,
-          height: lineHeight,
-        ),
+        style: baseStyle,
       );
     }
 
     final spans = parseTajwidSpans(text, fontSize, defaultColor);
 
     return Text.rich(
-      TextSpan(children: spans),
+      TextSpan(style: baseStyle, children: spans),
       textAlign: textAlign,
       textDirection: TextDirection.rtl,
     );
@@ -301,7 +305,17 @@ class TajwidText extends StatelessWidget {
 
     final clusters = _tokenizeClusters(input);
     if (clusters.isEmpty) {
-      return [TextSpan(text: input, style: GoogleFonts.amiri(fontSize: fontSize, color: baseColor))];
+      return [
+        TextSpan(
+          text: input,
+          style: GoogleFonts.amiri(
+            fontSize: fontSize,
+            fontWeight: FontWeight.w600,
+            color: baseColor,
+            height: 2.2,
+          ).copyWith(locale: const Locale('ar')),
+        )
+      ];
     }
 
     final rules = _applyTajwidRules(clusters);
@@ -311,42 +325,38 @@ class TajwidText extends StatelessWidget {
       fontWeight: FontWeight.w600,
       color: baseColor,
       height: 2.2,
+    ).copyWith(
+      locale: const Locale('ar'),
     );
 
     final List<TextSpan> spans = [];
     String currentText = '';
     Color currentColor = baseColor;
-    FontWeight currentWeight = FontWeight.w600;
 
     for (int i = 0; i < clusters.length; i++) {
       final cluster = clusters[i];
       final rule = rules[i];
       final Color clusterColor = _getColorForRule(rule, baseColor);
-      final FontWeight clusterWeight = (rule != _TajwidType.none && rule != _TajwidType.alifLamSyamsiyah)
-          ? FontWeight.w700
-          : FontWeight.w600;
 
       if (currentText.isEmpty) {
         currentText = cluster.text;
         currentColor = clusterColor;
-        currentWeight = clusterWeight;
-      } else if (currentColor == clusterColor && currentWeight == clusterWeight) {
+      } else if (currentColor == clusterColor) {
         currentText += cluster.text;
       } else {
         spans.add(TextSpan(
           text: currentText,
-          style: baseStyle.copyWith(color: currentColor, fontWeight: currentWeight),
+          style: baseStyle.copyWith(color: currentColor),
         ));
         currentText = cluster.text;
         currentColor = clusterColor;
-        currentWeight = clusterWeight;
       }
     }
 
     if (currentText.isNotEmpty) {
       spans.add(TextSpan(
         text: currentText,
-        style: baseStyle.copyWith(color: currentColor, fontWeight: currentWeight),
+        style: baseStyle.copyWith(color: currentColor),
       ));
     }
 
@@ -428,6 +438,22 @@ class TajwidText extends StatelessWidget {
     final int n = clusters.length;
     final List<_TajwidType> rules = List.filled(n, _TajwidType.none);
 
+    // Deteksi kluster yang merupakan bagian dari Lafaz Jalalah (الله)
+    // agar ligature sakral ini tidak terpecah oleh pewarnaan per huruf
+    final Set<int> lafazJalalahWordIndices = {};
+    final Map<int, List<int>> wordClustersMap = {};
+    for (int i = 0; i < n; i++) {
+      if (!clusters[i].isSpace && !clusters[i].isWaqf) {
+        wordClustersMap.putIfAbsent(clusters[i].wordIndex, () => []).add(i);
+      }
+    }
+    for (final entry in wordClustersMap.entries) {
+      final bare = entry.value.map((idx) => clusters[idx].baseChar).join();
+      if (_isLafazJalalahWord(bare)) {
+        lafazJalalahWordIndices.add(entry.key);
+      }
+    }
+
     const qalqalahLetters = {'ق', 'ط', 'ب', 'ج', 'د'};
     const ikhfaLetters = {
       'ت', 'ث', 'ج', 'د', 'ذ', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ف', 'ق', 'ك'
@@ -458,6 +484,9 @@ class TajwidText extends StatelessWidget {
     for (int i = 0; i < n - 1; i++) {
       final c1 = clusters[i];
       final c2 = clusters[i + 1];
+
+      // Lewatkan jika termasuk Lafaz Jalalah agar ligature Allah tidak terpotong
+      if (lafazJalalahWordIndices.contains(c1.wordIndex)) continue;
 
       final isAlif = c1.baseChar == 'ا' || c1.baseChar == 'ٱ';
       final isLam = c2.baseChar == 'ل';
@@ -697,7 +726,44 @@ class TajwidText extends StatelessWidget {
       }
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // PROTEKSI AKHIR: Lafaz Jalalah (الله)
+    // ─────────────────────────────────────────────────────────────
+    // Pastikan seluruh kluster dalam kata Lafaz Jalalah berstatus _TajwidType.none
+    // sehingga tergabung dalam satu TextSpan utuh tanpa terpecah sama sekali.
+    for (int i = 0; i < n; i++) {
+      if (lafazJalalahWordIndices.contains(clusters[i].wordIndex)) {
+        rules[i] = _TajwidType.none;
+      }
+    }
+
     return rules;
+  }
+
+  /// Cek apakah kata merupakan Lafaz Jalalah (Allah) dalam berbagai variasi
+  static bool _isLafazJalalahWord(String bareWord) {
+    final norm = bareWord
+        .replaceAll('ٱ', 'ا')
+        .replaceAll('آ', 'ا')
+        .replaceAll('إ', 'ا')
+        .replaceAll('أ', 'ا')
+        .replaceAll('\u0670', '')
+        .replaceAll('\u0671', 'ا')
+        .replaceAll(RegExp(r'[\u064B-\u065F\u0670\u06D6-\u06ED]'), '');
+
+    return norm == 'الله' ||
+        norm == 'لله' ||
+        norm == 'بالله' ||
+        norm == 'والله' ||
+        norm == 'فلله' ||
+        norm == 'ولله' ||
+        norm == 'فالله' ||
+        norm == 'تالله' ||
+        norm == 'اللهم' ||
+        norm == 'واللهم' ||
+        norm == 'باللهم' ||
+        (norm.length >= 4 && norm.endsWith('الله')) ||
+        (norm.length >= 3 && norm.endsWith('لله'));
   }
 
   /// Pemetaan tipe tajwid ke warna representatif

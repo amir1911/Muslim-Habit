@@ -56,7 +56,7 @@ class TajwidLegendSheet extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF557C2B).withValues(alpha: 0.12),
+                        color: const Color(0xFF518427).withValues(alpha: 0.12),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -129,7 +129,7 @@ class TajwidLegendSheet extends StatelessWidget {
                 width: 3,
                 height: 14,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -140,7 +140,7 @@ class TajwidLegendSheet extends StatelessWidget {
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.6,
-                  color: const Color(0xFF557C2B),
+                  color: const Color(0xFF518427),
                 ),
               ),
             ],
@@ -235,7 +235,7 @@ class TajwidLegendSheet extends StatelessWidget {
                     style: GoogleFonts.amiri(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: const Color(0xFF557C2B),
+                      color: const Color(0xFF518427),
                     ),
                   ),
                 ],

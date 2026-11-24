@@ -61,7 +61,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Komunitas "${_nameCtrl.text}" berhasil dibuat! 🌿'),
-          backgroundColor: const Color(0xFF4A7C59),
+          backgroundColor: const Color(0xFF518427),
         ),
       );
       Navigator.pop(context);
@@ -73,7 +73,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -107,14 +107,14 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
                 height: 90,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF4A7C59), Color(0xFF2D5A3C)],
+                    colors: [Color(0xFF518427), Color(0xFF2D5A3C)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF4A7C59).withValues(alpha: 0.3),
+                      color: const Color(0xFF518427).withValues(alpha: 0.3),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -149,7 +149,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
                 child: DropdownButton<String>(
                   value: _selectedCategory,
                   isExpanded: true,
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF4A7C59)),
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF518427)),
                   items: _categories.map((cat) {
                     return DropdownMenuItem(
                       value: cat,
@@ -198,12 +198,12 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF4A7C59).withValues(alpha: 0.1),
+                      color: const Color(0xFF518427).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       _isPrivate ? Icons.lock_rounded : Icons.public_rounded,
-                      color: const Color(0xFF4A7C59),
+                      color: const Color(0xFF518427),
                       size: 20,
                     ),
                   ),
@@ -227,7 +227,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
                   ),
                   Switch(
                     value: _isPrivate,
-                    activeColor: const Color(0xFF4A7C59),
+                    activeColor: const Color(0xFF518427),
                     onChanged: (val) => setState(() => _isPrivate = val),
                   ),
                 ],
@@ -239,7 +239,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
             ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -285,7 +285,7 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Color(0xFF4A7C59), width: 1.5),
+        borderSide: const BorderSide(color: Color(0xFF518427), width: 1.5),
       ),
     );
   }

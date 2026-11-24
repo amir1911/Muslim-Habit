@@ -274,7 +274,7 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 gradient: const RadialGradient(
-                                  colors: [Color(0xFF8CAF5C), Color(0xFF688C40)],
+                                  colors: [Color(0xFF6BA335), Color(0xFF518427)],
                                   center: Alignment(-0.2, -0.3),
                                   radius: 0.9,
                                 ),

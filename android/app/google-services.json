@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "124725735669-8pbscevge4fl8lnahqgg022gj0r3vg11.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.muslimhabit.muslim_habit",
+            "certificate_hash": "acc4f550801a002e51227f0fd8d67360f4964b23"
+          }
+        },
+        {
           "client_id": "124725735669-j3fr9oh5fqkpvc3deg5s9v47dbepd4hg.apps.googleusercontent.com",
           "client_type": 3
         }

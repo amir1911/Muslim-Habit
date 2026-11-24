@@ -72,13 +72,13 @@ class _KhatamReadingScreenState extends State<KhatamReadingScreen> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF55822B),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F6EE),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: IconButton(
             icon: Container(
@@ -150,7 +150,7 @@ class _KhatamReadingScreenState extends State<KhatamReadingScreen> {
                   Expanded(
                     child: prov.isLoadingAyahs
                         ? const Center(
-                            child: CircularProgressIndicator(color: Color(0xFF55822B)),
+                            child: CircularProgressIndicator(color: Color(0xFF518427)),
                           )
                         : groups.isEmpty
                             ? Center(
@@ -248,7 +248,7 @@ class _KhatamReadingScreenState extends State<KhatamReadingScreen> {
                                                         fontSize: 23,
                                                         fontWeight: FontWeight.bold,
                                                         color: isPlayingThis
-                                                            ? const Color(0xFF55822B)
+                                                            ? const Color(0xFF518427)
                                                             : const Color(0xFF1F2937),
                                                         height: 2.0,
                                                       ),
@@ -414,7 +414,7 @@ class _KhatamReadingScreenState extends State<KhatamReadingScreen> {
                                 'Alhamdulillah, Anda telah menyelesaikan seluruh 30 Juz!',
                                 style: GoogleFonts.inter(),
                               ),
-                              backgroundColor: const Color(0xFF55822B),
+                              backgroundColor: const Color(0xFF518427),
                             ),
                           );
                         }

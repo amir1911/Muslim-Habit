@@ -49,7 +49,7 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -97,7 +97,7 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
                   decoration: InputDecoration(
                     hintText: 'Cari dzikir, doa, atau transliterasi...',
                     hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 13),
-                    prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF4A7C59)),
+                    prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF518427)),
                     suffixIcon: _searchCtrl.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded, size: 18),
@@ -207,11 +207,11 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
                                       width: 44,
                                       height: 44,
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF4A7C59).withValues(alpha: 0.1),
+                                        color: const Color(0xFF518427).withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: const Center(
-                                        child: Icon(Icons.spa_rounded, color: Color(0xFF4A7C59), size: 22),
+                                        child: Icon(Icons.spa_rounded, color: Color(0xFF518427), size: 22),
                                       ),
                                     ),
                                     const SizedBox(width: 14),
@@ -235,7 +235,7 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
                                             style: GoogleFonts.inter(
                                               fontSize: 12,
                                               fontStyle: FontStyle.italic,
-                                              color: const Color(0xFF5D7F42),
+                                              color: const Color(0xFF518427),
                                             ),
                                           ),
                                           const SizedBox(height: 2),
@@ -252,7 +252,7 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
                                     const Icon(
                                       Icons.arrow_forward_ios_rounded,
                                       size: 14,
-                                      color: Color(0xFF4A7C59),
+                                      color: Color(0xFF518427),
                                     ),
                                   ],
                                 ),
@@ -272,9 +272,9 @@ class _DzikirSearchScreenState extends State<DzikirSearchScreen> {
       padding: const EdgeInsets.only(right: 8),
       child: ActionChip(
         label: Text(label),
-        labelStyle: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF4A7C59), fontWeight: FontWeight.w600),
+        labelStyle: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF518427), fontWeight: FontWeight.w600),
         backgroundColor: Colors.white,
-        side: const BorderSide(color: Color(0xFFB7CEB9)),
+        side: const BorderSide(color: Color(0xFF9AC07A)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         onPressed: () {
           _searchCtrl.text = label;

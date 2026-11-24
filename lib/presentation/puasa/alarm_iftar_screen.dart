@@ -83,7 +83,7 @@ class _AlarmIftarScreenState extends State<AlarmIftarScreen> {
                 Navigator.pop(context); // alarm screen
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),

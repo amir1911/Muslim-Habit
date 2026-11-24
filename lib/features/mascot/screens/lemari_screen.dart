@@ -75,7 +75,7 @@ class LemariScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
                             color: isEquipped
-                                ? const Color(0xFF55822B)
+                                ? const Color(0xFF518427)
                                 : const Color(0xFFE5E7EB),
                             width: isEquipped ? 1.5 : 1.0,
                           ),
@@ -136,7 +136,7 @@ class LemariScreen extends StatelessWidget {
                             if (isEquipped)
                               const SolidCheckCircle(
                                 size: 34,
-                                color: Color(0xFF55822B),
+                                color: Color(0xFF518427),
                               )
                             else
                               DashedCircleButton(
@@ -147,7 +147,7 @@ class LemariScreen extends StatelessWidget {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('Kostum ${costume.name} berhasil digunakan!'),
-                                      backgroundColor: const Color(0xFF55822B),
+                                      backgroundColor: const Color(0xFF518427),
                                       duration: const Duration(milliseconds: 1200),
                                     ),
                                   );
@@ -204,7 +204,7 @@ class LemariScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -233,7 +233,7 @@ class LemariScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -270,7 +270,7 @@ class LemariScreen extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: const BoxDecoration(
-                color: Color(0xFF55822B),
+                color: Color(0xFF518427),
                 shape: BoxShape.circle,
               ),
               child: const Icon(

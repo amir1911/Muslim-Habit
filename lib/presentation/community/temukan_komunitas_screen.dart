@@ -45,7 +45,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -90,7 +90,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
               decoration: InputDecoration(
                 hintText: 'Cari komunitas Islami...',
                 hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF4A7C59)),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF518427)),
                 filled: true,
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -121,7 +121,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
                 return ChoiceChip(
                   label: Text(cat),
                   selected: isSelected,
-                  selectedColor: const Color(0xFF4A7C59),
+                  selectedColor: const Color(0xFF518427),
                   backgroundColor: Colors.white,
                   labelStyle: GoogleFonts.inter(
                     fontSize: 12,
@@ -131,7 +131,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                     side: BorderSide(
-                      color: isSelected ? const Color(0xFF4A7C59) : const Color(0xFFCBD5E1),
+                      color: isSelected ? const Color(0xFF518427) : const Color(0xFFCBD5E1),
                     ),
                   ),
                   onSelected: (val) {
@@ -202,7 +202,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
           height: 48,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF4A7C59), Color(0xFF2D5A3C)],
+              colors: [Color(0xFF518427), Color(0xFF2D5A3C)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -268,7 +268,7 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF4A7C59),
+                    color: const Color(0xFF518427),
                   ),
                 ),
               )
@@ -278,12 +278,12 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Berhasil bergabung ke "${comm.name}"! 🌿'),
-                      backgroundColor: const Color(0xFF4A7C59),
+                      backgroundColor: const Color(0xFF518427),
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A7C59),
+                  backgroundColor: const Color(0xFF518427),
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

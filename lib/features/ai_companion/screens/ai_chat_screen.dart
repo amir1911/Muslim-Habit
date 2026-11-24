@@ -161,7 +161,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
       AIChatProvider aiChatProvider, AIAssistantModel companion) {
     if (aiChatProvider.isLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF557C2B)),
+        child: CircularProgressIndicator(color: Color(0xFF518427)),
       );
     }
 

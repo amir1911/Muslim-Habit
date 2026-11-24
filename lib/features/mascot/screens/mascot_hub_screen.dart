@@ -245,7 +245,7 @@ class MascotHubScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -281,7 +281,7 @@ class MascotHubScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
@@ -318,7 +318,7 @@ class MascotHubScreen extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: const Color(0xFF55822B),
+              color: const Color(0xFF518427),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -386,7 +386,7 @@ class MascotHubScreen extends StatelessWidget {
         width: 86,
         height: 86,
         decoration: BoxDecoration(
-          color: const Color(0xFF55822B),
+          color: const Color(0xFF518427),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -443,7 +443,7 @@ class MascotHubScreen extends StatelessWidget {
             children: [
               const Icon(
                 Icons.pets_rounded,
-                color: Color(0xFF55822B),
+                color: Color(0xFF518427),
                 size: 16,
               ),
               const SizedBox(width: 6),
@@ -492,7 +492,7 @@ class MascotHubScreen extends StatelessWidget {
               value: mascotProv.friendshipProgressFraction,
               minHeight: 12,
               backgroundColor: const Color(0xFFE5EBE0),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF55822B)),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
             ),
           ),
           const SizedBox(height: 8),
@@ -504,7 +504,7 @@ class MascotHubScreen extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF55822B),
+                color: const Color(0xFF518427),
               ),
               textAlign: TextAlign.center,
             ),

@@ -389,7 +389,7 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
               await _initSpeechRecognizer();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F8426),
+              backgroundColor: const Color(0xFF518427),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             child: Text(
@@ -425,7 +425,7 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F8426),
+              backgroundColor: const Color(0xFF518427),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             child: Text(
@@ -546,7 +546,7 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
                     decoration: const BoxDecoration(
                       border: Border(
                         left: BorderSide(
-                          color: Color(0xFF4F8426),
+                          color: Color(0xFF518427),
                           width: 4.5,
                         ),
                       ),
@@ -615,7 +615,7 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF4F8426),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
@@ -624,7 +624,7 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
           children: [
             // ── 1. HEADER HALAMAN (HIJAU #4F8426) ──
             Container(
-              color: const Color(0xFF4F8426),
+              color: const Color(0xFF518427),
               child: SafeArea(
                 bottom: false,
                 child: Column(

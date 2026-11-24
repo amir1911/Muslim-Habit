@@ -94,7 +94,7 @@ class _AlarmSahurScreenState extends State<AlarmSahurScreen>
                 Navigator.pop(context); // alarm screen
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4A7C59),
+                backgroundColor: const Color(0xFF518427),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -322,7 +322,7 @@ class _AlarmSahurScreenState extends State<AlarmSahurScreen>
                       icon: const Icon(Icons.snooze_rounded, size: 18),
                       label: const Text('Snooze (5 Menit)'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3F6212),
+                        backgroundColor: const Color(0xFF3D6318),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         elevation: 0,

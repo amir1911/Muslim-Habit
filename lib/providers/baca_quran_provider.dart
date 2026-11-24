@@ -8,6 +8,7 @@ import '../models/surah_item.dart';
 import '../models/verse_read_state.dart';
 import '../services/quran_service.dart';
 import '../services/storage_service.dart';
+import '../services/adzan_service.dart';
 
 class BacaQuranProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -83,6 +84,9 @@ class BacaQuranProvider extends ChangeNotifier {
     _loadBookmarks();
     _initAudioListeners();
     loadAyahs();
+
+    // Daftarkan koordinasi agar audio Quran berhenti otomatis saat adzan berkumandang
+    AdzanService.registerAudioPauseCallback(_onAdzanTriggeredPause);
   }
 
   // Getters
@@ -549,8 +553,23 @@ class BacaQuranProvider extends ChangeNotifier {
     _audioPlayer.seek(position);
   }
 
+  void _onAdzanTriggeredPause() {
+    stopAudio();
+  }
+
+  /// Hentikan audio Al-Qur'an secara penuh
+  Future<void> stopAudio() async {
+    try {
+      await _audioPlayer.stop();
+    } catch (_) {}
+    _isPlayingAudio = false;
+    _isLoadingAudio = false;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
+    AdzanService.unregisterAudioPauseCallback(_onAdzanTriggeredPause);
     _playerStateSub?.cancel();
     _positionSub?.cancel();
     _durationSub?.cancel();

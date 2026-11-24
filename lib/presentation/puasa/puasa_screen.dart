@@ -24,7 +24,7 @@ class PuasaScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -79,7 +79,7 @@ class PuasaScreen extends StatelessWidget {
         ],
       ),
       body: provider.isLoading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF4A7C59)))
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF518427)))
           : SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
               child: Column(
@@ -155,7 +155,7 @@ class PuasaScreen extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const TambahPuasaScreen()),
           );
         },
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         foregroundColor: Colors.white,
         elevation: 4,
         child: const Icon(Icons.add_rounded, size: 28),
@@ -194,7 +194,7 @@ class PuasaScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF4A7C59)),
+                      const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF518427)),
                       const SizedBox(width: 6),
                       Text(
                         'Target Puasa',
@@ -522,7 +522,7 @@ class PuasaScreen extends StatelessWidget {
             icon: const Icon(Icons.add_rounded),
             label: const Text('Rencanakan Puasa'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4A7C59),
+              backgroundColor: const Color(0xFF518427),
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

@@ -53,7 +53,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Postingan berhasil dibagikan ke komunitas! 🌿'),
-          backgroundColor: Color(0xFF4A7C59),
+          backgroundColor: Color(0xFF518427),
         ),
       );
     }
@@ -87,7 +87,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
             SliverAppBar(
               expandedHeight: 180,
               pinned: true,
-              backgroundColor: const Color(0xFF4A7C59),
+              backgroundColor: const Color(0xFF518427),
               elevation: 0,
               leading: IconButton(
                 icon: Container(
@@ -104,7 +104,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
                 background: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFF4A7C59), Color(0xFF2D5A3C)],
+                      colors: [Color(0xFF518427), Color(0xFF2D5A3C)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -181,7 +181,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF4A7C59),
+                                      color: const Color(0xFF518427),
                                     ),
                                   ),
                                 ],
@@ -198,7 +198,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
                             }
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isJoined ? const Color(0xFFF1F5F9) : const Color(0xFF4A7C59),
+                            backgroundColor: isJoined ? const Color(0xFFF1F5F9) : const Color(0xFF518427),
                             foregroundColor: isJoined ? const Color(0xFF64748B) : Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -231,9 +231,9 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
               delegate: _SliverAppBarDelegate(
                 TabBar(
                   controller: _tabCtrl,
-                  labelColor: const Color(0xFF4A7C59),
+                  labelColor: const Color(0xFF518427),
                   unselectedLabelColor: const Color(0xFF94A3B8),
-                  indicatorColor: const Color(0xFF4A7C59),
+                  indicatorColor: const Color(0xFF518427),
                   indicatorWeight: 3,
                   labelStyle: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w700),
                   tabs: const [
@@ -318,7 +318,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
                         style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4A7C59),
+                        backgroundColor: const Color(0xFF518427),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -406,7 +406,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF4A7C59),
+                    color: const Color(0xFF518427),
                   ),
                 ),
               ),
@@ -498,7 +498,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _buildMemberTile('Admin Utama', 'Admin', Icons.verified_user_rounded, const Color(0xFF4A7C59)),
+        _buildMemberTile('Admin Utama', 'Admin', Icons.verified_user_rounded, const Color(0xFF518427)),
         _buildMemberTile('Maulana Adiatma', 'Moderator', Icons.shield_rounded, const Color(0xFF2563EB)),
         _buildMemberTile('Fatimah Dwi Fitri', 'Anggota', Icons.person_rounded, const Color(0xFF64748B)),
         _buildMemberTile('Alya Fahira', 'Anggota', Icons.person_rounded, const Color(0xFF64748B)),
@@ -571,7 +571,7 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
             children: [
               Row(
                 children: [
-                  const Icon(Icons.rule_rounded, color: Color(0xFF4A7C59), size: 22),
+                  const Icon(Icons.rule_rounded, color: Color(0xFF518427), size: 22),
                   const SizedBox(width: 8),
                   Text(
                     'Aturan & Adab Komunitas',
@@ -684,7 +684,7 @@ class _CommentSheetState extends State<_CommentSheet> {
                             backgroundColor: const Color(0xFFE2E8F0),
                             child: Text(
                               c.userName[0],
-                              style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: const Color(0xFF4A7C59)),
+                              style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: const Color(0xFF518427)),
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -753,7 +753,7 @@ class _CommentSheetState extends State<_CommentSheet> {
                 icon: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF4A7C59),
+                    color: Color(0xFF518427),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.send_rounded, color: Colors.white, size: 16),

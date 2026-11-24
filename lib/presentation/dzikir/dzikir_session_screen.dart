@@ -52,7 +52,7 @@ class _DzikirSessionScreenState extends State<DzikirSessionScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAF8),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF4A7C59),
+        backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leading: IconButton(
           icon: Container(
@@ -111,7 +111,7 @@ class _DzikirSessionScreenState extends State<DzikirSessionScreen> {
                       value: progressRatio,
                       minHeight: 5,
                       backgroundColor: const Color(0xFFE2E7DF),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4A7C59)),
+                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
                     ),
                   ),
                 ],
@@ -276,7 +276,7 @@ class _DzikirSessionScreenState extends State<DzikirSessionScreen> {
                     width: 52,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: currentIndex > 0 ? const Color(0xFF1F442C) : const Color(0xFFC7D3C5),
+                      color: currentIndex > 0 ? const Color(0xFF3D6318) : const Color(0xFFC7D3C5),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: IconButton(
@@ -300,7 +300,7 @@ class _DzikirSessionScreenState extends State<DzikirSessionScreen> {
                       height: 52,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4A7C59),
+                          backgroundColor: const Color(0xFF518427),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -339,7 +339,7 @@ class _DzikirSessionScreenState extends State<DzikirSessionScreen> {
                     height: 52,
                     decoration: BoxDecoration(
                       color: currentIndex < items.length - 1
-                          ? const Color(0xFF1F442C)
+                          ? const Color(0xFF3D6318)
                           : const Color(0xFFC7D3C5),
                       borderRadius: BorderRadius.circular(16),
                     ),

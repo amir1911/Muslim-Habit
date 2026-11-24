@@ -7,6 +7,7 @@ import '../quran/quran_screen.dart';
 import '../tasbih/tasbih_screen.dart';
 import '../badges/badges_screen.dart';
 import '../community/community_screen.dart';
+import '../profile/profile_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 import '../../features/mascot/screens/mascot_hub_screen.dart';
 
@@ -48,7 +49,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     HabitsScreen(),
     QuranScreen(),
     CommunityScreen(),
-    BadgesScreen(),
+    ProfileScreen(),
   ];
 
   @override

@@ -69,6 +69,27 @@ class StorageService {
   String getUserName() => _prefs.getString(_keyUserName) ?? 'Sahabat Muslim';
   Future<void> setUserName(String name) => _prefs.setString(_keyUserName, name);
 
+  static const String _keyUserEmail = 'user_email_address';
+  static const String _keyUserPassword = 'user_auth_password';
+  static const String _keyUserAvatarPath = 'user_avatar_path';
+  static const String _keyHabitRemindersEnabled = 'user_habit_reminders_enabled';
+  static const String _keyChatbotTone = 'chatbot_tone_preference';
+
+  String getUserEmail() => _prefs.getString(_keyUserEmail) ?? 'ahmad.husain@email.com';
+  Future<void> setUserEmail(String email) => _prefs.setString(_keyUserEmail, email);
+
+  String? getUserPassword() => _prefs.getString(_keyUserPassword);
+  Future<void> setUserPassword(String password) => _prefs.setString(_keyUserPassword, password);
+
+  String? getUserAvatarPath() => _prefs.getString(_keyUserAvatarPath);
+  Future<void> setUserAvatarPath(String path) => _prefs.setString(_keyUserAvatarPath, path);
+
+  bool getHabitRemindersEnabled() => _prefs.getBool(_keyHabitRemindersEnabled) ?? true;
+  Future<void> setHabitRemindersEnabled(bool enabled) => _prefs.setBool(_keyHabitRemindersEnabled, enabled);
+
+  String getChatbotTone() => _prefs.getString(_keyChatbotTone) ?? 'Ramah & Islami';
+  Future<void> setChatbotTone(String tone) => _prefs.setString(_keyChatbotTone, tone);
+
   // Badges
   List<String> getUnlockedBadges() => _prefs.getStringList(_keyBadges) ?? ['pejuang_subuh'];
   Future<void> setUnlockedBadges(List<String> badges) => _prefs.setStringList(_keyBadges, badges);
@@ -232,6 +253,37 @@ class StorageService {
       await _prefs.setString(key, timeStr);
     }
   }
+
+  // ── Adzan Otomatis Settings ──
+  static const String _keyAdzanAutoEnabled = 'adzan_auto_enabled_global';
+  static const String _keyAdzanPrayerPrefix = 'adzan_prayer_enabled_';
+  static const String _keyAdzanVolume = 'adzan_playback_volume';
+  static const String _keyPrayerPreReminder = 'prayer_pre_reminder_enabled';
+  static const String _keyPrayerPreReminderMinutes = 'prayer_pre_reminder_minutes';
+  static const String _keyAdzanPlayedPrefix = 'adzan_played_';
+
+  bool getAdzanAutoEnabled() => _prefs.getBool(_keyAdzanAutoEnabled) ?? true;
+  Future<void> setAdzanAutoEnabled(bool val) => _prefs.setBool(_keyAdzanAutoEnabled, val);
+
+  bool getAdzanPrayerEnabled(String prayerKey) =>
+      _prefs.getBool('$_keyAdzanPrayerPrefix${prayerKey.toLowerCase()}') ?? true;
+  Future<void> setAdzanPrayerEnabled(String prayerKey, bool val) =>
+      _prefs.setBool('$_keyAdzanPrayerPrefix${prayerKey.toLowerCase()}', val);
+
+  double getAdzanVolume() => _prefs.getDouble(_keyAdzanVolume) ?? 1.0;
+  Future<void> setAdzanVolume(double vol) => _prefs.setDouble(_keyAdzanVolume, vol);
+
+  bool getPrayerPreReminderEnabled() => _prefs.getBool(_keyPrayerPreReminder) ?? false;
+  Future<void> setPrayerPreReminderEnabled(bool val) => _prefs.setBool(_keyPrayerPreReminder, val);
+
+  int getPrayerPreReminderMinutes() => _prefs.getInt(_keyPrayerPreReminderMinutes) ?? 10;
+  Future<void> setPrayerPreReminderMinutes(int minutes) =>
+      _prefs.setInt(_keyPrayerPreReminderMinutes, minutes);
+
+  String? getAdzanLastPlayed(String dateKey, String prayerKey) =>
+      _prefs.getString('$_keyAdzanPlayedPrefix${dateKey}_${prayerKey.toLowerCase()}');
+  Future<void> setAdzanLastPlayed(String dateKey, String prayerKey, String timestamp) =>
+      _prefs.setString('$_keyAdzanPlayedPrefix${dateKey}_${prayerKey.toLowerCase()}', timestamp);
 
   // ── Onboarding & Selected AI Assistant ──
   static const String _keySelectedAIId = 'selected_ai_assistant_id';

@@ -71,7 +71,7 @@ class VerseCard extends StatelessWidget {
           bottom: BorderSide(color: borderColor, width: 1.0),
           left: isActive || isAudioPlaying
               ? BorderSide(
-                  color: isAudioPlaying ? const Color(0xFF1976D2) : const Color(0xFF557C2B),
+                  color: isAudioPlaying ? const Color(0xFF1976D2) : const Color(0xFF518427),
                   width: 3.5,
                 )
               : BorderSide.none,
@@ -81,8 +81,8 @@ class VerseCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          splashColor: const Color(0xFF557C2B).withValues(alpha: 0.08),
-          highlightColor: const Color(0xFF557C2B).withValues(alpha: 0.04),
+          splashColor: const Color(0xFF518427).withValues(alpha: 0.08),
+          highlightColor: const Color(0xFF518427).withValues(alpha: 0.04),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
             child: Column(
@@ -101,7 +101,7 @@ class VerseCard extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF557C2B).withValues(alpha: 0.12),
+                              color: const Color(0xFF518427).withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -109,7 +109,7 @@ class VerseCard extends StatelessWidget {
                               children: [
                                 const Icon(
                                   Icons.check_circle_rounded,
-                                  color: Color(0xFF557C2B),
+                                  color: Color(0xFF518427),
                                   size: 14,
                                 ),
                                 const SizedBox(width: 4),
@@ -240,7 +240,7 @@ class VerseCard extends StatelessWidget {
           const Icon(
             Icons.auto_awesome,
             size: 11,
-            color: Color(0xFF557C2B),
+            color: Color(0xFF518427),
           ),
           const SizedBox(width: 4),
           Text(

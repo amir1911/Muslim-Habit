@@ -93,6 +93,8 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/audio/
+    - assets/audio/adzan.mp3
+    - assets/audio/adzan shubuh.mp3
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

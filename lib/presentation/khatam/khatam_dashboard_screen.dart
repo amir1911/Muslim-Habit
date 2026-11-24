@@ -29,13 +29,13 @@ class KhatamDashboardScreen extends StatelessWidget {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF55822B),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F6EE),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: IconButton(
             icon: Container(
@@ -185,7 +185,7 @@ class KhatamDashboardScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF55822B),
+                              color: const Color(0xFF518427),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -312,7 +312,7 @@ class KhatamDashboardScreen extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF55822B),
+                      color: const Color(0xFF518427),
                       letterSpacing: 0.4,
                     ),
                   ),

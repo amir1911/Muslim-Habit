@@ -124,7 +124,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF55822B),
+              backgroundColor: const Color(0xFF518427),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
             onPressed: () {
@@ -138,7 +138,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Jadwal "${updated.title}" berhasil disesuaikan!'),
-                  backgroundColor: const Color(0xFF55822B),
+                  backgroundColor: const Color(0xFF518427),
                 ),
               );
             },
@@ -190,7 +190,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
               ? '$addedCount habbit baru berhasil ditambahkan!'
               : 'Habbit berhasil diperbarui!',
         ),
-        backgroundColor: const Color(0xFF55822B),
+        backgroundColor: const Color(0xFF518427),
       ),
     );
   }
@@ -202,13 +202,13 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
-        statusBarColor: Color(0xFF55822B),
+        statusBarColor: Color(0xFF518427),
         statusBarIconBrightness: Brightness.light,
       ),
       child: Scaffold(
         backgroundColor: const Color(0xFFF7F6EE),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF55822B),
+          backgroundColor: const Color(0xFF518427),
           elevation: 0,
           leading: IconButton(
             icon: Container(
@@ -352,7 +352,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
                     const Icon(
                       Icons.check_rounded,
                       size: 13,
-                      color: Color(0xFF55822B),
+                      color: Color(0xFF518427),
                     ),
                     const SizedBox(width: 3),
                     Text(
@@ -360,7 +360,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF55822B),
+                        color: const Color(0xFF518427),
                       ),
                     ),
                   ],
@@ -435,7 +435,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? const Color(0xFF55822B) : const Color(0xFFE5E7EB),
+          color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
           width: isSelected ? 1.5 : 1,
         ),
         boxShadow: [
@@ -515,7 +515,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
                 width: 36,
                 height: 36,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF55822B),
+                  color: Color(0xFF518427),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -536,7 +536,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
               },
               child: CustomPaint(
                 painter: _DashedCirclePainter(
-                  color: const Color(0xFF55822B),
+                  color: const Color(0xFF518427),
                   strokeWidth: 1.8,
                   dashCount: 12,
                 ),
@@ -546,7 +546,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
                   child: Center(
                     child: Icon(
                       Icons.add_rounded,
-                      color: Color(0xFF55822B),
+                      color: Color(0xFF518427),
                       size: 22,
                     ),
                   ),
@@ -578,7 +578,7 @@ class _AddHabitScheduleScreenState extends State<AddHabitScheduleScreen> {
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: isEnabled
-                  ? const Color(0xFF55822B)
+                  ? const Color(0xFF518427)
                   : const Color(0xFF757575),
               disabledBackgroundColor: const Color(0xFF757575),
               shape: RoundedRectangleBorder(
