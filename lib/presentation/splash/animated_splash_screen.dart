@@ -238,38 +238,6 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                   ),
                 ),
 
-              // TOP DEBUG / STEP CONTROLLER BAR (Optional for demo exploration)
-              Positioned(
-                top: 50,
-                right: 16,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.replay_rounded, color: Colors.white70, size: 20),
-                        tooltip: 'Putar Ulang Splash',
-                        onPressed: () => _controller.forward(from: 0.0),
-                      ),
-                      TextButton(
-                        onPressed: _navigateToMainApp,
-                        child: Text(
-                          'Lewati',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ],
           );
         },
@@ -334,7 +302,14 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
   Widget _buildCurvedBottomAuthPanel(Size size) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(28, 36, 28, 32),
+      padding: EdgeInsets.fromLTRB(
+        28,
+        32,
+        28,
+        MediaQuery.of(context).padding.bottom > 0
+            ? MediaQuery.of(context).padding.bottom + 16
+            : 28,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFF9F8F2),
         borderRadius: BorderRadius.only(
@@ -355,7 +330,7 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
           // White Button "Masuk" (with sage text and border)
           SizedBox(
             width: double.infinity,
-            height: 54,
+            height: 52,
             child: ElevatedButton(
               onPressed: () => _showAuthSheet(false),
               style: ElevatedButton.styleFrom(
@@ -367,57 +342,47 @@ class _AnimatedSplashScreenState extends State<AnimatedSplashScreen>
                   side: const BorderSide(color: Color(0xFFE2E0CF), width: 1.5),
                 ),
               ),
-              child: Text(
-                'Masuk',
-                style: GoogleFonts.balooTammudu2(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryGreen,
+              child: Center(
+                child: Text(
+                  'Masuk',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primaryGreen,
+                    height: 1.0,
+                  ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
-          // Olive Green Button "Daftar"
+          // Green Button "Daftar"
           SizedBox(
             width: double.infinity,
-            height: 54,
+            height: 52,
             child: ElevatedButton(
               onPressed: () => _showAuthSheet(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5E8036),
+                backgroundColor: AppColors.primaryGreen,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
               ),
-              child: Text(
-                'Daftar',
-                style: GoogleFonts.balooTammudu2(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+              child: Center(
+                child: Text(
+                  'Daftar',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    height: 1.0,
+                  ),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Subtle Guest Entry Link
-          TextButton(
-            onPressed: _navigateToMainApp,
-            style: TextButton.styleFrom(
-              foregroundColor: AppColors.textMedium,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-            child: Text(
-              'Lanjutkan sebagai Tamu →',
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textMedium,
               ),
             ),
           ),

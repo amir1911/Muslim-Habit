@@ -10,6 +10,7 @@ import '../khatam/khatam_reading_screen.dart';
 import 'surah_detail_screen.dart';
 import 'widgets/quran_belajar_tab.dart';
 import 'widgets/quran_bookmark_tab.dart';
+import '../shell/main_navigation_shell.dart';
 
 class QuranScreen extends StatefulWidget {
   const QuranScreen({super.key});
@@ -26,13 +27,29 @@ class _QuranScreenState extends State<QuranScreen> {
     final habitProv = context.watch<HabitProvider>();
     final quranProv = context.watch<QuranProvider>();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F8F2),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // ── TOP HEADER (Back arrow, Al-Quran, Badges, Bell) ──
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else {
+          final switched = MainNavigationShell.switchToTab(context, 0);
+          if (!switched) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F8F2),
+        body: SafeArea(
+          bottom: false,
+          child: Column(
+            children: [
+              // ── TOP HEADER (Back arrow, Al-Quran, Badges, Bell) ──
             _buildTopHeader(context, habitProv),
 
             // ── SCROLLABLE BODY ──
@@ -104,6 +121,7 @@ class _QuranScreenState extends State<QuranScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -119,6 +137,14 @@ class _QuranScreenState extends State<QuranScreen> {
             onPressed: () {
               if (Navigator.canPop(context)) {
                 Navigator.pop(context);
+              } else {
+                final switched = MainNavigationShell.switchToTab(context, 0);
+                if (!switched) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+                  );
+                }
               }
             },
           ),

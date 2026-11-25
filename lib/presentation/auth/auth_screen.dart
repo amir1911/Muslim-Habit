@@ -7,6 +7,7 @@ import '../../providers/habit_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/storage_service.dart';
 import '../shell/main_navigation_shell.dart';
+import '../splash/animated_splash_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -448,9 +449,11 @@ class _AuthScreenState extends State<AuthScreen> {
     if (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
     } else {
-      // Jika halaman Auth merupakan root stack (misal setelah logout),
-      // keluar dari aplikasi secara normal alih-alih menampilkan layar hitam
-      SystemNavigator.pop();
+      // Jika halaman Auth merupakan root stack, arahkan kembali ke Welcome/Splash Screen
+      // agar tidak pernah terjadi layar hitam (black screen)
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AnimatedSplashScreen()),
+      );
     }
   }
 
@@ -506,7 +509,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(28, 0, 28, 28),
+                    padding: EdgeInsets.fromLTRB(
+                      28,
+                      0,
+                      28,
+                      MediaQuery.of(context).padding.bottom > 0
+                          ? MediaQuery.of(context).padding.bottom + 24
+                          : 28,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -525,7 +535,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _handleSubmit,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF557C2B),
+                              backgroundColor: const Color(0xFF518427),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
@@ -541,12 +551,16 @@ class _AuthScreenState extends State<AuthScreen> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : Text(
-                                    _isRegister ? 'Buat Akun' : 'Masuk',
-                                    style: GoogleFonts.balooTammudu2(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                : Center(
+                                    child: Text(
+                                      _isRegister ? 'Buat Akun' : 'Masuk',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                        height: 1.0,
+                                      ),
                                     ),
                                   ),
                           ),
@@ -959,7 +973,7 @@ class _AuthScreenState extends State<AuthScreen> {
         width: 48,
         height: 48,
         decoration: const BoxDecoration(
-          color: Color(0xFF557C2B),
+          color: Color(0xFF518427),
           shape: BoxShape.circle,
         ),
         alignment: Alignment.center,

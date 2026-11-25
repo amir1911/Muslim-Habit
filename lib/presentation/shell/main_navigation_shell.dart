@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../home/home_screen.dart';
@@ -58,55 +59,69 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     // SafeArea bottom + padding bottom(16) + tinggi container(72) + gap tombol(12)
     final bottomNavHeight = MediaQuery.of(context).padding.bottom + 16 + 72 + 12;
 
-    return Scaffold(
-      extendBody: true, // content mengalir di bawah floating nav
-      body: Stack(
-        children: [
-          // ── Konten halaman utama ──
-          IndexedStack(
-            index: _currentIndex,
-            children: _screens,
-          ),
-
-          // ── Floating AI Chat Button ──
-          Positioned(
-            right: 20,
-            bottom: bottomNavHeight,
-            child: _buildAiChatButton(context),
-          ),
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-        child: SafeArea(
-          top: false,
-          child: Container(
-            height: 72,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.13),
-                  blurRadius: 24,
-                  offset: const Offset(0, 6),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 6,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_currentIndex != 0) {
+          // Jika berada di tab Habbit, Qur'an, Community, atau Profile:
+          // tekan Back akan mengembalikan ke tab Home (index 0)
+          switchTab(0);
+        } else {
+          // Jika sudah di tab Home, keluar secara aman tanpa black screen
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        extendBody: true, // content mengalir di bawah floating nav
+        body: Stack(
+          children: [
+            // ── Konten halaman utama ──
+            IndexedStack(
+              index: _currentIndex,
+              children: _screens,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavItem(0, Icons.home_outlined, Icons.home_rounded, 'Home'),
-                _buildNavItem(1, Icons.track_changes_outlined, Icons.track_changes_rounded, 'Habbit'),
-                _buildNavItem(2, Icons.menu_book_outlined, Icons.menu_book_rounded, "Qur'an"),
-                _buildNavItem(3, Icons.people_outline_rounded, Icons.people_rounded, 'Community'),
-                _buildNavItem(4, Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
-              ],
+
+            // ── Floating AI Chat Button ──
+            Positioned(
+              right: 20,
+              bottom: bottomNavHeight,
+              child: _buildAiChatButton(context),
+            ),
+          ],
+        ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+          child: SafeArea(
+            top: false,
+            child: Container(
+              height: 72,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.13),
+                    blurRadius: 24,
+                    offset: const Offset(0, 6),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 6,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(0, Icons.home_outlined, Icons.home_rounded, 'Home'),
+                  _buildNavItem(1, Icons.track_changes_outlined, Icons.track_changes_rounded, 'Habbit'),
+                  _buildNavItem(2, Icons.menu_book_outlined, Icons.menu_book_rounded, "Qur'an"),
+                  _buildNavItem(3, Icons.people_outline_rounded, Icons.people_rounded, 'Community'),
+                  _buildNavItem(4, Icons.person_outline_rounded, Icons.person_rounded, 'Profile'),
+                ],
+              ),
             ),
           ),
         ),

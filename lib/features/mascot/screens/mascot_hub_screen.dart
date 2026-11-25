@@ -9,6 +9,7 @@ import '../widgets/mascot_speech_bubble.dart';
 import 'toko_screen.dart';
 import 'lemari_screen.dart';
 import 'chatbot_screen.dart';
+import '../../../presentation/shell/main_navigation_shell.dart';
 
 /// Halaman Utama Maskot Nunu (MascotHubScreen)
 class MascotHubScreen extends StatelessWidget {
@@ -19,12 +20,26 @@ class MascotHubScreen extends StatelessWidget {
     final habitProv = context.watch<HabitProvider>();
     final mascotProv = context.watch<MascotProvider>();
 
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-      ),
-      child: Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+            (route) => false,
+          );
+        }
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+        ),
+        child: Scaffold(
         body: Stack(
           children: [
             // ── 1. BACKGROUND PEMANDANGAN ALAM CERAH ──
@@ -173,6 +188,7 @@ class MascotHubScreen extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -185,13 +201,55 @@ class MascotHubScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Avatar + Sapaan & Tombol Back Bulat
+          // Tombol Kembali Bulat (#518427)
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+                    (route) => false,
+                  );
+                }
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0xFFE2E6DF), width: 1.2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.chevron_left_rounded,
+                  color: Color(0xFF518427),
+                  size: 24,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Avatar + Sapaan
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Avatar
               Container(
-                width: 44,
-                height: 44,
+                width: 38,
+                height: 38,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
@@ -207,20 +265,21 @@ class MascotHubScreen extends StatelessWidget {
                 child: ClipOval(
                   child: Container(
                     color: const Color(0xFFE8F5E9),
-                    child: const Icon(Icons.person_rounded, color: Color(0xFF4A7220), size: 28),
+                    child: const Icon(Icons.person_rounded, color: Color(0xFF4A7220), size: 24),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
 
               // Sapaan
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Assalamualaikum',
                     style: GoogleFonts.inter(
-                      fontSize: 11,
+                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF1E350E),
                     ),
@@ -228,11 +287,13 @@ class MascotHubScreen extends StatelessWidget {
                   Text(
                     habitProv.userName,
                     style: GoogleFonts.balooTammudu2(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFF1E350E),
                       height: 1.1,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),

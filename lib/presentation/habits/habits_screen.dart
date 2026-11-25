@@ -32,36 +32,53 @@ class _HabitsScreenState extends State<HabitsScreen> {
   Widget build(BuildContext context) {
     final habitProv = context.watch<HabitProvider>();
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7F6EE),
-      appBar: _buildAppBar(context, habitProv),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-          children: [
-            // 1. Dua Kartu Ringkasan Atas (Sejajar)
-            _buildTopSummaryCards(habitProv),
-            const SizedBox(height: 14),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        } else {
+          final switched = MainNavigationShell.switchToTab(context, 0);
+          if (!switched) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF7F6EE),
+        appBar: _buildAppBar(context, habitProv),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+            children: [
+              // 1. Dua Kartu Ringkasan Atas (Sejajar)
+              _buildTopSummaryCards(habitProv),
+              const SizedBox(height: 14),
 
-            // 2. Kartu Progres Utama (Hero Card)
-            _buildHeroProgressCard(habitProv),
-            const SizedBox(height: 14),
+              // 2. Kartu Progres Utama (Hero Card)
+              _buildHeroProgressCard(habitProv),
+              const SizedBox(height: 14),
 
-            // 3. Kartu Kalender Mingguan
-            _buildWeeklyCalendarCard(context),
-            const SizedBox(height: 16),
+              // 3. Kartu Kalender Mingguan
+              _buildWeeklyCalendarCard(context),
+              const SizedBox(height: 16),
 
-            // 4. Baris Tombol Fitur ("Fitur-Fitur")
-            _buildFeatureButtonsRow(context),
-            const SizedBox(height: 18),
+              // 4. Baris Tombol Fitur ("Fitur-Fitur")
+              _buildFeatureButtonsRow(context),
+              const SizedBox(height: 18),
 
-            // 5. Bagian "Sebentar Lagi..."
-            _buildUpcomingSection(context, habitProv),
-            const SizedBox(height: 18),
+              // 5. Bagian "Sebentar Lagi..."
+              _buildUpcomingSection(context, habitProv),
+              const SizedBox(height: 18),
 
-            // 6. Bagian "Program Aktif"
-            _buildActiveProgramSection(context),
-          ],
+              // 6. Bagian "Program Aktif"
+              _buildActiveProgramSection(context),
+            ],
+          ),
         ),
       ),
     );
@@ -93,6 +110,14 @@ class _HabitsScreenState extends State<HabitsScreen> {
         onPressed: () {
           if (Navigator.canPop(context)) {
             Navigator.pop(context);
+          } else {
+            final switched = MainNavigationShell.switchToTab(context, 0);
+            if (!switched) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+              );
+            }
           }
         },
       ),
