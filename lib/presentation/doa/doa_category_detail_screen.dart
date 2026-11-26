@@ -148,7 +148,77 @@ class _DoaCategoryDetailScreenState extends State<DoaCategoryDetailScreen> {
           ],
         ),
       ),
-      body: ListView(
+      body: _buildBody(context, doaProvider, allDoas, filtered, featuredDoa, readCount, totalCount, progressVal),
+    );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    DoaProvider doaProvider,
+    List<DoaItem> allDoas,
+    List<DoaItem> filtered,
+    DoaItem? featuredDoa,
+    int readCount,
+    int totalCount,
+    double progressVal,
+  ) {
+    // ── State: Sedang memuat dari API ──
+    if (doaProvider.isLoading && doaProvider.allDoa.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: Color(0xFF518427)),
+            SizedBox(height: 16),
+            Text('Memuat doa dari server...'),
+          ],
+        ),
+      );
+    }
+
+    // ── State: Error / Gagal memuat ──
+    if (doaProvider.errorMessage != null && doaProvider.allDoa.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.wifi_off_rounded, size: 56, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'Gagal memuat doa',
+                style: GoogleFonts.balooTammudu2(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1E2818),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Periksa koneksi internet Anda dan coba lagi.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () => doaProvider.loadDoaList(forceRefresh: true),
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Coba Lagi'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF518427),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // ── State: Data tersedia (normal) ──
+    return ListView(
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
         children: [
@@ -225,7 +295,6 @@ class _DoaCategoryDetailScreenState extends State<DoaCategoryDetailScreen> {
               },
             ),
         ],
-      ),
     );
   }
 

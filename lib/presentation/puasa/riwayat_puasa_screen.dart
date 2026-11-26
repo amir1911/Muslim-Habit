@@ -39,6 +39,8 @@ class _RiwayatPuasaScreenState extends State<RiwayatPuasaScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
+        centerTitle: false,
+        titleSpacing: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(6),
@@ -50,12 +52,28 @@ class _RiwayatPuasaScreenState extends State<RiwayatPuasaScreen> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          'Riwayat Puasa',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.white,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Riwayat Puasa',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                'Catatan & Statistik Ibadah Puasamu',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
+              ),
+            ],
           ),
         ),
       ),

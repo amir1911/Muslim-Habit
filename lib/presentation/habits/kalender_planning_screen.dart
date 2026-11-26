@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../core/utils/hijri_helper.dart';
 import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
+import 'services/habit_navigation_helper.dart';
 import 'widgets/edit_plan_bottom_sheet.dart';
 
 /// Halaman Kalender Planning (KalenderPlanningScreen)
@@ -20,10 +24,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
   String _searchQuery = '';
   String? _activeFilterChip;
 
-  // Kalender Bulanan state
-  DateTime _selectedDate = DateTime(2026, 4, 24); // Tanggal aktif sesuai referensi (24 April 2026)
-  int _currentMonth = 4;
-  int _currentYear = 2026;
+  // Kalender Bulanan state otomatis mengikuti tanggal aktual
+  late DateTime _selectedDate;
+  late int _currentMonth;
+  late int _currentYear;
+  Timer? _clockTimer;
+  String _currentTime = '';
 
   // Expansion states untuk 4 accordion
   bool _pagiExpanded = true;
@@ -32,7 +38,27 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
   bool _malamExpanded = false;
 
   @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now();
+    _selectedDate = DateTime(now.year, now.month, now.day);
+    _currentMonth = now.month;
+    _currentYear = now.year;
+    _currentTime = DateFormat('HH:mm').format(now);
+
+    // Update jam aktual setiap 30 detik
+    _clockTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) {
+        setState(() {
+          _currentTime = DateFormat('HH:mm').format(DateTime.now());
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _clockTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -48,9 +74,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
   @override
   Widget build(BuildContext context) {
     final habitProv = context.watch<HabitProvider>();
-    final progressPct = habitProv.dailyProgressPercent > 0 ? habitProv.dailyProgressPercent : 15;
+    final progressPct = habitProv.getProgressForDate(_selectedDate);
 
-    // Filtered lists
+    // Ambil daftar habit sesuai tanggal yang dipilih
+    final habitsForDate = habitProv.getHabitsForDate(_selectedDate);
+
+    // Filtered lists berdasarkan pencarian atau filter chip
     List<HabitItem> filterHabits(List<HabitItem> list) {
       if (_activeFilterChip != null && _activeFilterChip!.isNotEmpty) {
         return list.where((h) => h.title.toLowerCase().contains(_activeFilterChip!.toLowerCase())).toList();
@@ -61,10 +90,15 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
       return list;
     }
 
-    final pagiList = filterHabits(habitProv.pagiHabits);
-    final siangList = filterHabits(habitProv.siangHabits);
-    final soreList = filterHabits(habitProv.soreHabits);
-    final malamList = filterHabits(habitProv.malamHabits);
+    final pagiList = filterHabits(habitsForDate.where((h) => h.timeSlot == 'pagi').toList());
+    final siangList = filterHabits(habitsForDate.where((h) => h.timeSlot == 'siang').toList());
+    final soreList = filterHabits(habitsForDate.where((h) => h.timeSlot == 'sore').toList());
+    final malamList = filterHabits(habitsForDate.where((h) => h.timeSlot == 'malam').toList());
+
+    String getSlotRatio(List<HabitItem> list) {
+      final done = list.where((h) => h.isCompleted).length;
+      return '$done/${list.length}';
+    }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -225,7 +259,7 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Jumat, 24 April 2026',
+                              '${HijriHelper.getDayNameIndonesian(_selectedDate)}, ${_selectedDate.day} ${HijriHelper.getMonthNameIndonesian(_selectedDate.month)} ${_selectedDate.year}',
                               style: GoogleFonts.inter(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
@@ -234,7 +268,7 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '7 Dhu al-Qi\'dah 1447 H',
+                              HijriHelper.fromGregorian(_selectedDate).toFormattedString(),
                               style: GoogleFonts.inter(
                                 fontSize: 11.5,
                                 color: const Color(0xFFE2EAD8),
@@ -247,7 +281,7 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                             const Icon(Icons.wb_sunny_outlined, color: Colors.white, size: 18),
                             const SizedBox(width: 6),
                             Text(
-                              '10:00',
+                              _currentTime,
                               style: GoogleFonts.inter(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
@@ -265,7 +299,11 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Progress Hari Ini',
+                          _selectedDate.year == DateTime.now().year &&
+                                  _selectedDate.month == DateTime.now().month &&
+                                  _selectedDate.day == DateTime.now().day
+                              ? 'Progress Hari Ini'
+                              : 'Progress ${_selectedDate.day} ${HijriHelper.getMonthNameIndonesian(_selectedDate.month)}',
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -326,7 +364,7 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'April 2026',
+                              '${HijriHelper.getMonthNameIndonesian(_currentMonth)} $_currentYear',
                               style: GoogleFonts.inter(
                                 fontSize: 16.5,
                                 fontWeight: FontWeight.w800,
@@ -334,7 +372,7 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                               ),
                             ),
                             Text(
-                              'Syawal 1447 - Dzulqa\'dah 1447',
+                              HijriHelper.getHijriMonthRangeForGregorianMonth(_currentYear, _currentMonth),
                               style: GoogleFonts.inter(
                                 fontSize: 11,
                                 color: const Color(0xFF6B7280),
@@ -354,7 +392,17 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                         Row(
                           children: [
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                setState(() {
+                                  if (_currentMonth == 1) {
+                                    _currentMonth = 12;
+                                    _currentYear--;
+                                  } else {
+                                    _currentMonth--;
+                                  }
+                                });
+                              },
                               child: const Padding(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(Icons.chevron_left_rounded, size: 22, color: Color(0xFF4B5563)),
@@ -362,7 +410,17 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                             ),
                             const SizedBox(width: 8),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                HapticFeedback.lightImpact();
+                                setState(() {
+                                  if (_currentMonth == 12) {
+                                    _currentMonth = 1;
+                                    _currentYear++;
+                                  } else {
+                                    _currentMonth++;
+                                  }
+                                });
+                              },
                               child: const Padding(
                                 padding: EdgeInsets.all(4),
                                 child: Icon(Icons.chevron_right_rounded, size: 22, color: Color(0xFF4B5563)),
@@ -402,13 +460,17 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
 
               const SizedBox(height: 22),
 
-              // ── 3. BAGIAN "HABBIT HARI INI" ──
+              // ── 3. BAGIAN "HABBIT HARI INI" / TANGGAL TERPILIH ──
               Row(
                 children: [
                   const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF264E0B)),
                   const SizedBox(width: 8),
                   Text(
-                    'Habbit Hari ini',
+                    _selectedDate.year == DateTime.now().year &&
+                            _selectedDate.month == DateTime.now().month &&
+                            _selectedDate.day == DateTime.now().day
+                        ? 'Habbit Hari ini'
+                        : 'Habbit ${_selectedDate.day} ${HijriHelper.getMonthNameIndonesian(_selectedDate.month)}',
                     style: GoogleFonts.inter(
                       fontSize: 14.5,
                       fontWeight: FontWeight.w700,
@@ -423,12 +485,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
               // 1. Habit Pagi (04:00 - 10:00)
               _buildTimeSlotAccordion(
                 title: 'Habit Pagi',
-                subtitle: '${habitProv.pagiRatio} • 04:00-10:00',
+                subtitle: '${getSlotRatio(pagiList)} • 04:00-10:00',
                 icon: Icons.wb_twilight_rounded,
                 isExpanded: _pagiExpanded,
                 onToggle: () => setState(() => _pagiExpanded = !_pagiExpanded),
                 habits: pagiList,
-                onCheckTap: (id) => habitProv.toggleHabit(id),
+                onCheckTap: (id) => habitProv.toggleHabitForDate(id, _selectedDate),
               ),
 
               const SizedBox(height: 10),
@@ -436,12 +498,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
               // 2. Habit Siang
               _buildTimeSlotAccordion(
                 title: 'Habit Siang',
-                subtitle: habitProv.siangRatio,
+                subtitle: getSlotRatio(siangList),
                 icon: Icons.wb_sunny_outlined,
                 isExpanded: _siangExpanded,
                 onToggle: () => setState(() => _siangExpanded = !_siangExpanded),
                 habits: siangList,
-                onCheckTap: (id) => habitProv.toggleHabit(id),
+                onCheckTap: (id) => habitProv.toggleHabitForDate(id, _selectedDate),
               ),
 
               const SizedBox(height: 10),
@@ -449,12 +511,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
               // 3. Habit Sore
               _buildTimeSlotAccordion(
                 title: 'Habit Sore',
-                subtitle: habitProv.soreRatio,
+                subtitle: getSlotRatio(soreList),
                 icon: Icons.wb_cloudy_outlined,
                 isExpanded: _soreExpanded,
                 onToggle: () => setState(() => _soreExpanded = !_soreExpanded),
                 habits: soreList,
-                onCheckTap: (id) => habitProv.toggleHabit(id),
+                onCheckTap: (id) => habitProv.toggleHabitForDate(id, _selectedDate),
               ),
 
               const SizedBox(height: 10),
@@ -462,12 +524,12 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
               // 4. Habit Malam
               _buildTimeSlotAccordion(
                 title: 'Habit Malam',
-                subtitle: habitProv.malamRatio,
+                subtitle: getSlotRatio(malamList),
                 icon: Icons.nightlight_round,
                 isExpanded: _malamExpanded,
                 onToggle: () => setState(() => _malamExpanded = !_malamExpanded),
                 habits: malamList,
-                onCheckTap: (id) => habitProv.toggleHabit(id),
+                onCheckTap: (id) => habitProv.toggleHabitForDate(id, _selectedDate),
               ),
             ],
           ),
@@ -477,15 +539,23 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
   }
 
   Widget _buildCalendarGrid() {
-    // Tanggal-tanggal bulan April 2026 (1 April dimulai hari Rabu = kolom 3)
-    // Baris 1: null, null, null, 1, 2, 3, 4
-    final days = <int?>[
-      null, null, null, 1, 2, 3, 4,
-      5, 6, 7, 8, 9, 10, 11,
-      12, 13, 14, 15, 16, 17, 18,
-      19, 20, 21, 22, 23, 24, 25,
-      26, 27, 28, 29, 30, null, null,
-    ];
+    // Menghitung tanggal kalender dinamis dengan awal pekan hari Minggu
+    final firstDayOfMonth = DateTime(_currentYear, _currentMonth, 1);
+    final leadingEmptyCells = firstDayOfMonth.weekday % 7; // Dart: Sunday = 7 -> 7 % 7 = 0
+    final daysInMonth = DateTime(_currentYear, _currentMonth + 1, 0).day;
+
+    final List<int?> days = [];
+    for (int i = 0; i < leadingEmptyCells; i++) {
+      days.add(null);
+    }
+    for (int d = 1; d <= daysInMonth; d++) {
+      days.add(d);
+    }
+    while (days.length % 7 != 0) {
+      days.add(null);
+    }
+
+    final now = DateTime.now();
 
     return GridView.builder(
       shrinkWrap: true,
@@ -499,13 +569,20 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
         final dayNum = days[idx];
         if (dayNum == null) return const SizedBox.shrink();
 
-        final isSelected = dayNum == 24; // 24 April 2026 aktif sesuai referensi
-        final hijriDay = ((dayNum + 13) % 30) + 1; // Perkiraan tanggal Hijriah
+        final isSelected = _selectedDate.year == _currentYear &&
+            _selectedDate.month == _currentMonth &&
+            _selectedDate.day == dayNum;
+        final isToday = now.year == _currentYear &&
+            now.month == _currentMonth &&
+            now.day == dayNum;
+
+        final hijriDate = HijriHelper.fromGregorian(DateTime(_currentYear, _currentMonth, dayNum));
 
         return GestureDetector(
           onTap: () {
+            HapticFeedback.selectionClick();
             setState(() {
-              _selectedDate = DateTime(2026, 4, dayNum);
+              _selectedDate = DateTime(_currentYear, _currentMonth, dayNum);
             });
           },
           child: Container(
@@ -513,6 +590,9 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFF2E5714) : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
+              border: isToday && !isSelected
+                  ? Border.all(color: const Color(0xFF55822B), width: 1.5)
+                  : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -522,11 +602,13 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                    color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                    color: isSelected
+                        ? Colors.white
+                        : (isToday ? const Color(0xFF55822B) : const Color(0xFF1F2937)),
                   ),
                 ),
                 Text(
-                  _toArabicNumeral(hijriDay),
+                  _toArabicNumeral(hijriDate.day),
                   style: GoogleFonts.amiri(
                     fontSize: 10,
                     color: isSelected ? const Color(0xFFE2EAD8) : const Color(0xFF9CA3AF),
@@ -608,80 +690,97 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
                 children: habits.map((habit) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFBFBF9),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: const Color(0xFFE5E7EB)),
                     ),
-                    child: Row(
-                      children: [
-                        // Lingkaran Masjid Hijau Muda
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE8F2E2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.mosque_rounded, color: Color(0xFF264E0B), size: 18),
-                        ),
-                        const SizedBox(width: 12),
-
-                        // Judul Habit & Waktu / Recorded Time
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(14),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          HabitNavigationHelper.navigateToActivity(context, habit);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          child: Row(
                             children: [
-                              Text(
-                                habit.title,
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF1F2937),
+                              // Lingkaran Masjid Hijau Muda
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFE8F2E2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(Icons.mosque_rounded, color: Color(0xFF264E0B), size: 18),
+                              ),
+                              const SizedBox(width: 12),
+
+                              // Judul Habit & Waktu / Recorded Time
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      habit.title,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFF1F2937),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      habit.isCompleted && habit.recordedTime != null
+                                          ? 'Recorded: ${habit.recordedTime}'
+                                          : habit.scheduledTime,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        color: habit.isCompleted ? const Color(0xFF55822B) : const Color(0xFF6B7280),
+                                        fontWeight: habit.isCompleted ? FontWeight.w600 : FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                habit.isCompleted && habit.recordedTime != null
-                                    ? 'Recorded: ${habit.recordedTime}'
-                                    : habit.scheduledTime,
-                                style: GoogleFonts.inter(
-                                  fontSize: 11,
-                                  color: habit.isCompleted ? const Color(0xFF55822B) : const Color(0xFF6B7280),
-                                  fontWeight: habit.isCompleted ? FontWeight.w600 : FontWeight.w400,
+
+                              // Tombol Centang Hijau Solid / Ikon Lonceng
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => onCheckTap(habit.id),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: habit.isCompleted
+                                      ? Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: const BoxDecoration(
+                                            color: Color(0xFF55822B),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.check_rounded, color: Colors.white, size: 16),
+                                        )
+                                      : Icon(
+                                          habit.isMuted
+                                              ? Icons.notifications_off_outlined
+                                              : Icons.notifications_none_rounded,
+                                          size: 20,
+                                          color: const Color(0xFF6B7280),
+                                        ),
                                 ),
                               ),
+                              const SizedBox(width: 4),
+
+                              // Panah >
+                              const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFF9CA3AF)),
                             ],
                           ),
                         ),
-
-                        // Tombol Centang Hijau Solid / Ikon Lonceng
-                        GestureDetector(
-                          onTap: () => onCheckTap(habit.id),
-                          child: habit.isCompleted
-                              ? Container(
-                                  width: 24,
-                                  height: 24,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF55822B),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.check_rounded, color: Colors.white, size: 16),
-                                )
-                              : Icon(
-                                  habit.isMuted
-                                      ? Icons.notifications_off_outlined
-                                      : Icons.notifications_none_rounded,
-                                  size: 20,
-                                  color: const Color(0xFF6B7280),
-                                ),
-                        ),
-                        const SizedBox(width: 8),
-
-                        // Panah >
-                        const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFF9CA3AF)),
-                      ],
+                      ),
                     ),
                   );
                 }).toList(),

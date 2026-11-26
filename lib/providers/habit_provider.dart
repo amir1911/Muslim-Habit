@@ -4,6 +4,7 @@ import '../models/habit_item.dart';
 import '../models/badge_item.dart';
 import '../models/ai_assistant_model.dart';
 import '../services/storage_service.dart';
+import '../services/smart_notification_service.dart';
 import '../core/utils/streak_helper.dart';
 
 class HabitProvider extends ChangeNotifier {
@@ -337,6 +338,8 @@ class HabitProvider extends ChangeNotifier {
   String get soreRatio => '${soreHabits.where((h) => h.isCompleted).length}/${soreHabits.length}';
   String get malamRatio => '${malamHabits.where((h) => h.isCompleted).length}/${malamHabits.length}';
 
+  List<HabitItem> get todayHabits => _habits;
+  int get todayCompletedHabitsCount => completedHabitsCount;
   int get completedHabitsCount => _habits.where((h) => h.isCompleted).length;
   int get totalHabitsCount => _habits.length;
   double get progressFraction => totalHabitsCount == 0 ? 0.0 : (completedHabitsCount / totalHabitsCount);
@@ -392,6 +395,9 @@ class HabitProvider extends ChangeNotifier {
       _storageService.setUserPoints(_userPoints);
       _saveState();
 
+      // Trigger Smart Notification Evaluation
+      _triggerSmartNotificationSync();
+
       notifyListeners();
     }
   }
@@ -429,7 +435,29 @@ class HabitProvider extends ChangeNotifier {
     final index = _habits.indexWhere((h) => h.id == item.id);
     if (index != -1) {
       _habits[index] = item;
+      _triggerSmartNotificationSync();
       notifyListeners();
+    }
+  }
+
+  /// Sinkronisasi pintar evaluasi habit dengan SmartNotificationService
+  void _triggerSmartNotificationSync() {
+    try {
+      final dzikirPagiDone = _habits.any((h) => (h.id == 'dzikir_pagi' || h.title.toLowerCase().contains('dzikir pagi')) && h.isCompleted);
+      final dzikirPetangDone = _habits.any((h) => (h.id == 'dzikir_petang' || h.title.toLowerCase().contains('dzikir petang')) && h.isCompleted);
+      final quranDone = _habits.any((h) => (h.id == 'tilawah' || h.title.toLowerCase().contains('qur')) && h.isCompleted);
+      final doaDone = _habits.any((h) => h.title.toLowerCase().contains('doa') && h.isCompleted);
+
+      SmartNotificationService().syncSmartHabitReminders(
+        habits: _habits,
+        streakCount: _streakCount,
+        hasReadQuranToday: quranDone,
+        hasReadDzikirPagiToday: dzikirPagiDone,
+        hasReadDzikirPetangToday: dzikirPetangDone,
+        hasReadDoaToday: doaDone,
+      );
+    } catch (e) {
+      debugPrint('Error triggering smart notifications: $e');
     }
   }
 
@@ -440,13 +468,59 @@ class HabitProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void markFeatureHabitCompleted(String habitId) {
-    String targetId = habitId;
-    if (habitId == 'quran') targetId = 'target_baca';
-    final index = _habits.indexWhere((h) => h.id == targetId);
-    if (index != -1 && !_habits[index].isCompleted) {
-      toggleHabit(targetId);
+  void markFeatureHabitCompleted(String habitId, {bool completed = true}) {
+    String targetId = habitId.toLowerCase();
+    if (targetId == 'quran') targetId = 'target_baca';
+    if (targetId == 'maghrib') targetId = 'magrib';
+    final index = _habits.indexWhere((h) => h.id.toLowerCase() == targetId);
+    if (index != -1 && _habits[index].isCompleted != completed) {
+      toggleHabit(_habits[index].id);
     }
+  }
+
+  /// Mengambil daftar habit untuk tanggal tertentu.
+  /// Jika hari ini: mengembalikan habit saat ini.
+  /// Jika tanggal lain: membaca riwayat dari StorageService untuk tanggal tersebut tanpa mengubah status hari ini.
+  List<HabitItem> getHabitsForDate(DateTime date) {
+    final now = DateTime.now();
+    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    if (isToday) return _habits;
+
+    final dateKey = StreakHelper.formatDate(date);
+    final completedIds = _storageService.getDailyCompletedHabitIds(dateKey);
+
+    return _habits.map((h) {
+      final done = completedIds.contains(h.id);
+      return h.copyWith(isCompleted: done);
+    }).toList();
+  }
+
+  /// Menghitung persentase progres untuk tanggal tertentu
+  int getProgressForDate(DateTime date) {
+    final habits = getHabitsForDate(date);
+    if (habits.isEmpty) return 0;
+    final completed = habits.where((h) => h.isCompleted).length;
+    return ((completed / habits.length) * 100).round();
+  }
+
+  /// Toggle habit untuk tanggal tertentu
+  void toggleHabitForDate(String id, DateTime date) {
+    final now = DateTime.now();
+    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    if (isToday) {
+      toggleHabit(id);
+      return;
+    }
+
+    final dateKey = StreakHelper.formatDate(date);
+    final completedIds = _storageService.getDailyCompletedHabitIds(dateKey).toList();
+    if (completedIds.contains(id)) {
+      completedIds.remove(id);
+    } else {
+      completedIds.add(id);
+    }
+    _storageService.setDailyCompletedHabitIds(dateKey, completedIds);
+    notifyListeners();
   }
 
   void setUserName(String name) {

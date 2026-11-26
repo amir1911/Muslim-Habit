@@ -24,6 +24,10 @@ class StorageService {
     return StorageService(prefs);
   }
 
+  // Generic key-value helpers
+  String? getString(String key) => _prefs.getString(key);
+  Future<void> setString(String key, String value) => _prefs.setString(key, value);
+
   // Date key format YYYY-MM-DD
   String _todayKey() {
     final now = DateTime.now();
@@ -71,6 +75,7 @@ class StorageService {
 
   static const String _keyUserEmail = 'user_email_address';
   static const String _keyUserPassword = 'user_auth_password';
+  static const String _keyUserPhoneNumber = 'user_phone_number';
   static const String _keyUserAvatarPath = 'user_avatar_path';
   static const String _keyHabitRemindersEnabled = 'user_habit_reminders_enabled';
   static const String _keyChatbotTone = 'chatbot_tone_preference';
@@ -80,6 +85,9 @@ class StorageService {
 
   String? getUserPassword() => _prefs.getString(_keyUserPassword);
   Future<void> setUserPassword(String password) => _prefs.setString(_keyUserPassword, password);
+
+  String getUserPhoneNumber() => _prefs.getString(_keyUserPhoneNumber) ?? '';
+  Future<void> setUserPhoneNumber(String phone) => _prefs.setString(_keyUserPhoneNumber, phone);
 
   String? getUserAvatarPath() => _prefs.getString(_keyUserAvatarPath);
   Future<void> setUserAvatarPath(String path) => _prefs.setString(_keyUserAvatarPath, path);

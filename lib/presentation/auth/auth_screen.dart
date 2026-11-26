@@ -3,11 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
+import 'package:intl_phone_field/phone_number.dart';
 import '../../providers/habit_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/storage_service.dart';
 import '../shell/main_navigation_shell.dart';
 import '../splash/animated_splash_screen.dart';
+import '../onboarding/onboarding_welcome_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -28,8 +32,11 @@ class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController(text: 'Ahmad Husain');
   final _emailController = TextEditingController(text: 'ahmadhusain@gmail.com');
   final _dobController = TextEditingController(text: '18/03/2006');
-  final _phoneController = TextEditingController(text: '+62 813-1234-5534');
+  final _phoneController = TextEditingController(text: '81312345534');
   final _passwordController = TextEditingController(text: '12345678');
+
+  String _completePhoneNumber = '+6281312345534';
+  bool _isPhoneValid = true;
 
   bool _obscurePassword = true;
   bool _rememberMe = true;
@@ -82,6 +89,35 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  void _navigateToOnboarding() {
+    try {
+      widget.onSuccess();
+    } catch (e) {
+      debugPrint('onSuccess callback error: $e');
+    }
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (_, __, ___) => const OnboardingWelcomeScreen(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
+  /// After login: check if onboarding was done. If not, go to AI selection.
+  void _navigateAfterLogin() {
+    final hasOnboarded = context.read<HabitProvider>().hasCompletedOnboarding;
+    if (hasOnboarded) {
+      _navigateToHome();
+    } else {
+      _navigateToOnboarding();
+    }
+  }
+
   void _handleSubmit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -108,6 +144,14 @@ class _AuthScreenState extends State<AuthScreen> {
       _showErrorSnackBar('Harap masukkan nama lengkap Anda.');
       return;
     }
+    if (_isRegister && _phoneController.text.trim().isEmpty) {
+      _showErrorSnackBar('Harap masukkan nomor telepon Anda.');
+      return;
+    }
+    if (_isRegister && !_isPhoneValid) {
+      _showErrorSnackBar('Nomor telepon tidak sesuai dengan format negara yang dipilih.');
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -120,6 +164,7 @@ class _AuthScreenState extends State<AuthScreen> {
         // Simpan data pendaftaran secara lokal agar selalu dapat login
         await storage.setUserEmail(email);
         await storage.setUserPassword(password);
+        await storage.setUserPhoneNumber(_completePhoneNumber);
         if (name.isNotEmpty) {
           await storage.setUserName(name);
           if (mounted) context.read<HabitProvider>().setUserName(name);
@@ -358,60 +403,166 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _handleForgotPassword() {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      _showErrorSnackBar('Masukkan alamat email Anda terlebih dahulu.');
-      return;
-    }
+    final emailTextController = TextEditingController(text: _emailController.text.trim());
+    bool isSendingReset = false;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Reset Kata Sandi', style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
-        content: Text('Kirim email pemulihan kata sandi ke $email?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF557C2B),
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              try {
-                await context.read<AuthService>().sendPasswordResetEmail(email);
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Tautan reset kata sandi telah dikirim ke email Anda.'),
-                      backgroundColor: Color(0xFF557C2B),
+      barrierDismissible: !isSendingReset,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFFF9FAF8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF518427).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.lock_reset_rounded, color: Color(0xFF518427), size: 22),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Lupa Kata Sandi?',
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 17,
+                      color: const Color(0xFF2E531C),
                     ),
-                  );
-                }
-              } catch (e) {
-                if (mounted) {
-                  _showErrorSnackBar('Gagal mengirim email reset: $e');
-                }
-              }
-            },
-            child: const Text('Kirim'),
-          ),
-        ],
-      ),
-    );
-  }
+                  ),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Masukkan email terdaftar Anda. Kami akan mengirimkan tautan untuk membuat kata sandi baru.',
+                  style: GoogleFonts.inter(
+                    fontSize: 12.5,
+                    color: const Color(0xFF4A6836),
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFFE2E4D5),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: emailTextController,
+                    keyboardType: TextInputType.emailAddress,
+                    autofocus: true,
+                    enabled: !isSendingReset,
+                    style: GoogleFonts.inter(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF2D3C21),
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'nama@email.com',
+                      hintStyle: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade400),
+                      prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF9EAA91), size: 20),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isSendingReset ? null : () => Navigator.pop(ctx),
+                child: Text(
+                  'Batal',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF518427),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                ),
+                onPressed: isSendingReset
+                    ? null
+                    : () async {
+                        final inputEmail = emailTextController.text.trim();
+                        if (inputEmail.isEmpty) {
+                          _showErrorSnackBar('Harap masukkan alamat email.');
+                          return;
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(inputEmail)) {
+                          _showErrorSnackBar('Format email tidak valid.');
+                          return;
+                        }
 
-  void _handleFacebookSignIn() async {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Login Facebook memerlukan Facebook App ID di meta developers.',
-          style: GoogleFonts.inter(fontSize: 13),
-        ),
-        behavior: SnackBarBehavior.floating,
+                        setDialogState(() => isSendingReset = true);
+
+                        try {
+                          await context.read<AuthService>().sendPasswordResetEmail(inputEmail);
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (mounted) {
+                            _showInfoSnackBar('Tautan reset kata sandi telah dikirim ke $inputEmail. Silakan periksa kotak masuk atau spam email Anda.');
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          setDialogState(() => isSendingReset = false);
+                          String errorMsg;
+                          switch (e.code) {
+                            case 'user-not-found':
+                              errorMsg = 'Email tidak terdaftar di sistem Muslim Habit.';
+                              break;
+                            case 'invalid-email':
+                              errorMsg = 'Format email tidak valid.';
+                              break;
+                            case 'network-request-failed':
+                              errorMsg = 'Koneksi internet bermasalah. Periksa jaringan Anda.';
+                              break;
+                            case 'too-many-requests':
+                              errorMsg = 'Terlalu banyak permintaan. Silakan tunggu beberapa saat lagi.';
+                              break;
+                            default:
+                              errorMsg = 'Gagal mengirim email reset (${e.message ?? e.code}).';
+                          }
+                          _showErrorSnackBar(errorMsg);
+                        } catch (e) {
+                          setDialogState(() => isSendingReset = false);
+                          _showErrorSnackBar('Terjadi kendala saat mengirim email reset.');
+                        }
+                      },
+                child: isSendingReset
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(
+                        'Kirim Link Reset',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -629,20 +780,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Social Buttons (Google & Facebook)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildSocialButton(
-                              isGoogle: true,
-                              onTap: _handleGoogleSignIn,
-                            ),
-                            const SizedBox(width: 16),
-                            _buildSocialButton(
-                              isGoogle: false,
-                              onTap: _handleFacebookSignIn,
-                            ),
-                          ],
+                        // Social Button (Hanya Google, diposisikan di tengah secara elegan)
+                        Center(
+                          child: _buildGoogleSignInButton(),
                         ),
                         const SizedBox(height: 16),
                       ],
@@ -889,7 +1029,6 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
         const SizedBox(height: 6),
         Container(
-          height: 50,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -898,103 +1037,108 @@ class _AuthScreenState extends State<AuthScreen> {
               width: 1.2,
             ),
           ),
-          child: Row(
-            children: [
-              // Indonesia Flag and Down Arrow
-              Padding(
-                padding: const EdgeInsets.only(left: 12, right: 6),
-                child: Row(
-                  children: [
-                    // Mini Indonesian Flag
-                    Container(
-                      width: 22,
-                      height: 15,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
-                        border: Border.all(color: Colors.black12, width: 0.5),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Column(
-                        children: [
-                          Expanded(child: Container(color: const Color(0xFFFF0000))),
-                          Expanded(child: Container(color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF5E6B52),
-                      size: 18,
-                    ),
-                  ],
+          child: IntlPhoneField(
+            controller: _phoneController,
+            initialCountryCode: 'ID',
+            dropdownIconPosition: IconPosition.trailing,
+            dropdownIcon: const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Color(0xFF5E6B52),
+              size: 18,
+            ),
+            flagsButtonPadding: const EdgeInsets.only(left: 12, right: 8),
+            flagsButtonMargin: EdgeInsets.zero,
+            showDropdownIcon: true,
+            disableLengthCheck: true,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF2D3C21),
+            ),
+            dropdownTextStyle: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF2D3C21),
+            ),
+            pickerDialogStyle: PickerDialogStyle(
+              backgroundColor: const Color(0xFFF9FAF8),
+              countryCodeStyle: GoogleFonts.inter(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2E531C),
+              ),
+              countryNameStyle: GoogleFonts.inter(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF1F2937),
+              ),
+              searchFieldInputDecoration: InputDecoration(
+                hintText: 'Cari negara...',
+                hintStyle: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade400),
+                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF518427)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD6DEC9)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF518427), width: 1.5),
                 ),
               ),
-
-              // Vertical divider
-              Container(
-                width: 1,
-                height: 24,
-                color: const Color(0xFFE2E4D5),
-                margin: const EdgeInsets.only(right: 12),
-              ),
-
-              // Phone Number Field
-              Expanded(
-                child: TextField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF2D3C21),
-                  ),
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(vertical: 13),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-            ],
+            ),
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+              border: InputBorder.none,
+              hintText: '812-3456-7890',
+            ),
+            onChanged: (phone) {
+              _completePhoneNumber = phone.completeNumber;
+              try {
+                _isPhoneValid = phone.isValidNumber();
+              } catch (_) {
+                _isPhoneValid = phone.number.length >= 7;
+              }
+            },
+            onCountryChanged: (country) {
+              try {
+                final number = _phoneController.text.trim();
+                _completePhoneNumber = '+${country.dialCode}$number';
+              } catch (_) {}
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSocialButton({
-    required bool isGoogle,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildGoogleSignInButton() {
     return InkWell(
-      onTap: onTap,
+      onTap: _isLoading ? null : _handleGoogleSignIn,
       borderRadius: BorderRadius.circular(24),
       child: Container(
-        width: 48,
-        height: 48,
-        decoration: const BoxDecoration(
-          color: Color(0xFF518427),
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          color: const Color(0xFF518427),
           shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF518427).withValues(alpha: 0.28),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         alignment: Alignment.center,
-        child: isGoogle
-            ? Text(
-                'G',
-                style: GoogleFonts.inter(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                ),
-              )
-            : Text(
-                'f',
-                style: GoogleFonts.inter(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white,
-                ),
-              ),
+        child: Text(
+          'G',
+          style: GoogleFonts.inter(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+          ),
+        ),
       ),
     );
   }

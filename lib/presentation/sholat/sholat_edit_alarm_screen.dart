@@ -1034,29 +1034,19 @@ class _SholatEditAlarmScreenState extends State<SholatEditAlarmScreen> {
             const Divider(color: Color(0xFFE8E5D3), height: 1),
             const SizedBox(height: 14),
 
-            // 3. Pengingat Sebelum Waktu Salat
+            // 3. Pengingat Sebelum Waktu Salat (Layout bebas overflow)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Pengingat Sebelum Salat',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2C3E1F),
-                      ),
+                Expanded(
+                  child: Text(
+                    'Pengingat Sebelum Salat',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2C3E1F),
                     ),
-                    Text(
-                      'Pemberitahuan beberapa menit sebelum adzan',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: const Color(0xFF7E8D6B),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
                 Transform.scale(
                   scale: 0.8,
@@ -1067,34 +1057,43 @@ class _SholatEditAlarmScreenState extends State<SholatEditAlarmScreen> {
                       setState(() {
                         _preReminderEnabled = val;
                       });
+                      _storageService.setPrayerPreReminderEnabled(val);
                     },
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 2),
+            Text(
+              'Pemberitahuan beberapa menit sebelum adzan',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: const Color(0xFF7E8D6B),
+              ),
+            ),
             if (_preReminderEnabled) ...[
-              const SizedBox(height: 10),
-              Row(
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [5, 10, 15].map((mins) {
                   final isSelected = _preReminderMinutes == mins;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text('$mins Menit'),
-                      selected: isSelected,
-                      selectedColor: const Color(0xFF518427),
-                      backgroundColor: const Color(0xFFF4F2E6),
-                      labelStyle: GoogleFonts.inter(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : const Color(0xFF2C3E1F),
-                      ),
-                      onSelected: (_) {
-                        setState(() {
-                          _preReminderMinutes = mins;
-                        });
-                      },
+                  return ChoiceChip(
+                    label: Text('$mins Menit'),
+                    selected: isSelected,
+                    selectedColor: const Color(0xFF518427),
+                    backgroundColor: const Color(0xFFF4F2E6),
+                    labelStyle: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? Colors.white : const Color(0xFF2C3E1F),
                     ),
+                    onSelected: (_) {
+                      setState(() {
+                        _preReminderMinutes = mins;
+                      });
+                      _storageService.setPrayerPreReminderMinutes(mins);
+                    },
                   );
                 }).toList(),
               ),

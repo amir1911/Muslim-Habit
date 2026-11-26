@@ -52,10 +52,11 @@ class AIModelService {
   /// ke yang lebih besar. Jika model pertama mengembalikan 503 / 429,
   /// otomatis dicoba model berikutnya.
   static const List<String> _candidateModels = [
-    'gemini-3.5-flash-lite',
-    'gemini-3.5-flash',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-flash-latest',
     'gemini-flash-lite-latest',
-    'gemini-3.7-flash',
   ];
 
   final HttpClient _httpClient = HttpClient();

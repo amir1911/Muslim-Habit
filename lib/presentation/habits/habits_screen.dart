@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/hijri_helper.dart';
 import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
 import '../quran/quran_screen.dart';
@@ -14,6 +16,7 @@ import '../shell/main_navigation_shell.dart';
 import '../../features/mascot/screens/mascot_hub_screen.dart';
 import 'kalender_planning_screen.dart';
 import 'widgets/edit_plan_bottom_sheet.dart';
+import 'services/habit_navigation_helper.dart';
 
 /// HabbitDashboardScreen (Laman Utama Habbit Tracker)
 /// Alias HabitsScreen untuk kompatibilitas dengan MainNavigationShell
@@ -25,8 +28,8 @@ class HabitsScreen extends StatefulWidget {
 }
 
 class _HabitsScreenState extends State<HabitsScreen> {
-  // Tanggal aktif simulasi di strip mingguan
-  int _selectedDayIndex = 4; // index 4 -> Jumat (24 April)
+  // Tanggal aktif otomatis di strip mingguan (0: Sen, ..., 6: Min)
+  int _selectedDayIndex = DateTime.now().weekday - 1;
 
   @override
   Widget build(BuildContext context) {
@@ -458,18 +461,37 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   // ==========================================
-  // 3. KARTU KALENDER MINGGUAN
+  // 3. KARTU KALENDER MINGGUAN OTOMATIS
   // ==========================================
   Widget _buildWeeklyCalendarCard(BuildContext context) {
-    const daysData = [
-      {'day': 'Sen', 'date': '20', 'arabic': '۳'},
-      {'day': 'Sel', 'date': '21', 'arabic': '٤'},
-      {'day': 'Rab', 'date': '22', 'arabic': '٥'},
-      {'day': 'Kam', 'date': '23', 'arabic': '٦'},
-      {'day': 'Jum', 'date': '24', 'arabic': '۷'}, // Active
-      {'day': 'Sab', 'date': '25', 'arabic': '۸'},
-      {'day': 'Min', 'date': '26', 'arabic': '۹'},
-    ];
+    final now = DateTime.now();
+    final monday = now.subtract(Duration(days: now.weekday - 1));
+    const dayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+    String toArabicNumeral(int number) {
+      return number.toString().split('').map((char) {
+        final idx = int.tryParse(char);
+        return idx != null ? arabicDigits[idx] : char;
+      }).join('');
+    }
+
+    final List<Map<String, dynamic>> daysData = [];
+    for (int i = 0; i < 7; i++) {
+      final d = DateTime(monday.year, monday.month, monday.day).add(Duration(days: i));
+      final h = HijriHelper.fromGregorian(d);
+      daysData.add({
+        'day': dayLabels[i],
+        'date': '${d.day}',
+        'arabic': toArabicNumeral(h.day),
+        'dateTime': d,
+      });
+    }
+
+    final safeIndex = _selectedDayIndex.clamp(0, 6);
+    final selectedDate = (daysData[safeIndex]['dateTime'] as DateTime?) ?? now;
+    final hijriSelected = HijriHelper.fromGregorian(selectedDate);
+    final currentTimeStr = DateFormat('HH:mm').format(now);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -497,7 +519,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Jumat, 24 April 2026',
+                    '${HijriHelper.getDayNameIndonesian(selectedDate)}, ${selectedDate.day} ${HijriHelper.getMonthNameIndonesian(selectedDate.month)} ${selectedDate.year}',
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -506,7 +528,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '7 Dhu al-Qi\'dah 1447 H',
+                    hijriSelected.toFormattedString(),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -528,7 +550,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '10:00',
+                        currentTimeStr,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
@@ -875,7 +897,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
   ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -888,84 +909,97 @@ class _HabitsScreenState extends State<HabitsScreen> {
           ),
         ],
       ),
-      child: Row(
-        children: [
-          // Ikon Masjid / Kategori dalam Kotak Bulat Hijau Muda
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAF2E3),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.mosque_rounded,
-              color: Color(0xFF518427),
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 12),
-
-          // Judul & Jam Jadwal
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            HabitNavigationHelper.navigateToActivity(context, item);
+          },
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
               children: [
-                Text(
-                  item.title,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF2E5714),
+                // Ikon Masjid / Kategori dalam Kotak Bulat Hijau Muda
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEAF2E3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.mosque_rounded,
+                    color: Color(0xFF518427),
+                    size: 22,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time_rounded,
-                      size: 13,
-                      color: Color(0xFF75856B),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      item.scheduledTime,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF75856B),
+                const SizedBox(width: 12),
+
+                // Judul & Jam Jadwal
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF2E5714),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.access_time_rounded,
+                            size: 13,
+                            color: Color(0xFF75856B),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            item.scheduledTime,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF75856B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Toggle Notifikasi Lonceng
+                IconButton(
+                  icon: Icon(
+                    item.isMuted
+                        ? Icons.notifications_off_outlined
+                        : Icons.notifications_active_rounded,
+                    color: item.isMuted
+                        ? const Color(0xFFA0ABA0)
+                        : const Color(0xFF518427),
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    habitProv.toggleMute(item.id);
+                  },
+                ),
+
+                // Chevron Kanan
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: Color(0xFFA0ABA0),
+                  size: 20,
                 ),
               ],
             ),
           ),
-
-          // Toggle Notifikasi Lonceng
-          IconButton(
-            icon: Icon(
-              item.isMuted
-                  ? Icons.notifications_off_outlined
-                  : Icons.notifications_active_rounded,
-              color: item.isMuted
-                  ? const Color(0xFFA0ABA0)
-                  : const Color(0xFF518427),
-              size: 20,
-            ),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              habitProv.toggleMute(item.id);
-            },
-          ),
-
-          // Chevron Kanan
-          const Icon(
-            Icons.chevron_right_rounded,
-            color: Color(0xFFA0ABA0),
-            size: 20,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1027,7 +1061,6 @@ class _HabitsScreenState extends State<HabitsScreen> {
 
         // Kartu Hijau Tua Program Aktif
         Container(
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: const Color(0xFF2E5714),
             borderRadius: BorderRadius.circular(16),
@@ -1039,119 +1072,140 @@ class _HabitsScreenState extends State<HabitsScreen> {
               ),
             ],
           ),
-          child: Column(
-            children: [
-              // Baris Atas: Thumbnail, Judul, Lonceng, Chevron
-              Row(
-                children: [
-                  // Lingkaran Avatar / Thumbnail
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.mosque_rounded,
-                      color: Colors.white,
-                      size: 22,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SholatScreen(
+                      initialCategoryIndex: 1,
+                      initialPrayerKey: 'dhuha',
                     ),
                   ),
-                  const SizedBox(width: 12),
-
-                  // Judul Program
-                  Expanded(
-                    child: Text(
-                      'Target baru sholat dhuha s...',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-
-                  // Lonceng & Panah Kanan
-                  const Icon(
-                    Icons.notifications_none_rounded,
-                    color: Colors.white70,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: Colors.white70,
-                    size: 22,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // Baris Bawah: Badge 1 Minggu, 100 XP, 0/7 Sholat Dhuha
-              Row(
-                children: [
-                  // Pill Durasi
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '1 Minggu',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Pill XP
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    // Baris Atas: Thumbnail, Judul, Lonceng, Chevron
+                    Row(
                       children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          color: Color(0xFFFFD700),
-                          size: 13,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          '100 XP',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                        // Lingkaran Avatar / Thumbnail
+                        Container(
+                          width: 42,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.mosque_rounded,
                             color: Colors.white,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Judul Program
+                        Expanded(
+                          child: Text(
+                            'Target baru sholat dhuha s...',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+
+                        // Lonceng & Panah Kanan
+                        const Icon(
+                          Icons.notifications_none_rounded,
+                          color: Colors.white70,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          color: Colors.white70,
+                          size: 22,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Baris Bawah: Badge 1 Minggu, 100 XP, 0/7 Sholat Dhuha
+                    Row(
+                      children: [
+                        // Pill Durasi
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            '1 Minggu',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+
+                        // Pill XP
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: Color(0xFFFFD700),
+                                size: 13,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                '100 XP',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+
+                        // Teks Progress Target
+                        Text(
+                          '0/7 Sholat Dhuha',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white.withValues(alpha: 0.85),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  const Spacer(),
-
-                  // Teks Progress Target
-                  Text(
-                    '0/7 Sholat Dhuha',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white.withValues(alpha: 0.85),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
+            ),
           ),
         ),
       ],

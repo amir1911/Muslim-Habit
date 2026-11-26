@@ -232,21 +232,69 @@ class FastingAlarmService {
     await _notifications.cancelAll();
   }
 
-  /// Memutar nada alarm (Adzan Makkah / Bedug)
-  Future<void> playAlarmSound(String ringtoneName) async {
-    try {
-      // Nada alarm islami
-      await _ringtonePlayer.stop();
-      // Gunakan audio asset atau fallback online audio adzan
-      await _ringtonePlayer.setUrl(
-        'https://cdn.islamic.network/quran/audio/128/ar.alafasy/1.mp3',
-      );
-      await _ringtonePlayer.setLoopMode(LoopMode.one);
-      await _ringtonePlayer.play();
-    } catch (_) {}
+  /// Mapping nama nada dering ke path asset audio
+  static String getRingtoneAsset(String ringtoneName) {
+    switch (ringtoneName.trim().toLowerCase()) {
+      case 'adzan makkah':
+      case 'adzan maghrib':
+      case 'bedug & adzan':
+        return 'assets/audio/adzan.mp3';
+      case 'adzan madinah':
+        return 'assets/audio/adzan_shubuh.mp3';
+      case 'nada lembut':
+        return 'assets/audio/nada_lembut.wav';
+      case 'bel tradisional':
+        return 'assets/audio/bel_tradisional.wav';
+      case 'bedug sahur':
+        return 'assets/audio/bedug.wav';
+      case 'genta islami':
+        return 'assets/audio/genta_islami.wav';
+      default:
+        return 'assets/audio/adzan.mp3';
+    }
   }
 
-  /// Menghentikan nada alarm
+  /// Memutar nada alarm berulang (looping) sesuai nama nada dering yang dipilih
+  Future<void> playAlarmSound(String ringtoneName) async {
+    try {
+      final assetPath = getRingtoneAsset(ringtoneName);
+      debugPrint('[FastingAlarmService] Memutar alarm: $ringtoneName ($assetPath)');
+      await stopAlarmSound();
+      await _ringtonePlayer.setVolume(1.0);
+      try {
+        await _ringtonePlayer.setAsset(assetPath);
+      } catch (assetErr) {
+        debugPrint('[FastingAlarmService] Fallback ke adzan.mp3 karena asset gagal di-load: $assetErr');
+        await _ringtonePlayer.setAsset('assets/audio/adzan.mp3');
+      }
+      await _ringtonePlayer.setLoopMode(LoopMode.one);
+      await _ringtonePlayer.play();
+    } catch (e) {
+      debugPrint('[FastingAlarmService] Error playing alarm sound ($ringtoneName): $e');
+    }
+  }
+
+  /// Memutar preview satu kali (tanpa loop) untuk pengujian suara di pengaturan
+  Future<void> playPreviewSound(String ringtoneName) async {
+    try {
+      final assetPath = getRingtoneAsset(ringtoneName);
+      debugPrint('[FastingAlarmService] Memutar preview: $ringtoneName ($assetPath)');
+      await stopAlarmSound();
+      await _ringtonePlayer.setVolume(1.0);
+      try {
+        await _ringtonePlayer.setAsset(assetPath);
+      } catch (assetErr) {
+        debugPrint('[FastingAlarmService] Fallback ke adzan.mp3 untuk preview: $assetErr');
+        await _ringtonePlayer.setAsset('assets/audio/adzan.mp3');
+      }
+      await _ringtonePlayer.setLoopMode(LoopMode.off);
+      await _ringtonePlayer.play();
+    } catch (e) {
+      debugPrint('[FastingAlarmService] Error playing preview sound ($ringtoneName): $e');
+    }
+  }
+
+  /// Menghentikan nada alarm atau preview
   Future<void> stopAlarmSound() async {
     try {
       await _ringtonePlayer.stop();
@@ -269,21 +317,19 @@ class FastingAlarmService {
   }
 
   /// Fitur Simulasi: Menampilkan Layar Alarm Sahur Seketika untuk Pengujian
-  void simulateSahurAlarm(BuildContext context) {
-    playAlarmSound('Adzan Makkah');
+  void simulateSahurAlarm(BuildContext context, {String ringtoneName = 'Adzan Makkah'}) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const AlarmSahurScreen(),
+        builder: (_) => AlarmSahurScreen(ringtoneName: ringtoneName),
       ),
     );
   }
 
   /// Fitur Simulasi: Menampilkan Layar Alarm Berbuka Seketika untuk Pengujian
-  void simulateIftarAlarm(BuildContext context) {
-    playAlarmSound('Bedug & Adzan');
+  void simulateIftarAlarm(BuildContext context, {String ringtoneName = 'Bedug & Adzan'}) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const AlarmIftarScreen(),
+        builder: (_) => AlarmIftarScreen(ringtoneName: ringtoneName),
       ),
     );
   }

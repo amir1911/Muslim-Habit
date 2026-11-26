@@ -61,54 +61,171 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
 
   void _showRingtonePicker({required bool isSahur}) {
     final options = isSahur
-        ? ['Adzan Makkah', 'Adzan Madinah', 'Nada Lembut', 'Bel Tradisional']
-        : ['Bedug & Adzan', 'Bedug Sahur', 'Adzan Maghrib', 'Genta Islami'];
+        ? [
+            {'title': 'Adzan Makkah', 'desc': 'Kumandang adzan Makkah Al-Mukarramah'},
+            {'title': 'Adzan Madinah', 'desc': 'Lantunan merdu adzan Madinah Nabawi'},
+            {'title': 'Nada Lembut', 'desc': 'Melodi lembut & menenangkan untuk bangun'},
+            {'title': 'Bel Tradisional', 'desc': 'Dentang bel klasik sahur'},
+          ]
+        : [
+            {'title': 'Bedug & Adzan', 'desc': 'Kombinasi tabuhan bedug dan adzan Maghrib'},
+            {'title': 'Bedug Sahur', 'desc': 'Tabuhan bedug tradisional berirama'},
+            {'title': 'Adzan Maghrib', 'desc': 'Adzan penanda waktu berbuka puasa'},
+            {'title': 'Genta Islami', 'desc': 'Genta resonan khidmat penyejuk hati'},
+          ];
+
+    String? playingRingtone;
 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                'Pilih Nada Dering',
-                style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-            ),
-            const SizedBox(height: 10),
-            ...options.map((opt) {
-              final current = isSahur ? _config.sahurRingtone : _config.iftarRingtone;
-              final isSelected = current == opt;
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          final current = isSahur ? _config.sahurRingtone : _config.iftarRingtone;
 
-              return ListTile(
-                title: Text(opt, style: GoogleFonts.inter(fontSize: 14)),
-                trailing: isSelected
-                    ? const Icon(Icons.check_circle_rounded, color: Color(0xFF518427))
-                    : null,
-                onTap: () {
-                  setState(() {
-                    if (isSahur) {
-                      _config = _config.copyWith(sahurRingtone: opt);
-                    } else {
-                      _config = _config.copyWith(iftarRingtone: opt);
-                    }
-                  });
-                  Navigator.pop(ctx);
-                },
-              );
-            }),
-          ],
-        ),
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pilih Nada Dering ${isSahur ? 'Sahur' : 'Iftar'}',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1E293B),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Tekan tombol putar untuk mendengar cuplikan suara',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (playingRingtone != null)
+                      IconButton(
+                        tooltip: 'Hentikan Suara',
+                        icon: const Icon(Icons.stop_circle_rounded, color: Colors.redAccent, size: 26),
+                        onPressed: () {
+                          FastingAlarmService().stopAlarmSound();
+                          setModalState(() => playingRingtone = null);
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                ...options.map((item) {
+                  final opt = item['title']!;
+                  final desc = item['desc']!;
+                  final isSelected = current == opt;
+                  final isAudioPlaying = playingRingtone == opt;
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF518427).withValues(alpha: 0.08)
+                          : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isSelected ? const Color(0xFF518427) : const Color(0xFFE2E8F0),
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      leading: InkWell(
+                        onTap: () async {
+                          if (isAudioPlaying) {
+                            await FastingAlarmService().stopAlarmSound();
+                            setModalState(() => playingRingtone = null);
+                          } else {
+                            await FastingAlarmService().playPreviewSound(opt);
+                            setModalState(() => playingRingtone = opt);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: isAudioPlaying
+                                ? Colors.redAccent.withValues(alpha: 0.15)
+                                : const Color(0xFF518427).withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isAudioPlaying ? Icons.stop_rounded : Icons.play_arrow_rounded,
+                            color: isAudioPlaying ? Colors.redAccent : const Color(0xFF518427),
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        opt,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                          color: isSelected ? const Color(0xFF518427) : const Color(0xFF1E293B),
+                        ),
+                      ),
+                      subtitle: Text(
+                        desc,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      trailing: isSelected
+                          ? const Icon(Icons.check_circle_rounded, color: Color(0xFF518427), size: 22)
+                          : const Icon(Icons.radio_button_unchecked_rounded, color: Color(0xFFCBD5E1), size: 22),
+                      onTap: () {
+                        FastingAlarmService().stopAlarmSound();
+                        setState(() {
+                          if (isSahur) {
+                            _config = _config.copyWith(sahurRingtone: opt);
+                          } else {
+                            _config = _config.copyWith(iftarRingtone: opt);
+                          }
+                        });
+                        Navigator.pop(ctx);
+                      },
+                    ),
+                  );
+                }),
+              ],
+            ),
+          );
+        },
       ),
-    );
+    ).whenComplete(() {
+      FastingAlarmService().stopAlarmSound();
+    });
   }
 
   void _showSnoozePicker() {
@@ -246,6 +363,8 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
+        centerTitle: false,
+        titleSpacing: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(6),
@@ -257,25 +376,29 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Pengaturan Alarm',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Pengaturan Alarm',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            Text(
-              'Jadwal Puasa-mu Bulan Ini',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                color: Colors.white.withValues(alpha: 0.85),
+              Text(
+                'Jadwal Puasa-mu Bulan Ini',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -382,7 +505,10 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => FastingAlarmService().simulateSahurAlarm(context),
+                          onPressed: () => FastingAlarmService().simulateSahurAlarm(
+                            context,
+                            ringtoneName: _config.sahurRingtone,
+                          ),
                           icon: const Icon(Icons.wb_twilight_rounded, size: 16),
                           label: const Text('Simulasi Sahur'),
                           style: OutlinedButton.styleFrom(
@@ -396,7 +522,10 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () => FastingAlarmService().simulateIftarAlarm(context),
+                          onPressed: () => FastingAlarmService().simulateIftarAlarm(
+                            context,
+                            ringtoneName: _config.iftarRingtone,
+                          ),
                           icon: const Icon(Icons.dinner_dining_rounded, size: 16),
                           label: const Text('Simulasi Iftar'),
                           style: OutlinedButton.styleFrom(

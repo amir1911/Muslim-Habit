@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/fasting_plan.dart';
 import '../services/fasting_service.dart';
 import '../services/fasting_alarm_service.dart';
+import '../services/smart_notification_service.dart';
 import 'prayer_time_provider.dart';
 
 class FastingProvider extends ChangeNotifier {
@@ -132,5 +133,33 @@ class FastingProvider extends ChangeNotifier {
       imsakTimeStr: imsak,
       maghribTimeStr: maghrib,
     );
+
+    // Sinkronkan juga ke SmartNotificationService
+    try {
+      final now = DateTime.now();
+      final todayKey = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+      final tomorrow = now.add(const Duration(days: 1));
+      final tomorrowKey = '${tomorrow.year}-${tomorrow.month.toString().padLeft(2, '0')}-${tomorrow.day.toString().padLeft(2, '0')}';
+
+      FastingPlan? todayPlan;
+      FastingPlan? tomorrowPlan;
+
+      for (final p in _plans) {
+        if (p.dateKey == todayKey) todayPlan = p;
+        if (p.dateKey == tomorrowKey) tomorrowPlan = p;
+      }
+
+      SmartNotificationService().syncSmartFastingReminders(
+        todayPlan: todayPlan,
+        tomorrowPlan: tomorrowPlan,
+        prayerSchedule: _prayerProvider?.schedule,
+        alarmSahurEnabled: _alarmConfig.sahurAlarmEnabled,
+        alarmIftarEnabled: _alarmConfig.iftarAlarmEnabled,
+        ringtoneSahur: _alarmConfig.sahurRingtone,
+        ringtoneIftar: _alarmConfig.iftarRingtone,
+      );
+    } catch (e) {
+      debugPrint('Error syncing smart fasting reminders: $e');
+    }
   }
 }

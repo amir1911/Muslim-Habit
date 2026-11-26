@@ -11,6 +11,11 @@ import 'services/storage_service.dart';
 import 'services/auth_service.dart';
 import 'services/widget_update_service.dart';
 import 'services/adzan_service.dart';
+import 'services/smart_notification_service.dart';
+import 'presentation/shell/main_navigation_shell.dart';
+import 'presentation/dzikir/dzikir_screen.dart';
+import 'presentation/puasa/puasa_screen.dart';
+import 'presentation/sholat/sholat_screen.dart';
 import 'providers/habit_provider.dart';
 import 'providers/tasbih_provider.dart';
 import 'providers/tilawah_provider.dart';
@@ -59,6 +64,7 @@ void main() async {
   // Inisialisasi Home Screen Widget service & Adzan Service
   await WidgetUpdateService.init();
   await AdzanService().init(storageService);
+  await SmartNotificationService().init(storageService);
 
   runApp(
     MultiProvider(
@@ -66,6 +72,7 @@ void main() async {
         Provider<StorageService>.value(value: storageService),
         Provider<AuthService>(create: (_) => AuthService()),
         ChangeNotifierProvider<AdzanService>.value(value: AdzanService()),
+        ChangeNotifierProvider<SmartNotificationService>.value(value: SmartNotificationService()),
         ChangeNotifierProvider(create: (_) => HabitProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TasbihProvider(storageService)),
         ChangeNotifierProvider(create: (_) => TilawahProvider(storageService)),
@@ -119,8 +126,16 @@ class MuslimHabitApp extends StatelessWidget {
     return MaterialApp(
       title: 'Muslim Habit',
       debugShowCheckedModeBanner: false,
+      navigatorKey: SmartNotificationService.navigatorKey,
       theme: AppTheme.lightTheme,
       home: const AnimatedSplashScreen(),
+      routes: {
+        '/dzikir': (_) => const DzikirScreen(),
+        '/puasa': (_) => const PuasaScreen(),
+        '/sholat': (_) => const SholatScreen(),
+        '/quran': (_) => const MainNavigationShell(initialIndex: 2),
+        '/habits': (_) => const MainNavigationShell(initialIndex: 1),
+      },
     );
   }
 }

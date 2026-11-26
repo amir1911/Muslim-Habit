@@ -7,8 +7,9 @@ import 'tidak_puasa_screen.dart';
 
 class AlarmSahurScreen extends StatefulWidget {
   final String? planId;
+  final String? ringtoneName;
 
-  const AlarmSahurScreen({super.key, this.planId});
+  const AlarmSahurScreen({super.key, this.planId, this.ringtoneName});
 
   @override
   State<AlarmSahurScreen> createState() => _AlarmSahurScreenState();
@@ -22,6 +23,7 @@ class _AlarmSahurScreenState extends State<AlarmSahurScreen>
   @override
   void initState() {
     super.initState();
+    FastingAlarmService().playAlarmSound(widget.ringtoneName ?? 'Adzan Makkah');
     _holdController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2500),
@@ -36,6 +38,7 @@ class _AlarmSahurScreenState extends State<AlarmSahurScreen>
 
   @override
   void dispose() {
+    FastingAlarmService().stopAlarmSound();
     _holdController.dispose();
     super.dispose();
   }

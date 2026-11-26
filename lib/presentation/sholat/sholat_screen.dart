@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/prayer_time_provider.dart';
+import '../../providers/habit_provider.dart';
 import '../../services/adzan_service.dart';
 import 'widgets/sholat_app_bar.dart';
 import 'widgets/sholat_category_switch.dart';
@@ -13,7 +14,14 @@ import 'widgets/sholat_list_item_card.dart';
 import 'sholat_edit_alarm_screen.dart';
 
 class SholatScreen extends StatefulWidget {
-  const SholatScreen({super.key});
+  final int initialCategoryIndex;
+  final String? initialPrayerKey;
+
+  const SholatScreen({
+    super.key,
+    this.initialCategoryIndex = 0,
+    this.initialPrayerKey,
+  });
 
   @override
   State<SholatScreen> createState() => _SholatScreenState();
@@ -22,6 +30,20 @@ class SholatScreen extends StatefulWidget {
 class _SholatScreenState extends State<SholatScreen> {
   int _categoryIndex = 0; // 0: Wajib, 1: Sunnah
   bool _isCalendarExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoryIndex = widget.initialCategoryIndex;
+    if (widget.initialPrayerKey != null) {
+      final key = widget.initialPrayerKey!.toLowerCase();
+      if (key == 'dhuha' || key == 'tahajjud' || key == 'tarawih' || key == 'witir') {
+        _categoryIndex = 1;
+      } else {
+        _categoryIndex = 0;
+      }
+    }
+  }
 
   final List<Map<String, dynamic>> _wajibPrayers = const [
     {
@@ -305,8 +327,12 @@ class _SholatScreenState extends State<SholatScreen> {
                   actionLabel: actionLabel,
                   actionTime: actionTime,
                   isRecorded: isDone,
-                  onCheckTap: () {
-                    prayerProvider.togglePrayerRecord(key);
+                  onCheckTap: () async {
+                    await prayerProvider.togglePrayerRecord(key);
+                    if (context.mounted) {
+                      final done = prayerProvider.isPrayerDone(key);
+                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: done);
+                    }
                   },
                   onCardTap: () => _openEditAlarm(context, key),
                 ),
@@ -343,8 +369,12 @@ class _SholatScreenState extends State<SholatScreen> {
                   actionLabel: actionLabel,
                   actionTime: displayAlarmTime,
                   isRecorded: isDone,
-                  onCheckTap: () {
-                    prayerProvider.togglePrayerRecord(key);
+                  onCheckTap: () async {
+                    await prayerProvider.togglePrayerRecord(key);
+                    if (context.mounted) {
+                      final done = prayerProvider.isPrayerDone(key);
+                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: done);
+                    }
                   },
                   onCardTap: () => _openEditAlarm(context, key),
                 ),

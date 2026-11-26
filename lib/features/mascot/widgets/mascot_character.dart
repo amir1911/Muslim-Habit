@@ -25,6 +25,14 @@ class _MascotCharacterState extends State<MascotCharacter>
   late AnimationController _animController;
   late Animation<double> _floatAnimation;
 
+  int _expressionIndex = 0;
+  static const List<String> _expressions = [
+    'assets/images/mascot 4.png',
+    'assets/images/mascot 1.png',
+    'assets/images/mascot 2.png',
+    'assets/images/mascot 3.png',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +57,9 @@ class _MascotCharacterState extends State<MascotCharacter>
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
+        setState(() {
+          _expressionIndex = (_expressionIndex + 1) % _expressions.length;
+        });
         widget.onTap?.call();
       },
       child: AnimatedBuilder(
@@ -88,15 +99,26 @@ class _MascotCharacterState extends State<MascotCharacter>
                   ),
                 ],
 
-                // ── GAMBAR MASKOT NUNU BERDIRI ──
-                Image.asset(
-                  'assets/images/mascot_standing.png',
-                  height: widget.height,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    'assets/images/mascot_nunu.png',
+                // ── GAMBAR MASKOT DENGAN 4 EKSPRESI DINAMIS ──
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  transitionBuilder: (child, animation) => FadeTransition(
+                    opacity: animation,
+                    child: ScaleTransition(
+                      scale: Tween<double>(begin: 0.95, end: 1.0).animate(animation),
+                      child: child,
+                    ),
+                  ),
+                  child: Image.asset(
+                    _expressions[_expressionIndex],
+                    key: ValueKey<int>(_expressionIndex),
                     height: widget.height,
                     fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Image.asset(
+                      'assets/images/mascot_standing.png',
+                      height: widget.height,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
 

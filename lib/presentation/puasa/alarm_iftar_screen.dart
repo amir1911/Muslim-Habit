@@ -8,8 +8,9 @@ import '../../services/fasting_alarm_service.dart';
 
 class AlarmIftarScreen extends StatefulWidget {
   final String? planId;
+  final String? ringtoneName;
 
-  const AlarmIftarScreen({super.key, this.planId});
+  const AlarmIftarScreen({super.key, this.planId, this.ringtoneName});
 
   @override
   State<AlarmIftarScreen> createState() => _AlarmIftarScreenState();
@@ -17,6 +18,12 @@ class AlarmIftarScreen extends StatefulWidget {
 
 class _AlarmIftarScreenState extends State<AlarmIftarScreen> {
   bool _soundPlaying = true;
+
+  @override
+  void initState() {
+    super.initState();
+    FastingAlarmService().playAlarmSound(widget.ringtoneName ?? 'Bedug & Adzan');
+  }
 
   @override
   void dispose() {

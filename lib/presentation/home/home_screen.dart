@@ -21,6 +21,7 @@ import '../../core/theme/home_time_theme.dart';
 import '../../services/adzan_service.dart';
 import '../../features/mascot/screens/mascot_hub_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
+import 'widgets/interactive_home_mascot.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME SCREEN  (sesuai desain Figma)
@@ -388,37 +389,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 10),
 
-                  // Right column: Speech Bubble + Mascot
-                  Expanded(
+                  // Right column: Speech Bubble + Interactive Virtual Mascot
+                  const Expanded(
                     flex: 9,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const MascotHubScreen()),
-                        );
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Speech bubble dinamis sesuai karakter AI
-                          _buildSpeechBubble(
-                            '${provider.currentAssistant.name}: "${provider.currentAssistant.homeMotivationDefault}"',
-                          ),
-                          const SizedBox(height: 2),
-
-                          // Mascot AI yang dipilih (Lulu, Nunu, Riri)
-                          SizedBox(
-                            height: 165,
-                            child: Image.asset(
-                              provider.currentAssistant.imagePath,
-                              fit: BoxFit.contain,
-                              alignment: Alignment.bottomCenter,
-                            ),
-                          ),
-                        ],
-                      ),
+                    child: InteractiveHomeMascot(
+                      height: 165,
                     ),
                   ),
                 ],

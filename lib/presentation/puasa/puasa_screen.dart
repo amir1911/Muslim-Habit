@@ -26,6 +26,8 @@ class PuasaScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
+        centerTitle: false,
+        titleSpacing: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(6),
@@ -37,25 +39,29 @@ class PuasaScreen extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Puasa',
-              style: GoogleFonts.inter(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Puasa',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            Text(
-              'Jadwal Puasa-mu Bulan Ini',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                color: Colors.white.withValues(alpha: 0.85),
+              Text(
+                'Jadwal Puasa-mu Bulan Ini',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: Colors.white.withValues(alpha: 0.85),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           IconButton(
@@ -189,41 +195,48 @@ class PuasaScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF518427)),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Target Puasa',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF0F172A),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_month_rounded, size: 18, color: Color(0xFF518427)),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Target Puasa',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF0F172A),
+                          ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '$monthName ${currentMonth.year}',
+                      style: GoogleFonts.inter(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF1E293B),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '$monthName ${currentMonth.year}',
-                    style: GoogleFonts.inter(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1E293B),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                  Text(
-                    hijriRange,
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
+                    Text(
+                      hijriRange,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Row(
                 children: [
                   IconButton(
@@ -256,15 +269,14 @@ class PuasaScreen extends StatelessWidget {
 
           // Header Hari (Min, Sen, Sel, Rab, Kam, Jum, Sab)
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              _DayHeader('Min'),
-              _DayHeader('Sen'),
-              _DayHeader('Sel'),
-              _DayHeader('Rab'),
-              _DayHeader('Kam'),
-              _DayHeader('Jum'),
-              _DayHeader('Sab'),
+              Expanded(child: _DayHeader('Min')),
+              Expanded(child: _DayHeader('Sen')),
+              Expanded(child: _DayHeader('Sel')),
+              Expanded(child: _DayHeader('Rab')),
+              Expanded(child: _DayHeader('Kam')),
+              Expanded(child: _DayHeader('Jum')),
+              Expanded(child: _DayHeader('Sab')),
             ],
           ),
 
@@ -608,16 +620,13 @@ class _DayHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 36,
-      child: Center(
-        child: Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 11.5,
-            fontWeight: FontWeight.w700,
-            color: Colors.grey.shade500,
-          ),
+    return Center(
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 11.5,
+          fontWeight: FontWeight.w700,
+          color: Colors.grey.shade500,
         ),
       ),
     );
