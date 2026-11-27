@@ -8,6 +8,7 @@ import '../../../models/ai_assistant_model.dart';
 import '../../../providers/habit_provider.dart';
 import '../../ai_companion/models/chat_message.dart';
 import '../../ai_companion/services/ai_model_service.dart';
+import '../../ai_companion/screens/companion_settings_screen.dart';
 import '../providers/mascot_provider.dart';
 
 class _ChatMessageItem {
@@ -575,6 +576,21 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ],
               ),
             ],
+          ),
+          const Spacer(),
+          IconButton(
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: Color(0xFF2E5714),
+              size: 22,
+            ),
+            tooltip: 'Pengaturan ChatBot',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CompanionSettingsScreen()),
+              );
+            },
           ),
         ],
       ),

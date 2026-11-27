@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/khatam_provider.dart';
 import 'khatam_target_modal.dart';
 import 'khatam_dashboard_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 /// Halaman Pengaturan Target Mode Khatam Al-Qur'an (ModeKhatamSetupScreen)
 class KhatamSetupScreen extends StatefulWidget {
@@ -199,17 +200,9 @@ class _KhatamSetupScreenState extends State<KhatamSetupScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF84B74E),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 26),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: CustomBackButton(),
           ),
           centerTitle: true,
           title: Text(

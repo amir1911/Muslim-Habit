@@ -3,6 +3,7 @@ import '../models/fasting_plan.dart';
 import '../services/fasting_service.dart';
 import '../services/fasting_alarm_service.dart';
 import '../services/smart_notification_service.dart';
+import '../services/habit_progress_service.dart';
 import 'prayer_time_provider.dart';
 
 class FastingProvider extends ChangeNotifier {
@@ -97,6 +98,7 @@ class FastingProvider extends ChangeNotifier {
 
   Future<void> markCompleted(String id) async {
     await _fastingService.markCompleted(id);
+    await HabitProgressService.markPuasaActivityToday();
     _plans = await _fastingService.getPlans();
     notifyListeners();
   }

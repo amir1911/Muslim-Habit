@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -94,6 +96,7 @@ class SmartNotificationService extends ChangeNotifier {
   SmartNotificationService._internal();
 
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  static const MethodChannel _customNotifChannel = MethodChannel('com.muslimhabit/custom_notification');
   StorageService? _storageService;
   bool _isInitialized = false;
 
@@ -106,10 +109,10 @@ class SmartNotificationService extends ChangeNotifier {
   Stream<SmartNotificationPayload> get onNotificationClick => _payloadController.stream;
 
   // ID Channels & Notification IDs
-  static const String channelSmartReminders = 'muslim_habit_smart_reminders';
-  static const String channelAdzanShubuh = 'adzan_subuh_channel';
-  static const String channelAdzanRegular = 'adzan_regular_channel';
-  static const String channelProgress = 'muslim_habit_progress_channel';
+  static const String channelSmartReminders = 'muslim_habit_smart_reminders_v2';
+  static const String channelAdzanShubuh = 'adzan_subuh_channel_v2';
+  static const String channelAdzanRegular = 'adzan_regular_channel_v2';
+  static const String channelProgress = 'muslim_habit_progress_channel_v2';
 
   // Base IDs
   static const int idAdzanSubuh = 1001;
@@ -172,7 +175,9 @@ class SmartNotificationService extends ChangeNotifier {
     try {
       tz.initializeTimeZones();
       tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[SmartNotification] TimeZone init error: $e');
+    }
 
     // Android & iOS Settings
     const androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
@@ -194,8 +199,74 @@ class SmartNotificationService extends ChangeNotifier {
     );
 
     await _createChannels();
+    await requestPermissions();
     _loadHistory();
+
+    // Batalkan notifikasi tes lama agar tidak muncul kembali di notification tray
+    for (final testId in [9001, 9002, 9003, 9999]) {
+      try {
+        await cancelNotification(testId);
+      } catch (_) {}
+    }
+
+    // Setup listener untuk notifikasi custom yang diklik pengguna
+    _customNotifChannel.setMethodCallHandler((call) async {
+      if (call.method == 'onNotificationClicked') {
+        final payloadStr = call.arguments as String?;
+        if (payloadStr != null && payloadStr.isNotEmpty) {
+          final payload = SmartNotificationPayload.fromJson(payloadStr);
+          if (payload != null) {
+            _payloadController.add(payload);
+            _executeNavigation(payload);
+          }
+        }
+      }
+    });
+
+    // Periksa apakah aplikasi dibuka dari custom notification
+    try {
+      final pending = await _customNotifChannel.invokeMethod<String>('getPendingPayload');
+      if (pending != null && pending.isNotEmpty) {
+        final payload = SmartNotificationPayload.fromJson(pending);
+        if (payload != null) {
+          Future.delayed(const Duration(milliseconds: 600), () {
+            _payloadController.add(payload);
+            _executeNavigation(payload);
+          });
+        }
+      }
+    } catch (_) {}
+
     _isInitialized = true;
+  }
+
+  /// Meminta izin notifikasi & exact alarm secara resmi di Android 13+ (API 33+)
+  Future<bool> requestPermissions() async {
+    try {
+      final androidImpl = _notifications.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (androidImpl != null) {
+        final notifGranted = await androidImpl.requestNotificationsPermission() ?? false;
+        await androidImpl.requestExactAlarmsPermission();
+        debugPrint('[SmartNotification] Notification permission granted: $notifGranted');
+        return notifGranted;
+      }
+    } catch (e) {
+      debugPrint('[SmartNotification] Error requesting permissions: $e');
+    }
+    return true;
+  }
+
+  /// Cek apakah notifikasi diaktifkan di level OS
+  Future<bool> areNotificationsEnabled() async {
+    try {
+      final androidImpl = _notifications.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (androidImpl != null) {
+        return await androidImpl.areNotificationsEnabled() ?? false;
+      }
+    } catch (_) {}
+    return true;
   }
 
   // Buat Notification Channels di Android
@@ -209,10 +280,11 @@ class SmartNotificationService extends ChangeNotifier {
     await androidImpl.createNotificationChannel(
       const AndroidNotificationChannel(
         channelSmartReminders,
-        'Pengingat Ibadah Muslim Habit',
+        'Pengingat Ibadah Muslim Habbit',
         description: 'Notifikasi pintar pengingat habit, dzikir, doa, dan Al-Quran.',
-        importance: Importance.high,
+        importance: Importance.max,
         enableVibration: true,
+        playSound: true,
       ),
     );
 
@@ -248,7 +320,9 @@ class SmartNotificationService extends ChangeNotifier {
         channelProgress,
         'Progres & Streak Ibadah',
         description: 'Apresiasi dan pengingat target harian serta streak ibadah.',
-        importance: Importance.defaultImportance,
+        importance: Importance.high,
+        enableVibration: true,
+        playSound: true,
       ),
     );
   }
@@ -272,58 +346,75 @@ class SmartNotificationService extends ChangeNotifier {
 
     final now = DateTime.now();
 
-    // ── A. DZIKIR PAGI PINTAR (Contoh: jam 06.00) ──
+    // ── A. DZIKIR PAGI PINTAR (Target jam 06:00 atau adaptif) ──
     if (hasReadDzikirPagiToday) {
-      // Jika sudah selesai, BATALKAN notifikasi
       await cancelNotification(idDzikirPagi);
     } else {
-      // Jika belum selesai dan waktu sekarang belum melewati batas pagi (misal jam 09.00)
-      if (now.hour < 9) {
-        final randomGreeting = _nunuGreetingMorning[Random().nextInt(_nunuGreetingMorning.length)];
-        await scheduleSmartReminder(
-          id: idDzikirPagi,
-          title: "Nunu • Waktunya Dzikir Pagi 🌅",
-          body: randomGreeting,
-          targetTime: _nextInstanceOfTime(6, 0),
-          payload: const SmartNotificationPayload(target: 'dzikir_pagi'),
-        );
+      var targetDzikirPagi = _parseTimeOnDate(now, "06:00");
+      if (targetDzikirPagi.isBefore(now)) {
+        // Jika sudah siang/sore (jam 11 ke atas), jadwalkan besok pagi jam 06:00
+        if (now.hour >= 11) {
+          targetDzikirPagi = targetDzikirPagi.add(const Duration(days: 1));
+        } else {
+          // Masih pagi tapi lewat jam 6 (misal jam 7-10), jadwalkan 5 menit lagi
+          targetDzikirPagi = now.add(const Duration(minutes: 5));
+        }
       }
+      final randomGreeting = _nunuGreetingMorning[Random().nextInt(_nunuGreetingMorning.length)];
+      await scheduleSmartReminder(
+        id: idDzikirPagi,
+        title: "Muslim Habbit",
+        body: randomGreeting,
+        targetTime: targetDzikirPagi,
+        payload: const SmartNotificationPayload(target: 'dzikir_pagi'),
+      );
     }
 
-    // ── B. DZIKIR PETANG PINTAR (Contoh: jam 16.30) ──
+    // ── B. DZIKIR PETANG PINTAR (Target jam 16:30 atau adaptif) ──
     if (hasReadDzikirPetangToday) {
       await cancelNotification(idDzikirPetang);
     } else {
-      if (now.hour < 18) {
-        await scheduleSmartReminder(
-          id: idDzikirPetang,
-          title: "Nunu • Dzikir Petang Menjelang Senja 🌇",
-          body: "Sore yang tenang. Yuk luangkan waktu membaca Dzikir Petang agar hati selalu tenteram.",
-          targetTime: _nextInstanceOfTime(16, 30),
-          payload: const SmartNotificationPayload(target: 'dzikir_petang'),
-        );
+      var targetDzikirPetang = _parseTimeOnDate(now, "16:30");
+      if (targetDzikirPetang.isBefore(now)) {
+        if (now.hour >= 19) {
+          targetDzikirPetang = targetDzikirPetang.add(const Duration(days: 1));
+        } else {
+          targetDzikirPetang = now.add(const Duration(minutes: 5));
+        }
       }
+      await scheduleSmartReminder(
+        id: idDzikirPetang,
+        title: "Muslim Habbit",
+        body: "Sore yang tenang. Yuk luangkan waktu membaca Dzikir Petang agar hati selalu tenteram.",
+        targetTime: targetDzikirPetang,
+        payload: const SmartNotificationPayload(target: 'dzikir_petang'),
+      );
     }
 
     // ── C. AL-QUR'AN / TILAWAH PINTAR ──
     if (hasReadQuranToday) {
       await cancelNotification(idTilawahReminder);
     } else {
-      if (now.hour < 21) {
-        final randomQuran = _nunuGreetingQuran[Random().nextInt(_nunuGreetingQuran.length)];
-        await scheduleSmartReminder(
-          id: idTilawahReminder,
-          title: "Nunu • Sudahkah Tilawah Hari Ini? 📖",
-          body: randomQuran,
-          targetTime: _nextInstanceOfTime(19, 30),
-          payload: const SmartNotificationPayload(target: 'quran'),
-        );
+      var targetTilawah = _parseTimeOnDate(now, "19:30");
+      if (targetTilawah.isBefore(now)) {
+        if (now.hour >= 22) {
+          targetTilawah = targetTilawah.add(const Duration(days: 1));
+        } else {
+          targetTilawah = now.add(const Duration(minutes: 5));
+        }
       }
+      final randomQuran = _nunuGreetingQuran[Random().nextInt(_nunuGreetingQuran.length)];
+      await scheduleSmartReminder(
+        id: idTilawahReminder,
+        title: "Muslim Habbit",
+        body: randomQuran,
+        targetTime: targetTilawah,
+        payload: const SmartNotificationPayload(target: 'quran'),
+      );
     }
 
-    // ── D. PROGRES HARIAN & STREAK EVALUATION (Jam 20:30 Malam) ──
+    // ── D. PROGRES HARIAN & STREAK EVALUATION (Malam) ──
     final int uncompletedCount = habits.where((h) => !h.isCompleted).length;
-    final int completedCount = habits.where((h) => h.isCompleted).length;
 
     if (uncompletedCount == 0 && habits.isNotEmpty) {
       // Semua target selesai: Batalkan pengingat sisa, kirim apresiasi jika belum pernah dikirim hari ini
@@ -337,21 +428,29 @@ class SmartNotificationService extends ChangeNotifier {
         final randomPraise = _nunuCompletedPraise[Random().nextInt(_nunuCompletedPraise.length)];
         await showInstantNotification(
           id: idDailyAppreciation,
-          title: "Nunu • Target Hari Ini Tuntas! 🌟",
+          title: "Muslim Habbit",
           body: randomPraise,
           payload: const SmartNotificationPayload(target: 'progress'),
         );
       }
     } else if (uncompletedCount > 0) {
       // Masih ada target belum selesai: Jadwalkan pengingat jam 20:15
-      final randomStreak = _nunuStreakEncouragement[Random().nextInt(_nunuStreakEncouragement.length)];
+      var targetProgress = _parseTimeOnDate(now, "20:15");
+      if (targetProgress.isBefore(now)) {
+        if (now.hour < 22) {
+          targetProgress = now.add(const Duration(minutes: 5));
+        } else {
+          targetProgress = targetProgress.add(const Duration(days: 1));
+        }
+      }
+
       final streakText = streakCount > 0 ? " Jaga streak $streakCount harimu!" : "";
 
       await scheduleSmartReminder(
         id: idDailyProgress,
-        title: "Nunu • Masih ada $uncompletedCount Target Hari Ini 🌿",
+        title: "Muslim Habbit",
         body: "Semangat! Selesaikan $uncompletedCount habit sebelum hari berakhir.$streakText",
-        targetTime: _nextInstanceOfTime(20, 15),
+        targetTime: targetProgress,
         payload: const SmartNotificationPayload(target: 'habit'),
       );
     }
@@ -376,8 +475,8 @@ class SmartNotificationService extends ChangeNotifier {
         if (maghribTime.isAfter(DateTime.now())) {
           await scheduleSmartReminder(
             id: idBukaPuasaReminder,
-            title: "Selamat Berbuka Puasa! 🌙",
-            body: "Waktu Maghrib telah tiba. Selamat menunaikan ibadah buka puasa untuk ${todayPlan.type.displayName}.",
+            title: "Muslim Habbit",
+            body: "Waktu Maghrib telah tiba. Selamat menunaikan ibadah berbuka puasa ${todayPlan.type.displayName}.",
             targetTime: maghribTime,
             payload: const SmartNotificationPayload(target: 'puasa'),
             channelId: channelAdzanRegular,
@@ -399,7 +498,7 @@ class SmartNotificationService extends ChangeNotifier {
         if (sahurTime.isAfter(DateTime.now())) {
           await scheduleSmartReminder(
             id: idSahurReminder,
-            title: "Nunu • Waktunya Sahur 🥣",
+            title: "Muslim Habbit",
             body: "Bangun yuk! Persiapkan santap sahur untuk puasa ${tomorrowPlan.type.displayName} hari ini.",
             targetTime: sahurTime,
             payload: const SmartNotificationPayload(target: 'puasa'),
@@ -412,7 +511,7 @@ class SmartNotificationService extends ChangeNotifier {
         if (imsakTime.isAfter(DateTime.now())) {
           await scheduleSmartReminder(
             id: idImsakReminder,
-            title: "Peringatan Waktu Imsak ⏳",
+            title: "Muslim Habbit",
             body: "10 menit menuju waktu Shubuh. Segera selesaikan sahur dan bersiap shalat Shubuh.",
             targetTime: imsakTime,
             payload: const SmartNotificationPayload(target: 'puasa'),
@@ -437,7 +536,7 @@ class SmartNotificationService extends ChangeNotifier {
     final now = DateTime.now();
 
     final prayers = [
-      {'key': 'shubuh', 'name': 'Shubuh', 'time': schedule.subuh, 'id': idAdzanSubuh, 'channel': channelAdzanShubuh},
+      {'key': 'shubuh', 'name': 'Subuh', 'time': schedule.subuh, 'id': idAdzanSubuh, 'channel': channelAdzanShubuh},
       {'key': 'dzuhur', 'name': 'Dzuhur', 'time': schedule.dzuhur, 'id': idAdzanDzuhur, 'channel': channelAdzanRegular},
       {'key': 'ashar', 'name': 'Ashar', 'time': schedule.ashar, 'id': idAdzanAshar, 'channel': channelAdzanRegular},
       {'key': 'maghrib', 'name': 'Maghrib', 'time': schedule.maghrib, 'id': idAdzanMaghrib, 'channel': channelAdzanRegular},
@@ -458,22 +557,25 @@ class SmartNotificationService extends ChangeNotifier {
         continue;
       }
 
-      final prayerDate = _parseTimeOnDate(now, timeStr);
-      if (prayerDate.isAfter(now)) {
-        await scheduleSmartReminder(
-          id: id,
-          title: "Waktu Sholat $name Telah Tiba 🕌",
-          body: "Hayya 'alash-shalaah. Mari dirikan sholat $name tepat waktu.",
-          targetTime: prayerDate,
-          payload: SmartNotificationPayload(target: 'sholat', extra: {'prayerKey': key}),
-          channelId: channel,
-        );
+      var prayerDate = _parseTimeOnDate(now, timeStr);
+      // Jika waktu shalat hari ini sudah lewat, jadwalkan untuk besok
+      if (prayerDate.isBefore(now)) {
+        prayerDate = prayerDate.add(const Duration(days: 1));
       }
+
+      await scheduleSmartReminder(
+        id: id,
+        title: "Muslim Habbit",
+        body: "Hayya 'alash-shalaah. Waktu sholat $name telah tiba. Mari dirikan sholat tepat waktu.",
+        targetTime: prayerDate,
+        payload: SmartNotificationPayload(target: 'sholat', extra: {'prayerKey': key}),
+        channelId: channel,
+      );
     }
   }
 
   // =========================================================================
-  // HELPER METODE NOTIFIKASI
+  // HELPER METODE NOTIFIKASI & SAFE SCHEDULER
   // =========================================================================
   Future<void> scheduleSmartReminder({
     required int id,
@@ -483,10 +585,12 @@ class SmartNotificationService extends ChangeNotifier {
     required SmartNotificationPayload payload,
     String channelId = channelSmartReminders,
   }) async {
-    // Jangan jadwalkan jika target waktu sudah lewat
+    // Pastikan target waktu berada di masa depan
     if (targetTime.isBefore(DateTime.now())) return;
 
     final tzTarget = tz.TZDateTime.from(targetTime, tz.local);
+    final tzNow = tz.TZDateTime.now(tz.local);
+    if (tzTarget.isBefore(tzNow)) return;
 
     final androidDetails = AndroidNotificationDetails(
       channelId,
@@ -494,7 +598,11 @@ class SmartNotificationService extends ChangeNotifier {
           ? 'Adzan Shubuh'
           : channelId == channelAdzanRegular
               ? 'Waktu Sholat & Adzan'
-              : 'Pengingat Ibadah Muslim Habit',
+              : channelId == channelProgress
+                  ? 'Progres & Streak Ibadah'
+                  : 'Pengingat Ibadah Muslim Habbit',
+      channelDescription: 'Pengingat pintar ibadah Muslim Habbit',
+      icon: '@mipmap/launcher_icon',
       importance: Importance.max,
       priority: Priority.high,
       sound: channelId == channelAdzanShubuh
@@ -503,6 +611,8 @@ class SmartNotificationService extends ChangeNotifier {
               ? const RawResourceAndroidNotificationSound('adzan')
               : null,
       playSound: channelId == channelAdzanShubuh || channelId == channelAdzanRegular,
+      enableVibration: true,
+      visibility: NotificationVisibility.public,
     );
 
     const iosDetails = DarwinNotificationDetails(
@@ -513,19 +623,62 @@ class SmartNotificationService extends ChangeNotifier {
 
     final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    await _notifications.zonedSchedule(
-      id,
-      title,
-      body,
-      tzTarget,
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      payload: payload.toJson(),
-    );
+    // 1. Coba jadwalkan Custom Notification Layout (Maskot Nunu & Gradasi Ungu-Hijau) via Android AlarmManager
+    bool customScheduled = false;
+    try {
+      final res = await _customNotifChannel.invokeMethod<bool>('scheduleCustomNotification', {
+        'id': id,
+        'title': "Muslim Habbit",
+        'message': body,
+        'targetEpochMillis': targetTime.millisecondsSinceEpoch,
+        'payload': payload.toJson(),
+      });
+      customScheduled = res ?? false;
+      if (customScheduled) {
+        _recordHistory(id.toString(), title, body, payload.target, targetTime);
+        debugPrint('[SmartNotification] Custom layout scheduled via AlarmManager #$id at $targetTime');
+      }
+    } catch (e) {
+      debugPrint('[SmartNotification] Custom schedule native failed, fallback to flutter_local_notifications: $e');
+    }
 
-    _recordHistory(id.toString(), title, body, payload.target, targetTime);
+    // 2. Jika bukan Android atau custom layout gagal, gunakan fallback standar
+    if (!customScheduled) {
+      try {
+        await _notifications.zonedSchedule(
+          id,
+          title,
+          body,
+          tzTarget,
+          details,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          payload: payload.toJson(),
+        );
+        _recordHistory(id.toString(), title, body, payload.target, targetTime);
+        debugPrint('[SmartNotification] Berhasil menjadwalkan #$id "$title" pada $tzTarget (exact)');
+      } catch (e) {
+        debugPrint('[SmartNotification] Exact schedule gagal #$id: $e. Mencoba fallback inexact...');
+        try {
+          await _notifications.zonedSchedule(
+            id,
+            title,
+            body,
+            tzTarget,
+            details,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            payload: payload.toJson(),
+          );
+          _recordHistory(id.toString(), title, body, payload.target, targetTime);
+          debugPrint('[SmartNotification] Fallback berhasil #$id "$title" pada $tzTarget (inexact)');
+        } catch (fallbackErr) {
+          debugPrint('[SmartNotification] Fallback juga gagal #$id: $fallbackErr');
+        }
+      }
+    }
   }
 
   Future<void> showInstantNotification({
@@ -533,33 +686,150 @@ class SmartNotificationService extends ChangeNotifier {
     required String title,
     required String body,
     required SmartNotificationPayload payload,
-    String channelId = channelProgress,
+    String channelId = channelSmartReminders,
   }) async {
-    final androidDetails = AndroidNotificationDetails(
-      channelId,
-      'Progres & Streak Ibadah',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-    const iosDetails = DarwinNotificationDetails();
-    final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    // 1. Tampilkan menggunakan Custom Layout Android (RemoteViews: Maskot Nunu + Gradasi Ungu-Hijau)
+    bool customShown = false;
+    try {
+      final nowStr = DateFormat('HH:mm').format(DateTime.now());
+      final res = await _customNotifChannel.invokeMethod<bool>(
+        'showCustomNotification',
+        {
+          'id': id,
+          'title': "Muslim Habbit",
+          'message': body,
+          'time': nowStr,
+          'payload': payload.toJson(),
+        },
+      );
+      customShown = res ?? false;
+      if (customShown) {
+        _recordHistory(id.toString(), title, body, payload.target, DateTime.now());
+        debugPrint('[SmartNotification] Custom notification shown: #$id "$body"');
+      }
+    } catch (e) {
+      debugPrint('[SmartNotification] Custom notification failed, fallback to standard: $e');
+    }
 
-    await _notifications.show(
-      id,
-      title,
-      body,
-      details,
-      payload: payload.toJson(),
-    );
+    if (!customShown) {
+      final androidDetails = AndroidNotificationDetails(
+        channelId,
+        channelId == channelProgress
+            ? 'Progres & Streak Ibadah'
+            : 'Pengingat Ibadah Muslim Habbit',
+        channelDescription: 'Notifikasi langsung Muslim Habbit',
+        icon: '@mipmap/launcher_icon',
+        importance: Importance.max,
+        priority: Priority.high,
+        enableVibration: true,
+        visibility: NotificationVisibility.public,
+      );
+      const iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      );
+      final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    _recordHistory(id.toString(), title, body, payload.target, DateTime.now());
+      try {
+        await _notifications.show(
+          id,
+          title,
+          body,
+          details,
+          payload: payload.toJson(),
+        );
+        _recordHistory(id.toString(), title, body, payload.target, DateTime.now());
+        debugPrint('[SmartNotification] Notifikasi instan terkirim: #$id "$title"');
+      } catch (e) {
+        debugPrint('[SmartNotification] Error kirim notifikasi instan: $e');
+      }
+    }
+  }
+
+  // =========================================================================
+  // METODE PENGUJIAN NOTIFIKASI (TEST SUITE)
+  // =========================================================================
+
+  /// 1. Tes Notifikasi Sekarang (Muncul Langsung dengan Desain Kustom Maskot Nunu)
+  Future<bool> testInstantNotification() async {
+    try {
+      await requestPermissions();
+      await showInstantNotification(
+        id: 9001,
+        title: "Muslim Habbit",
+        body: "Jangan Lupa Untuk Melanjutkan Streakmu!",
+        payload: const SmartNotificationPayload(target: 'streak'),
+        channelId: channelSmartReminders,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[SmartNotification] Error testInstantNotification: $e');
+      return false;
+    }
+  }
+
+  /// 2. Tes Notifikasi 1 Menit Lagi
+  Future<bool> testNotificationInOneMinute() async {
+    try {
+      await requestPermissions();
+      final targetTime = DateTime.now().add(const Duration(minutes: 1));
+      await scheduleSmartReminder(
+        id: 9002,
+        title: "Muslim Habbit",
+        body: "Yuk, jangan lupa Dzikir Pagi hari ini!",
+        targetTime: targetTime,
+        payload: const SmartNotificationPayload(target: 'dzikir_pagi'),
+        channelId: channelSmartReminders,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[SmartNotification] Error testNotificationInOneMinute: $e');
+      return false;
+    }
+  }
+
+  /// 3. Tes Notifikasi Terjadwal (Custom seconds, default 10 detik)
+  Future<bool> testScheduledNotification({int seconds = 10}) async {
+    try {
+      await requestPermissions();
+      final targetTime = DateTime.now().add(Duration(seconds: seconds));
+      await scheduleSmartReminder(
+        id: 9003,
+        title: "Muslim Habbit",
+        body: "Sudahkah kamu membaca Al-Qur'an hari ini?",
+        targetTime: targetTime,
+        payload: const SmartNotificationPayload(target: 'quran'),
+        channelId: channelSmartReminders,
+      );
+      return true;
+    } catch (e) {
+      debugPrint('[SmartNotification] Error testScheduledNotification: $e');
+      return false;
+    }
   }
 
   Future<void> cancelNotification(int id) async {
+    try {
+      await _customNotifChannel.invokeMethod('cancelCustomNotification', {'id': id});
+    } catch (_) {}
     await _notifications.cancel(id);
   }
 
   Future<void> cancelAllSmartReminders() async {
+    // Batalkan semua custom notification via AlarmManager (ID yang sudah diketahui saja)
+    const knownIds = [
+      idAdzanSubuh, idAdzanDzuhur, idAdzanAshar, idAdzanMaghrib, idAdzanIsya,
+      idSahurReminder, idImsakReminder, idBukaPuasaReminder,
+      idDzikirPagi, idDzikirPetang, idDoaPagi, idTilawahReminder,
+      idStreakReminder, idDailyProgress, idDailyAppreciation,
+      9001, 9002, 9003,
+    ];
+    for (final id in knownIds) {
+      try {
+        await _customNotifChannel.invokeMethod('cancelCustomNotification', {'id': id});
+      } catch (_) {}
+    }
     await _notifications.cancelAll();
   }
 

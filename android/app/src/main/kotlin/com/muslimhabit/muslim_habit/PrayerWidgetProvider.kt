@@ -10,21 +10,24 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
+import android.os.Bundle
+import android.util.SizeF
+import android.view.View
 import android.widget.RemoteViews
 import java.util.*
 
 /**
  * PrayerWidgetProvider — Android Home Screen Widget untuk MuslimHabit
  *
- * Menampilkan:
- * 1. Status waktu salat real-time ("Sekarang Ashar" atau "Berikutnya Subuh")
- * 2. Jam waktu salat (contoh: "15:30 WIB")
- * 3. Seluruh jadwal salat 5 waktu (Subuh, Dzuhur, Ashar, Maghrib, Isya)
- * 4. Maskot MuslimHabit (Lulu)
- * 5. Tombol "Pantau habit →" untuk membuka aplikasi
- *
- * Widget otomatis menghitung waktu salat aktif berdasarkan jam perangkat saat ini
- * dan menjadwalkan update otomatis tepat di pergantian waktu salat berikutnya.
+ * Mengimplementasikan konsep "Islamic Garden – Soft Green & Gold":
+ * - Panel Kiri: Info sholat sekarang, jam digital TextClock, lokasi,
+ *   maskot Nunu (membaca Al-Qur'an), dan tombol "Pantau Habit →".
+ * - Panel Kanan: Jadwal 5 waktu sholat dengan indikator sholat berikutnya
+ *   (badge emas "Berikutnya") dan sholat yang telah selesai (centang hijau).
+ * - Mendukung 3 ukuran responsif:
+ *   1. Small (2x2 / lebar < 220dp) -> prayer_widget_small.xml
+ *   2. Medium (4x2 / standar)       -> prayer_widget_layout.xml
+ *   3. Large (4x3 atau 4x4)         -> prayer_widget_large.xml
  */
 class PrayerWidgetProvider : AppWidgetProvider() {
 
@@ -33,7 +36,7 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         const val ACTION_UPDATE_WIDGET = "com.muslimhabit.UPDATE_WIDGET"
         private const val ALARM_REQUEST_CODE = 8821
 
-        /** Paksa refresh semua widget yang terpasang */
+        /** Paksa refresh semua widget yang terpasang di launcher */
         fun forceUpdate(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(
@@ -59,12 +62,23 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         }
     }
 
+    override fun onAppWidgetOptionsChanged(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
+        newOptions: Bundle
+    ) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+        updateWidget(context, appWidgetManager, appWidgetId)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_UPDATE_WIDGET ||
             intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE ||
             intent.action == Intent.ACTION_TIME_CHANGED ||
-            intent.action == Intent.ACTION_TIMEZONE_CHANGED
+            intent.action == Intent.ACTION_TIMEZONE_CHANGED ||
+            intent.action == "android.intent.action.TIME_SET"
         ) {
             val manager = AppWidgetManager.getInstance(context)
             val ids = manager.getAppWidgetIds(
@@ -97,7 +111,6 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
     /**
      * Konversi string waktu "HH:mm" menjadi total menit dari tengah malam.
-     * Contoh: "04:30" -> 4 * 60 + 30 = 270 menit.
      */
     private fun timeToMinutes(timeStr: String): Int {
         val clean = timeStr.trim().split(" ")[0]
@@ -111,21 +124,24 @@ class PrayerWidgetProvider : AppWidgetProvider() {
     }
 
     data class PrayerCalculation(
-        val badgeLabel: String,     // "Sekarang" atau "Berikutnya"
-        val activeName: String,     // Nama salat yang sedang berlangsung atau yang berikutnya
-        val displayTime: String,    // Jam yang ditampilkan besar di kiri (misal "15:30")
-        val highlightName: String,  // Nama salat yang di-highlight pada daftar kanan
-        val minutesToNextTrigger: Int // Sisa menit menuju waktu salat berikutnya untuk AlarmManager
+        val badgeLabel: String,         // "Sekarang"
+        val activeName: String,         // Nama salat yang sedang berlangsung (misal "Subuh")
+        val nextPrayerName: String,     // Nama salat berikutnya (misal "Dzuhur")
+        val nextPrayerTime: String,     // Jam salat berikutnya (misal "11:55")
+        val displayTime: String,        // Jam salat aktif
+        val highlightName: String,      // Nama salat yang di-highlight ("subuh", "dzuhur", dll)
+        val passedPrayers: Set<String>, // Kumpulan salat yang sudah lewat hari ini
+        val minutesToNextTrigger: Int   // Sisa menit menuju waktu salat berikutnya
     )
 
     /**
      * Menghitung status salat secara real-time berdasarkan jam perangkat saat ini:
-     * - 00:00 - < Subuh     -> Berikutnya Subuh
-     * - Subuh - < Dzuhur    -> Sekarang Subuh
-     * - Dzuhur - < Ashar    -> Sekarang Dzuhur
-     * - Ashar - < Maghrib   -> Sekarang Ashar
-     * - Maghrib - < Isya    -> Sekarang Maghrib
-     * - Isya - 23:59        -> Sekarang Isya
+     * - 00:00 - < Subuh     -> Sekarang Isya, Berikutnya Subuh
+     * - Subuh - < Dzuhur    -> Sekarang Subuh, Berikutnya Dzuhur
+     * - Dzuhur - < Ashar    -> Sekarang Dzuhur, Berikutnya Ashar
+     * - Ashar - < Maghrib   -> Sekarang Ashar, Berikutnya Maghrib
+     * - Maghrib - < Isya    -> Sekarang Maghrib, Berikutnya Isya
+     * - Isya - 23:59        -> Sekarang Isya, Berikutnya Subuh
      */
     private fun determinePrayerStatus(
         subuh: String,
@@ -144,13 +160,16 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         val nowMin = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE)
 
         return when {
-            // Sebelum Subuh (misal 04:10)
+            // Sebelum Subuh (misal 03:00)
             nowMin < subuhMin -> {
                 PrayerCalculation(
-                    badgeLabel = "Berikutnya",
-                    activeName = "Subuh",
+                    badgeLabel = "Sekarang",
+                    activeName = "Isya",
+                    nextPrayerName = "Subuh",
+                    nextPrayerTime = subuh,
                     displayTime = subuh,
                     highlightName = "subuh",
+                    passedPrayers = emptySet(),
                     minutesToNextTrigger = (subuhMin - nowMin).coerceAtLeast(1)
                 )
             }
@@ -159,49 +178,63 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 PrayerCalculation(
                     badgeLabel = "Sekarang",
                     activeName = "Subuh",
+                    nextPrayerName = "Dzuhur",
+                    nextPrayerTime = dzuhur,
                     displayTime = subuh,
-                    highlightName = "subuh",
+                    highlightName = "dzuhur",
+                    passedPrayers = setOf("subuh"),
                     minutesToNextTrigger = (dzuhurMin - nowMin).coerceAtLeast(1)
                 )
             }
-            // Rentang Dzuhur (misal 12:10)
+            // Rentang Dzuhur (misal 12:15)
             nowMin < asharMin -> {
                 PrayerCalculation(
                     badgeLabel = "Sekarang",
                     activeName = "Dzuhur",
+                    nextPrayerName = "Ashar",
+                    nextPrayerTime = ashar,
                     displayTime = dzuhur,
-                    highlightName = "dzuhur",
+                    highlightName = "ashar",
+                    passedPrayers = setOf("subuh", "dzuhur"),
                     minutesToNextTrigger = (asharMin - nowMin).coerceAtLeast(1)
                 )
             }
-            // Rentang Ashar (misal 16:00, 17:24)
+            // Rentang Ashar (misal 15:45)
             nowMin < maghribMin -> {
                 PrayerCalculation(
                     badgeLabel = "Sekarang",
                     activeName = "Ashar",
+                    nextPrayerName = "Maghrib",
+                    nextPrayerTime = maghrib,
                     displayTime = ashar,
-                    highlightName = "ashar",
+                    highlightName = "maghrib",
+                    passedPrayers = setOf("subuh", "dzuhur", "ashar"),
                     minutesToNextTrigger = (maghribMin - nowMin).coerceAtLeast(1)
                 )
             }
-            // Rentang Maghrib (misal 18:00)
+            // Rentang Maghrib (misal 18:05)
             nowMin < isyaMin -> {
                 PrayerCalculation(
                     badgeLabel = "Sekarang",
                     activeName = "Maghrib",
+                    nextPrayerName = "Isya",
+                    nextPrayerTime = isya,
                     displayTime = maghrib,
-                    highlightName = "maghrib",
+                    highlightName = "isya",
+                    passedPrayers = setOf("subuh", "dzuhur", "ashar", "maghrib"),
                     minutesToNextTrigger = (isyaMin - nowMin).coerceAtLeast(1)
                 )
             }
-            // Rentang Isya (misal 19:10, 23:30)
+            // Rentang Isya (misal 19:30 s/d 23:59)
             else -> {
                 PrayerCalculation(
                     badgeLabel = "Sekarang",
                     activeName = "Isya",
+                    nextPrayerName = "Subuh",
+                    nextPrayerTime = subuh,
                     displayTime = isya,
-                    highlightName = "isya",
-                    // Menuju Subuh hari esok
+                    highlightName = "subuh",
+                    passedPrayers = setOf("subuh", "dzuhur", "ashar", "maghrib", "isya"),
                     minutesToNextTrigger = ((1440 - nowMin) + subuhMin).coerceAtLeast(1)
                 )
             }
@@ -220,48 +253,218 @@ class PrayerWidgetProvider : AppWidgetProvider() {
         val ashar   = readString(prefs, "widget_ashar",   "15:30")
         val maghrib = readString(prefs, "widget_maghrib", "17:50")
         val isya    = readString(prefs, "widget_isya",    "19:00")
+        val city    = readString(prefs, "widget_city",    "Palembang")
         val tz      = readString(prefs, "widget_timezone", "WIB")
 
-        // Hitung status waktu salat real-time berdasarkan jam perangkat
         val calculation = determinePrayerStatus(subuh, dzuhur, ashar, maghrib, isya)
 
-        val views = RemoteViews(context.packageName, R.layout.prayer_widget_layout)
+        // PendingIntent untuk tombol "Pantau Habit" -> Navigasi ke Habits Tab
+        val habitLaunchIntent = context.packageManager
+            .getLaunchIntentForPackage(context.packageName)
+            ?.apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra(
+                    "notification_payload",
+                    "{\"id\":\"widget_habit\",\"title\":\"Habits\",\"body\":\"\",\"target\":\"habits\"}"
+                )
+                putExtra("route", "habits")
+            }
 
-        // Set Prayer Times di panel kanan
-        views.setTextViewText(R.id.tv_subuh,   subuh)
-        views.setTextViewText(R.id.tv_dzuhur,  dzuhur)
-        views.setTextViewText(R.id.tv_ashar,   ashar)
-        views.setTextViewText(R.id.tv_maghrib, maghrib)
-        views.setTextViewText(R.id.tv_isya,    isya)
+        val habitPendingIntent = PendingIntent.getActivity(
+            context,
+            101,
+            habitLaunchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
-        // Set Badge & Jam Utama di panel kiri sesuai waktu saat ini
-        views.setTextViewText(R.id.tv_badge_label, calculation.badgeLabel)
-        views.setTextViewText(R.id.tv_next_prayer_name, calculation.activeName)
-        views.setTextViewText(R.id.tv_next_prayer_time, "${calculation.displayTime} $tz")
-
-        // Berikan highlight pill pada baris salat yang sedang aktif
-        highlightPrayer(views, calculation.highlightName)
-
-        // PendingIntent untuk membuka aplikasi saat widget atau tombol ditekan
-        val launchIntent = context.packageManager
+        // PendingIntent untuk widget root -> Buka aplikasi biasa
+        val rootLaunchIntent = context.packageManager
             .getLaunchIntentForPackage(context.packageName)
             ?.apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
 
-        val pendingIntent = PendingIntent.getActivity(
+        val rootPendingIntent = PendingIntent.getActivity(
             context,
-            0,
-            launchIntent,
+            100,
+            rootLaunchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        views.setOnClickPendingIntent(R.id.btn_open_app, pendingIntent)
-        views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
 
-        manager.updateAppWidget(widgetId, views)
+        // Dukungan responsif Android 12+ (API 31+) menggunakan SizeF map
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val smallViews = createViews(
+                context, R.layout.prayer_widget_small,
+                subuh, dzuhur, ashar, maghrib, isya, city, tz,
+                calculation, habitPendingIntent, rootPendingIntent, isSmall = true
+            )
+            val mediumViews = createViews(
+                context, R.layout.prayer_widget_layout,
+                subuh, dzuhur, ashar, maghrib, isya, city, tz,
+                calculation, habitPendingIntent, rootPendingIntent, isSmall = false
+            )
+            val largeViews = createViews(
+                context, R.layout.prayer_widget_large,
+                subuh, dzuhur, ashar, maghrib, isya, city, tz,
+                calculation, habitPendingIntent, rootPendingIntent, isSmall = false
+            )
 
-        // Jadwalkan auto-update tepat pada pergantian waktu salat berikutnya
+            val viewsMap = mapOf(
+                SizeF(100f, 100f) to smallViews,
+                SizeF(220f, 100f) to mediumViews,
+                SizeF(260f, 180f) to largeViews
+            )
+            manager.updateAppWidget(widgetId, RemoteViews(viewsMap))
+        } else {
+            // Android versi sebelumnya: tentukan layout berdasarkan opsi ukuran
+            val options = manager.getAppWidgetOptions(widgetId)
+            val minWidth = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) ?: 0
+            val minHeight = options?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT) ?: 0
+
+            val layoutId = when {
+                minWidth in 1..219 -> R.layout.prayer_widget_small
+                minHeight >= 180 -> R.layout.prayer_widget_large
+                else -> R.layout.prayer_widget_layout
+            }
+
+            val isSmall = (layoutId == R.layout.prayer_widget_small)
+            val views = createViews(
+                context, layoutId,
+                subuh, dzuhur, ashar, maghrib, isya, city, tz,
+                calculation, habitPendingIntent, rootPendingIntent, isSmall
+            )
+            manager.updateAppWidget(widgetId, views)
+        }
+
+        // Jadwalkan auto-update tepat pada waktu salat berikutnya
         scheduleNextPrayerAlarm(context, calculation.minutesToNextTrigger)
+    }
+
+    private fun createViews(
+        context: Context,
+        layoutId: Int,
+        subuh: String,
+        dzuhur: String,
+        ashar: String,
+        maghrib: String,
+        isya: String,
+        city: String,
+        tz: String,
+        calculation: PrayerCalculation,
+        habitPendingIntent: PendingIntent?,
+        rootPendingIntent: PendingIntent?,
+        isSmall: Boolean
+    ): RemoteViews {
+        val views = RemoteViews(context.packageName, layoutId)
+
+        // Set Data Header Kiri
+        views.setTextViewText(R.id.tv_badge_label, calculation.badgeLabel)
+        views.setTextViewText(R.id.tv_next_prayer_name, calculation.activeName)
+        views.setTextViewText(R.id.tv_location, city)
+
+        // Pasang aksi klik
+        if (habitPendingIntent != null) {
+            views.setOnClickPendingIntent(R.id.btn_open_app, habitPendingIntent)
+        }
+        if (rootPendingIntent != null) {
+            views.setOnClickPendingIntent(R.id.widget_root, rootPendingIntent)
+        }
+
+        if (isSmall) {
+            // Small layout: tampilkan banner sholat berikutnya
+            views.setTextViewText(
+                R.id.tv_small_next_banner,
+                "Berikutnya: ${calculation.nextPrayerName} ${calculation.nextPrayerTime}"
+            )
+        } else {
+            // Medium & Large layout: pasang data 5 waktu sholat pada panel kanan
+            views.setTextViewText(R.id.tv_subuh,   subuh)
+            views.setTextViewText(R.id.tv_dzuhur,  dzuhur)
+            views.setTextViewText(R.id.tv_ashar,   ashar)
+            views.setTextViewText(R.id.tv_maghrib, maghrib)
+            views.setTextViewText(R.id.tv_isya,    isya)
+
+            // Atur status centang selesai dan badge berikutnya untuk masing-masing waktu sholat
+            applyPrayerRowStatus(
+                views = views,
+                rowId = R.id.row_subuh,
+                checkId = R.id.iv_check_subuh,
+                badgeId = R.id.tv_badge_subuh,
+                prayerKey = "subuh",
+                calculation = calculation
+            )
+
+            applyPrayerRowStatus(
+                views = views,
+                rowId = R.id.row_dzuhur,
+                checkId = R.id.iv_check_dzuhur,
+                badgeId = R.id.tv_badge_dzuhur,
+                prayerKey = "dzuhur",
+                calculation = calculation
+            )
+
+            applyPrayerRowStatus(
+                views = views,
+                rowId = R.id.row_ashar,
+                checkId = R.id.iv_check_ashar,
+                badgeId = R.id.tv_badge_ashar,
+                prayerKey = "ashar",
+                calculation = calculation
+            )
+
+            applyPrayerRowStatus(
+                views = views,
+                rowId = R.id.row_maghrib,
+                checkId = R.id.iv_check_maghrib,
+                badgeId = R.id.tv_badge_maghrib,
+                prayerKey = "maghrib",
+                calculation = calculation
+            )
+
+            applyPrayerRowStatus(
+                views = views,
+                rowId = R.id.row_isya,
+                checkId = R.id.iv_check_isya,
+                badgeId = R.id.tv_badge_isya,
+                prayerKey = "isya",
+                calculation = calculation
+            )
+        }
+
+        return views
+    }
+
+    /**
+     * Mengatur visual indikator pada baris jadwal sholat:
+     * 1. Jika sudah lewat: tampilkan centang hijau (@drawable/ic_widget_check).
+     * 2. Jika sholat berikutnya: tampilkan badge emas (@drawable/badge_berikutnya_bg)
+     *    dan berikan highlight background (@drawable/row_next_highlight_bg).
+     * 3. Jika belum tiba: sembunyikan keduanya dan gunakan background transparan.
+     */
+    private fun applyPrayerRowStatus(
+        views: RemoteViews,
+        rowId: Int,
+        checkId: Int,
+        badgeId: Int,
+        prayerKey: String,
+        calculation: PrayerCalculation
+    ) {
+        val isPassed = calculation.passedPrayers.contains(prayerKey)
+        val isNext = calculation.highlightName.equals(prayerKey, ignoreCase = true)
+
+        if (isPassed) {
+            views.setViewVisibility(checkId, View.VISIBLE)
+            views.setViewVisibility(badgeId, View.GONE)
+            views.setInt(rowId, "setBackgroundColor", Color.TRANSPARENT)
+        } else if (isNext) {
+            views.setViewVisibility(checkId, View.GONE)
+            views.setViewVisibility(badgeId, View.VISIBLE)
+            views.setInt(rowId, "setBackgroundResource", R.drawable.row_next_highlight_bg)
+        } else {
+            views.setViewVisibility(checkId, View.GONE)
+            views.setViewVisibility(badgeId, View.GONE)
+            views.setInt(rowId, "setBackgroundColor", Color.TRANSPARENT)
+        }
     }
 
     /**
@@ -280,7 +483,6 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            // Trigger tepat saat waktu salat berikutnya + 2 detik buffer
             val triggerTimeMs = System.currentTimeMillis() + (minutesUntilNext * 60 * 1000L) + 2000L
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -298,38 +500,6 @@ class PrayerWidgetProvider : AppWidgetProvider() {
             }
         } catch (_: Exception) {
             // Ignore jika security policy membatasi exact alarm
-        }
-    }
-
-    /**
-     * Berikan highlight pill hijau gelap pada baris waktu salat yang sedang aktif,
-     * serta atur warna teks menjadi putih. Baris lainnya transparan dengan teks hijau gelap.
-     */
-    private fun highlightPrayer(views: RemoteViews, activeKey: String) {
-        val darkGreen = Color.parseColor("#1B3D0D")
-        val white = Color.WHITE
-
-        val rows = listOf(
-            Triple("subuh", R.id.row_subuh, Pair(R.id.tv_label_subuh, R.id.tv_subuh)),
-            Triple("dzuhur", R.id.row_dzuhur, Pair(R.id.tv_label_dzuhur, R.id.tv_dzuhur)),
-            Triple("ashar", R.id.row_ashar, Pair(R.id.tv_label_ashar, R.id.tv_ashar)),
-            Triple("maghrib", R.id.row_maghrib, Pair(R.id.tv_label_maghrib, R.id.tv_maghrib)),
-            Triple("isya", R.id.row_isya, Pair(R.id.tv_label_isya, R.id.tv_isya))
-        )
-
-        val target = activeKey.lowercase(Locale.getDefault())
-
-        for ((name, rowId, textIds) in rows) {
-            val (labelId, timeId) = textIds
-            if (name == target) {
-                views.setInt(rowId, "setBackgroundResource", R.drawable.active_prayer_row)
-                views.setTextColor(labelId, white)
-                views.setTextColor(timeId, white)
-            } else {
-                views.setInt(rowId, "setBackgroundResource", android.R.color.transparent)
-                views.setTextColor(labelId, darkGreen)
-                views.setTextColor(timeId, darkGreen)
-            }
         }
     }
 }

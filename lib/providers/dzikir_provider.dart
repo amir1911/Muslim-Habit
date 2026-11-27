@@ -5,6 +5,7 @@ import '../models/dzikir/dzikir_category_model.dart';
 import '../services/dzikir_service.dart';
 import '../core/utils/streak_helper.dart';
 import '../core/utils/tasbih_feedback_helper.dart';
+import '../services/habit_progress_service.dart';
 import 'habit_provider.dart';
 
 class DzikirProvider extends ChangeNotifier {
@@ -160,6 +161,7 @@ class DzikirProvider extends ChangeNotifier {
 
     _sessionCount++;
     _todayTotalCount++;
+    HabitProgressService.markDzikirActivityToday();
 
     // Simpan hitungan sesi dan total harian
     _service.setSessionCount(dzikir.id, _sessionCount);

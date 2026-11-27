@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../models/fasting_plan.dart';
 import '../../providers/fasting_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class TidakPuasaScreen extends StatefulWidget {
   final String? planId;
@@ -76,9 +77,11 @@ class _TidakPuasaScreenState extends State<TidakPuasaScreen> {
         elevation: 0,
         centerTitle: false,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B), size: 18),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(
+            isLightBackground: true,
+          ),
         ),
         title: Padding(
           padding: const EdgeInsets.only(left: 4),

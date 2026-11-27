@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../providers/khatam_provider.dart';
 import 'khatam_setup_screen.dart';
 import 'khatam_reading_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 /// Laman Utama Khatam Al-Qur'an (KhatamDashboardScreen)
 class KhatamDashboardScreen extends StatelessWidget {
@@ -37,17 +38,9 @@ class KhatamDashboardScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF84B74E),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 26),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: CustomBackButton(),
           ),
           centerTitle: true,
           title: Text(

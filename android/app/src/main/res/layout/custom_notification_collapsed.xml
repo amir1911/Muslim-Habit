@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notification_root"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:background="@drawable/notification_bg_gradient"
+    android:paddingStart="12dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
+
+    <!-- Maskot Nunu di dalam kartu squircle hijau -->
+    <FrameLayout
+        android:id="@+id/mascot_container"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/mascot_badge_bg">
+
+        <ImageView
+            android:id="@+id/notification_mascot"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Maskot Muslim Habit"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mascot_nunu" />
+    </FrameLayout>
+
+    <!-- Header bar: Waktu di pojok kanan atas -->
+    <TextView
+        android:id="@+id/notification_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="2dp"
+        android:fontFamily="sans-serif"
+        android:text="10:00"
+        android:textColor="#CBD5E1"
+        android:textSize="11.5sp" />
+
+    <!-- Konten Teks: Nama Aplikasi & Pesan Dinamis -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:layout_toStartOf="@id/notification_time"
+        android:layout_toEndOf="@id/mascot_container"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/notification_app_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Muslim Habbit"
+            android:textColor="#FFFFFF"
+            android:textSize="13.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/notification_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:text="Jangan Lupa Untuk Melanjutkan Streakmu!"
+            android:textColor="#F1F5F9"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</RelativeLayout>

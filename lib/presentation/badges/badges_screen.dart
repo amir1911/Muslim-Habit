@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../models/badge_item.dart';
 import '../../providers/habit_provider.dart';
 import '../onboarding/ai_selection_carousel_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class BadgesScreen extends StatelessWidget {
   const BadgesScreen({super.key});
@@ -18,6 +19,12 @@ class BadgesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.creamBackground,
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(
+            isLightBackground: true,
+          ),
+        ),
         title: Text(
           'Pencapaian & Badge',
           style: GoogleFonts.balooTammudu2(

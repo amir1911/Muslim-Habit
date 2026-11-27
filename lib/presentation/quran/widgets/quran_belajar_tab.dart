@@ -8,6 +8,7 @@ import '../../../providers/tilawah_provider.dart';
 import '../../tilawah/tilawah_screen.dart';
 import '../pendeteksi_bacaan_screen.dart';
 import '../surah_detail_screen.dart';
+import '../hafalan_surah_list_screen.dart';
 import '../hapalan_ai_quran_screen.dart';
 import '../../../providers/khatam_provider.dart';
 import '../../khatam/khatam_dashboard_screen.dart';
@@ -61,10 +62,10 @@ class QuranBelajarTab extends StatelessWidget {
         _buildActionCard(
           context: context,
           icon: Icons.psychology_rounded,
-          title: "Mode Hapalan",
+          title: "Mode Hafalan Al-Qur'an",
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const HapalanAiQuranScreen()),
+            MaterialPageRoute(builder: (_) => const HafalanSurahListScreen()),
           ),
         ),
         const SizedBox(height: 24),

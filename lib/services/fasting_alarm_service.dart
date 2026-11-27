@@ -42,10 +42,59 @@ class FastingAlarmService {
       },
     );
 
+    await _createNotificationChannels();
+
     // Minta izin notifikasi di Android 13+
     await _requestPermissions();
 
     _isInitialized = true;
+  }
+
+  Future<void> _createNotificationChannels() async {
+    final android = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android == null) return;
+
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'sahur_alarm_channel',
+        'Alarm Sahur',
+        description: 'Panggilan pengingat sahur',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'imsak_warning_channel',
+        'Peringatan Imsak',
+        description: 'Peringatan waktu imsak',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'iftar_prep_channel',
+        'Persiapan Iftar',
+        description: 'Pengingat persiapan buka puasa',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
+    await android.createNotificationChannel(
+      const AndroidNotificationChannel(
+        'iftar_alarm_channel',
+        'Alarm Iftar',
+        description: 'Pemberitahuan waktu berbuka puasa',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      ),
+    );
   }
 
   Future<void> _requestPermissions() async {
@@ -223,7 +272,21 @@ class FastingAlarmService {
       );
     } catch (_) {
       // Fallback jika exact alarm ditolak oleh sistem Android
-      await _notifications.show(id, title, body, details, payload: payload);
+      try {
+        await _notifications.zonedSchedule(
+          id,
+          title,
+          body,
+          tz.TZDateTime.from(scheduledDate, tz.local),
+          details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          payload: payload,
+        );
+      } catch (e) {
+        debugPrint('[FastingAlarmService] Error scheduling fallback alarm: $e');
+      }
     }
   }
 

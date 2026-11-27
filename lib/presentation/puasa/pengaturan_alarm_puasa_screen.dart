@@ -5,6 +5,7 @@ import '../../models/fasting_plan.dart';
 import '../../providers/fasting_provider.dart';
 import '../../providers/prayer_time_provider.dart';
 import '../../services/fasting_alarm_service.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class PengaturanAlarmPuasaScreen extends StatefulWidget {
   final FastingType selectedType;
@@ -365,16 +366,9 @@ class _PengaturanAlarmPuasaScreenState extends State<PengaturanAlarmPuasaScreen>
         elevation: 0,
         centerTitle: false,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Padding(
           padding: const EdgeInsets.only(left: 4),

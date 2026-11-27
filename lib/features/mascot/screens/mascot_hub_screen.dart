@@ -9,6 +9,7 @@ import '../widgets/mascot_speech_bubble.dart';
 import 'toko_screen.dart';
 import 'lemari_screen.dart';
 import 'chatbot_screen.dart';
+import '../../ai_companion/screens/companion_settings_screen.dart';
 import '../../../presentation/shell/main_navigation_shell.dart';
 
 /// Halaman Utama Maskot Nunu (MascotHubScreen)
@@ -90,11 +91,9 @@ class MascotHubScreen extends StatelessWidget {
                           _buildRoundActionButton(
                             icon: Icons.settings_outlined,
                             onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Pengaturan Suara & Animasi Maskot'),
-                                  duration: Duration(seconds: 1),
-                                ),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const CompanionSettingsScreen()),
                               );
                             },
                           ),

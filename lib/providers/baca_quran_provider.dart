@@ -9,6 +9,7 @@ import '../models/verse_read_state.dart';
 import '../services/quran_service.dart';
 import '../services/storage_service.dart';
 import '../services/adzan_service.dart';
+import '../services/habit_progress_service.dart';
 
 class BacaQuranProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -126,6 +127,52 @@ class BacaQuranProvider extends ChangeNotifier {
     _showTranslation = _storageService.getShowTranslation();
     _readerTheme = _storageService.getReaderTheme();
     _audioSpeed = _storageService.getAudioSpeed();
+    _loadCloudSettings();
+  }
+
+  Future<void> _loadCloudSettings() async {
+    try {
+      final cloudSettings = await HabitProgressService.fetchReaderSettingsFromCloud();
+      if (cloudSettings != null) {
+        if (cloudSettings['arabicFontSize'] != null) {
+          _arabicFontSize = (cloudSettings['arabicFontSize'] as num).toDouble();
+          _storageService.setArabicFontSize(_arabicFontSize);
+        }
+        if (cloudSettings['translationFontSize'] != null) {
+          _translationFontSize = (cloudSettings['translationFontSize'] as num).toDouble();
+          _storageService.setTranslationFontSize(_translationFontSize);
+        }
+        if (cloudSettings['showTajwid'] != null) {
+          _showTajwid = cloudSettings['showTajwid'] as bool;
+          _storageService.setShowTajwid(_showTajwid);
+        }
+        if (cloudSettings['showTranslation'] != null) {
+          _showTranslation = cloudSettings['showTranslation'] as bool;
+          _storageService.setShowTranslation(_showTranslation);
+        }
+        if (cloudSettings['readerTheme'] != null) {
+          _readerTheme = cloudSettings['readerTheme'] as String;
+          _storageService.setReaderTheme(_readerTheme);
+        }
+        if (cloudSettings['audioSpeed'] != null) {
+          _audioSpeed = (cloudSettings['audioSpeed'] as num).toDouble();
+          _storageService.setAudioSpeed(_audioSpeed);
+          _audioPlayer.setSpeed(_audioSpeed);
+        }
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
+  void _syncSettingsToCloud() {
+    HabitProgressService.syncReaderSettingsToCloud(
+      arabicFontSize: _arabicFontSize,
+      translationFontSize: _translationFontSize,
+      showTajwid: _showTajwid,
+      showTranslation: _showTranslation,
+      readerTheme: _readerTheme,
+      audioSpeed: _audioSpeed,
+    );
   }
 
   void _loadSavedProgress() {
@@ -199,13 +246,14 @@ class BacaQuranProvider extends ChangeNotifier {
     // 3 & 4. Simpan ke storage
     _saveProgressToStorage();
 
-    // 5. Update global recent reading untuk dashboard aplikasi
+    // 5. Update global recent reading untuk dashboard aplikasi & catat habit Al-Qur'an
     _storageService.saveRecentReading(
       surahNumber: surah.number,
       surahName: surah.nameLatin,
       ayahNumber: ayahNumber,
       progress: _progress.progress,
     );
+    HabitProgressService.markQuranActivityToday();
 
     // 6. Hitung ayat berikutnya untuk dijadikan active
     final total = _surahDetail?.ayahs.length ?? surah.numberOfAyahs;
@@ -252,30 +300,35 @@ class BacaQuranProvider extends ChangeNotifier {
   void setArabicFontSize(double size) {
     _arabicFontSize = size;
     _storageService.setArabicFontSize(size);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 
   void setTranslationFontSize(double size) {
     _translationFontSize = size;
     _storageService.setTranslationFontSize(size);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 
   void setShowTajwid(bool show) {
     _showTajwid = show;
     _storageService.setShowTajwid(show);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 
   void setShowTranslation(bool show) {
     _showTranslation = show;
     _storageService.setShowTranslation(show);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 
   void setReaderTheme(String theme) {
     _readerTheme = theme;
     _storageService.setReaderTheme(theme);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 
@@ -283,6 +336,7 @@ class BacaQuranProvider extends ChangeNotifier {
     _audioSpeed = speed;
     _storageService.setAudioSpeed(speed);
     _audioPlayer.setSpeed(speed);
+    _syncSettingsToCloud();
     notifyListeners();
   }
 

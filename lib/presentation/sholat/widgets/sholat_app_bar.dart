@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/widgets/custom_back_button.dart';
 
 class SholatAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -24,28 +25,14 @@ class SholatAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: const Color(0xFF518427), // Forest Olive Green
       elevation: 0,
       centerTitle: false,
+      leadingWidth: 56,
       leading: Padding(
-        padding: const EdgeInsets.only(left: 12),
-        child: Center(
-          child: GestureDetector(
-            onTap: onBackPressed ?? () => Navigator.of(context).pop(),
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.22),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: Colors.white,
-                size: 18,
-              ),
-            ),
-          ),
+        padding: const EdgeInsets.only(left: 10),
+        child: CustomBackButton(
+          onTap: onBackPressed,
         ),
       ),
-      titleSpacing: 8,
+      titleSpacing: 10,
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

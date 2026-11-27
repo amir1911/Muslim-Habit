@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../models/community/community_model.dart';
 import '../../models/community/community_post_model.dart';
 import '../../providers/community_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class DetailKomunitasScreen extends StatefulWidget {
   final CommunityModel community;
@@ -89,16 +90,9 @@ class _DetailKomunitasScreenState extends State<DetailKomunitasScreen> with Sing
               pinned: true,
               backgroundColor: const Color(0xFF518427),
               elevation: 0,
-              leading: IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: CustomBackButton(),
               ),
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(

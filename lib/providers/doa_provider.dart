@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/doa_item.dart';
 import '../services/doa_service.dart';
 import '../services/storage_service.dart';
+import '../services/habit_progress_service.dart';
 
 class DoaProvider extends ChangeNotifier {
   final StorageService _storageService;
@@ -42,6 +43,7 @@ class DoaProvider extends ChangeNotifier {
 
   Future<void> markAsRead(int id) async {
     await _storageService.markDoaAsRead(id);
+    await HabitProgressService.markDoaActivityToday();
     notifyListeners();
   }
 

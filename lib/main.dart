@@ -12,6 +12,10 @@ import 'services/auth_service.dart';
 import 'services/widget_update_service.dart';
 import 'services/adzan_service.dart';
 import 'services/smart_notification_service.dart';
+import 'services/hapalan_progress_service.dart';
+import 'services/habit_progress_service.dart';
+import 'services/last_session_service.dart';
+import 'providers/notification_provider.dart';
 import 'presentation/shell/main_navigation_shell.dart';
 import 'presentation/dzikir/dzikir_screen.dart';
 import 'presentation/puasa/puasa_screen.dart';
@@ -65,12 +69,16 @@ void main() async {
   await WidgetUpdateService.init();
   await AdzanService().init(storageService);
   await SmartNotificationService().init(storageService);
+  HapalanProgressService.syncFromCloud();
+  HabitProgressService.syncStreakFromCloud();
+  LastSessionService.syncFromCloud();
 
   runApp(
     MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storageService),
         Provider<AuthService>(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider<AdzanService>.value(value: AdzanService()),
         ChangeNotifierProvider<SmartNotificationService>.value(value: SmartNotificationService()),
         ChangeNotifierProvider(create: (_) => HabitProvider(storageService)),

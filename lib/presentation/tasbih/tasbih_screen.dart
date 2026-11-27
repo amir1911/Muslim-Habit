@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/tasbih_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class TasbihScreen extends StatefulWidget {
   const TasbihScreen({super.key});
@@ -101,6 +102,12 @@ class _TasbihScreenState extends State<TasbihScreen> with SingleTickerProviderSt
     return Scaffold(
       backgroundColor: AppColors.creamBackground,
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(
+            isLightBackground: true,
+          ),
+        ),
         title: Text(
           'Tasbih Digital',
           style: GoogleFonts.balooTammudu2(

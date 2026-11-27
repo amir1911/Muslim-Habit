@@ -302,6 +302,7 @@ class _SholatScreenState extends State<SholatScreen> {
               final schedTime = _getPrayerScheduleTime(prayerProvider, key);
               final recordedTime = prayerProvider.getRecordedPrayerTime(key);
               final isDone = prayerProvider.isPrayerDone(key);
+              final isArrived = prayerProvider.isPrayerTimeArrived(key, customSchedTime: schedTime);
 
               // Ambil alarm config untuk waktu custom bila ada
               final alarmConfig = prayerProvider.getAlarmModel(key, schedTime);
@@ -310,14 +311,20 @@ class _SholatScreenState extends State<SholatScreen> {
                   : schedTime;
 
               final subtitle = isDone
-                  ? (recordedTime != null ? '$recordedTime' : schedTime)
-                  : '10:15 AM';
+                  ? (recordedTime != null ? 'Dilaksanakan pukul $recordedTime' : 'Dilaksanakan ($schedTime)')
+                  : (isArrived
+                      ? 'Waktu masuk: $schedTime'
+                      : 'Jadwal masuk: $schedTime');
 
               final actionLabel = isDone
-                  ? 'Catat Waktu Ini'
-                  : '${prayer["shortTitle"]} belum berkumandang';
+                  ? 'Sudah dilaksanakan'
+                  : (isArrived
+                      ? 'Waktu telah tiba • Tekan untuk mencatat'
+                      : '${prayer["shortTitle"]} belum berkumandang');
 
-              final actionTime = isDone ? schedTime : displayAlarmTime;
+              final actionTime = isDone
+                  ? (recordedTime != null ? recordedTime.replaceAll(' WIB', '') : schedTime)
+                  : displayAlarmTime;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -327,11 +334,43 @@ class _SholatScreenState extends State<SholatScreen> {
                   actionLabel: actionLabel,
                   actionTime: actionTime,
                   isRecorded: isDone,
+                  isTimeArrived: isArrived,
                   onCheckTap: () async {
-                    await prayerProvider.togglePrayerRecord(key);
-                    if (context.mounted) {
-                      final done = prayerProvider.isPrayerDone(key);
-                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: done);
+                    if (isDone) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Sholat $fullTitle sudah tercatat dilaksanakan ($recordedTime).'),
+                          backgroundColor: const Color(0xFF518427),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!isArrived) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Waktu sholat $fullTitle belum masuk (jadwal: $schedTime).'),
+                          backgroundColor: const Color(0xFF6B7280),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    final success = await prayerProvider.togglePrayerRecord(key, customSchedTime: schedTime);
+                    if (context.mounted && success) {
+                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: true);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Alhamdulillah, sholat $fullTitle berhasil dicatat.'),
+                          backgroundColor: const Color(0xFF518427),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
                     }
                   },
                   onCardTap: () => _openEditAlarm(context, key),
@@ -347,6 +386,7 @@ class _SholatScreenState extends State<SholatScreen> {
               final baseTime = schedTime != '10:00' ? schedTime : defaultTime;
               final recordedTime = prayerProvider.getRecordedPrayerTime(key);
               final isDone = prayerProvider.isPrayerDone(key);
+              final isArrived = prayerProvider.isPrayerTimeArrived(key, customSchedTime: baseTime);
 
               final alarmConfig = prayerProvider.getAlarmModel(key, baseTime);
               final displayAlarmTime = alarmConfig.customTime.isNotEmpty
@@ -354,12 +394,16 @@ class _SholatScreenState extends State<SholatScreen> {
                   : baseTime;
 
               final subtitle = isDone
-                  ? (recordedTime != null ? '$recordedTime' : baseTime)
-                  : 'Belum dikerjakan';
+                  ? (recordedTime != null ? 'Dilaksanakan pukul $recordedTime' : 'Dilaksanakan ($baseTime)')
+                  : (isArrived ? 'Waktu dianjurkan: $baseTime' : 'Jadwal masuk: $baseTime');
 
               final actionLabel = isDone
-                  ? 'Catat Waktu Ini'
-                  : 'Waktu yang dianjurkan';
+                  ? 'Sudah dilaksanakan'
+                  : (isArrived ? 'Waktu telah tiba • Tekan untuk mencatat' : 'Belum masuk waktu');
+
+              final actionTime = isDone
+                  ? (recordedTime != null ? recordedTime.replaceAll(' WIB', '') : baseTime)
+                  : displayAlarmTime;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -367,13 +411,45 @@ class _SholatScreenState extends State<SholatScreen> {
                   title: fullTitle,
                   subtitle: subtitle,
                   actionLabel: actionLabel,
-                  actionTime: displayAlarmTime,
+                  actionTime: actionTime,
                   isRecorded: isDone,
+                  isTimeArrived: isArrived,
                   onCheckTap: () async {
-                    await prayerProvider.togglePrayerRecord(key);
-                    if (context.mounted) {
-                      final done = prayerProvider.isPrayerDone(key);
-                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: done);
+                    if (isDone) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Sholat $fullTitle sudah tercatat dilaksanakan ($recordedTime).'),
+                          backgroundColor: const Color(0xFF518427),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (!isArrived) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Waktu sholat $fullTitle belum masuk (jadwal: $baseTime).'),
+                          backgroundColor: const Color(0xFF6B7280),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    final success = await prayerProvider.togglePrayerRecord(key, customSchedTime: baseTime);
+                    if (context.mounted && success) {
+                      context.read<HabitProvider>().markFeatureHabitCompleted(key, completed: true);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Alhamdulillah, sholat $fullTitle berhasil dicatat.'),
+                          backgroundColor: const Color(0xFF518427),
+                          duration: const Duration(seconds: 2),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
                     }
                   },
                   onCardTap: () => _openEditAlarm(context, key),

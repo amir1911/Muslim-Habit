@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../core/utils/hijri_helper.dart';
 import '../../models/fasting_plan.dart';
 import 'pengaturan_alarm_puasa_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class TambahPuasaScreen extends StatefulWidget {
   const TambahPuasaScreen({super.key});
@@ -81,16 +82,9 @@ class _TambahPuasaScreenState extends State<TambahPuasaScreen> {
         elevation: 0,
         centerTitle: false,
         titleSpacing: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Padding(
           padding: const EdgeInsets.only(left: 4),

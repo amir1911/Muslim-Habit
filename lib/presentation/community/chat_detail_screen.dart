@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../models/community/user_profile_model.dart';
 import '../../models/community/chat_message_model.dart';
 import '../../providers/community_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final UserProfileModel friend;
@@ -74,16 +75,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
         leadingWidth: 40,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 14),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Row(
           children: [

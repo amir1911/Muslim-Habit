@@ -92,6 +92,7 @@ class WidgetUpdateService {
     required String currentPrayerTime,
     required String nextPrayerName,
     required String nextPrayerTime,
+    String city = 'Palembang',
     String timezone = 'WIB',
   }) async {
     if (!Platform.isAndroid) return;
@@ -103,6 +104,7 @@ class WidgetUpdateService {
       HomeWidget.saveWidgetData<String>('widget_ashar',   ashar),
       HomeWidget.saveWidgetData<String>('widget_maghrib', maghrib),
       HomeWidget.saveWidgetData<String>('widget_isya',    isya),
+      HomeWidget.saveWidgetData<String>('widget_city',    city),
       HomeWidget.saveWidgetData<String>('widget_current_label', currentLabel),
       HomeWidget.saveWidgetData<String>('widget_current_prayer_name', currentPrayerName),
       HomeWidget.saveWidgetData<String>('widget_current_prayer_time', currentPrayerTime),

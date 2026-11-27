@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/utils/hijri_helper.dart';
+import '../../core/widgets/custom_back_button.dart';
 import '../../models/fasting_plan.dart';
 import '../../providers/fasting_provider.dart';
 import 'tambah_puasa_screen.dart';
@@ -27,41 +28,32 @@ class PuasaScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
         centerTitle: false,
-        titleSpacing: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leadingWidth: 56,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: CustomBackButton(),
         ),
-        title: Padding(
-          padding: const EdgeInsets.only(left: 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Puasa',
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
+        titleSpacing: 10,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Puasa',
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
               ),
-              Text(
-                'Jadwal Puasa-mu Bulan Ini',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  color: Colors.white.withValues(alpha: 0.85),
-                ),
+            ),
+            Text(
+              'Jadwal Puasa-mu Bulan Ini',
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                color: Colors.white.withValues(alpha: 0.85),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: [
           IconButton(

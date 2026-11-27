@@ -5,16 +5,34 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/doa_item.dart';
 import '../../providers/doa_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
-class DoaDetailScreen extends StatelessWidget {
+class DoaDetailScreen extends StatefulWidget {
   final DoaItem doa;
 
   const DoaDetailScreen({super.key, required this.doa});
 
   @override
+  State<DoaDetailScreen> createState() => _DoaDetailScreenState();
+}
+
+class _DoaDetailScreenState extends State<DoaDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<DoaProvider>().markAsRead(widget.doa.id);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final doa = widget.doa;
     final doaProvider = context.watch<DoaProvider>();
     final isFav = doaProvider.isFavorite(doa.id);
+    final isRead = doaProvider.isReadToday(doa.id);
 
     return Scaffold(
       backgroundColor: AppColors.creamBackground,
@@ -23,26 +41,9 @@ class DoaDetailScreen extends StatelessWidget {
         child: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12),
-            child: Center(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ),
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: CustomBackButton(),
           ),
           title: Text(
             'Detail Doa',
@@ -368,6 +369,49 @@ class DoaDetailScreen extends StatelessWidget {
                 ),
               ),
             ],
+
+            const SizedBox(height: 24),
+
+            // Tombol Konfirmasi Selesai Dibaca (Mencatat Habit & Streak)
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  doaProvider.markAsRead(doa.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Alhamdulillah! Doa selesai dibaca & progres habit diperbarui.',
+                        style: GoogleFonts.inter(fontSize: 13),
+                      ),
+                      backgroundColor: const Color(0xFF518427),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                },
+                icon: Icon(
+                  isRead ? Icons.check_circle_rounded : Icons.check_circle_outline_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                label: Text(
+                  isRead ? 'Sudah Dibaca Hari Ini' : 'Tandai Sudah Dibaca',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isRead ? const Color(0xFF2D3C21) : const Color(0xFF518427),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -11,6 +11,10 @@ import 'temukan_komunitas_screen.dart';
 import 'buat_komunitas_screen.dart';
 import 'detail_komunitas_screen.dart';
 import 'notifikasi_community_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
+import '../../core/widgets/streak_badge.dart';
+import '../../core/widgets/notification_bell_button.dart';
+import '../../providers/habit_provider.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({super.key});
@@ -51,22 +55,25 @@ class CommunityScreen extends StatelessWidget {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // 1. TOP HEADER (Komunitas + Badges)
+  // 1. TOP HEADER (Komunitas + Badges: Streak, Poin, Notifikasi)
   // ─────────────────────────────────────────────────────────────────────────────
   Widget _buildHeader(BuildContext context, CommunityProvider provider) {
+    final habitProv = context.watch<HabitProvider?>();
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 10, 16, 8),
       child: Row(
         children: [
-          // Back button jika dibuka via push, atau text judul
-          if (Navigator.canPop(context))
-            IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF1E293B)),
-              onPressed: () => Navigator.of(context).pop(),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+          // Back button dengan jarak horizontal yang konsisten
+          if (Navigator.canPop(context)) ...[
+            const Padding(
+              padding: EdgeInsets.only(right: 6),
+              child: CustomBackButton(
+                isLightBackground: true,
+              ),
             ),
-          if (Navigator.canPop(context)) const SizedBox(width: 8),
+            const SizedBox(width: 4),
+          ],
 
           Text(
             'Komunitas',
@@ -78,9 +85,17 @@ class CommunityScreen extends StatelessWidget {
           ),
           const Spacer(),
 
-          // Badge 1 (Daun/Hijau 17)
+          // 1. Icon Api (Streak)
+          StreakBadge(
+            streakOverride: habitProv?.streakCount,
+            backgroundColor: const Color(0xFF518427),
+            iconColor: const Color(0xFFFFB300),
+          ),
+          const SizedBox(width: 6),
+
+          // 2. Icon Bintang (Poin)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(16),
@@ -88,10 +103,10 @@ class CommunityScreen extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.eco_rounded, size: 14, color: Colors.white),
+                const Icon(Icons.star_rounded, size: 15, color: Color(0xFFFFD700)),
                 const SizedBox(width: 4),
                 Text(
-                  '17',
+                  '${habitProv?.userPoints ?? 10}',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -103,68 +118,10 @@ class CommunityScreen extends StatelessWidget {
           ),
           const SizedBox(width: 6),
 
-          // Badge 2 (Bintang/Kuning 10)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEAB308),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star_rounded, size: 14, color: Colors.white),
-                const SizedBox(width: 4),
-                Text(
-                  '10',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 6),
-
-          // Icon Notifikasi
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const NotifikasiCommunityScreen()),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF518427),
-                shape: BoxShape.circle,
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  const Icon(Icons.notifications_none_rounded, size: 16, color: Colors.white),
-                  if (provider.unreadNotificationCount > 0)
-                    Positioned(
-                      top: -4,
-                      right: -4,
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFEF4444),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          '${provider.unreadNotificationCount}',
-                          style: GoogleFonts.inter(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+          // 3. Icon Lonceng (Notifikasi Terpadu)
+          const NotificationBellButton(
+            backgroundColor: Color(0xFF518427),
+            size: 34,
           ),
         ],
       ),

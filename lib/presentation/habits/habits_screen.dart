@@ -17,6 +17,9 @@ import '../../features/mascot/screens/mascot_hub_screen.dart';
 import 'kalender_planning_screen.dart';
 import 'widgets/edit_plan_bottom_sheet.dart';
 import 'services/habit_navigation_helper.dart';
+import '../../core/widgets/custom_back_button.dart';
+import '../../core/widgets/streak_badge.dart';
+import '../../core/widgets/notification_bell_button.dart';
 
 /// HabbitDashboardScreen (Laman Utama Habbit Tracker)
 /// Alias HabitsScreen untuk kompatibilitas dengan MainNavigationShell
@@ -88,42 +91,35 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   // ==========================================
-  // APP BAR
+  // APP BAR (Judul di Kiri Samping Tombol Kembali)
   // ==========================================
   PreferredSizeWidget _buildAppBar(BuildContext context, HabitProvider habitProv) {
     return AppBar(
       backgroundColor: const Color(0xFFF7F6EE),
       elevation: 0,
       scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: const Color(0xFFE2E6DF)),
-          ),
-          child: const Icon(
-            Icons.chevron_left_rounded,
-            color: Color(0xFF2E5714),
-            size: 24,
-          ),
-        ),
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          } else {
-            final switched = MainNavigationShell.switchToTab(context, 0);
-            if (!switched) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
-              );
+      centerTitle: false,
+      leadingWidth: 56,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 10),
+        child: CustomBackButton(
+          isLightBackground: true,
+          onTap: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context);
+            } else {
+              final switched = MainNavigationShell.switchToTab(context, 0);
+              if (!switched) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+                );
+              }
             }
-          }
-        },
+          },
+        ),
       ),
+      titleSpacing: 10,
       title: Text(
         'Habbit',
         style: GoogleFonts.plusJakartaSans(
@@ -133,38 +129,16 @@ class _HabitsScreenState extends State<HabitsScreen> {
         ),
       ),
       actions: [
-        // Pill Streak Api Kuning
-        Container(
-          margin: const EdgeInsets.only(right: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2E5714),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.local_fire_department_rounded,
-                color: Color(0xFFFFB300),
-                size: 16,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${habitProv.streakCount}',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
+        // Pill Streak Api Terpadu
+        StreakBadge(
+          streakOverride: habitProv.streakCount,
+          backgroundColor: const Color(0xFF2E5714),
+          iconColor: const Color(0xFFFFB300),
         ),
+        const SizedBox(width: 6),
 
         // Pill Poin Bintang Kuning
         Container(
-          margin: const EdgeInsets.only(right: 6),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: const Color(0xFF518427),
@@ -190,33 +164,14 @@ class _HabitsScreenState extends State<HabitsScreen> {
             ],
           ),
         ),
+        const SizedBox(width: 6),
 
-        // Tombol Bulat Lonceng Notifikasi
-        Container(
-          margin: const EdgeInsets.only(right: 14),
-          width: 34,
-          height: 34,
-          decoration: const BoxDecoration(
-            color: Color(0xFF2E5714),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: Colors.white,
-              size: 18,
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notifikasi pengingat ibadah aktif'),
-                  duration: Duration(seconds: 1),
-                ),
-              );
-            },
-          ),
+        // Tombol Bulat Lonceng Notifikasi Terpadu
+        const NotificationBellButton(
+          backgroundColor: Color(0xFF2E5714),
+          size: 34,
         ),
+        const SizedBox(width: 14),
       ],
     );
   }
@@ -379,11 +334,14 @@ class _HabitsScreenState extends State<HabitsScreen> {
   }
 
   // ==========================================
-  // 2. KARTU PROGRES UTAMA (HERO CARD)
+  // 2. KARTU PROGRES UTAMA (HERO CARD - TARGET HARI INI)
   // ==========================================
   Widget _buildHeroProgressCard(HabitProvider habitProv) {
-    final progressFraction = habitProv.progressFraction;
-    final displayPercent = habitProv.dailyProgressPercent;
+    // Mengambil data real-time progres 5 kategori ibadah
+    final progressFraction = habitProv.fiveCategoriesProgressFraction;
+    final displayPercent = habitProv.fiveCategoriesProgressPercent;
+    final completedCount = habitProv.todayCompletedCategoriesCount;
+    final targetCount = habitProv.todayTargetCategoriesCount;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
@@ -430,7 +388,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
           ),
           const SizedBox(width: 18),
 
-          // Teks Target Hari Ini
+          // Teks Target Hari Ini (Real-Time Progres Habit)
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,7 +403,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '${habitProv.totalHabitsCount} habbit di Jadwal',
+                  '$completedCount dari $targetCount aktivitas selesai',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,

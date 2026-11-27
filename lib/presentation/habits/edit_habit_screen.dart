@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
 import 'add_habit_schedule_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 /// Halaman Edit atau Tambah Habbit (EditHabitScreen)
 class EditHabitScreen extends StatefulWidget {
@@ -141,21 +142,9 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF84B74E),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.chevron_left_rounded,
-                color: Colors.white,
-                size: 26,
-              ),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: CustomBackButton(),
           ),
           centerTitle: true,
           title: Text(

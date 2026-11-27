@@ -7,6 +7,7 @@ class SholatListItemCard extends StatelessWidget {
   final String actionLabel;
   final String actionTime;
   final bool isRecorded;
+  final bool isTimeArrived;
   final VoidCallback onCheckTap;
   final VoidCallback? onCardTap;
 
@@ -17,6 +18,7 @@ class SholatListItemCard extends StatelessWidget {
     required this.actionLabel,
     required this.actionTime,
     required this.isRecorded,
+    this.isTimeArrived = true,
     required this.onCheckTap,
     this.onCardTap,
   });
@@ -96,24 +98,51 @@ class SholatListItemCard extends StatelessWidget {
                   ),
                 ),
 
-                // Check button
+                // Check button (3 status: Belum masuk waktu [kunci/abu-abu], Sudah masuk [aktif], Sudah dilaksanakan [centang hijau])
                 GestureDetector(
                   onTap: onCheckTap,
                   behavior: HitTestBehavior.opaque,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: 26,
-                    height: 26,
+                    width: 28,
+                    height: 28,
                     decoration: BoxDecoration(
-                      color: isRecorded ? const Color(0xFF557C2B) : const Color(0xFFE2E7D3),
+                      color: isRecorded
+                          ? const Color(0xFF518427)
+                          : (isTimeArrived
+                              ? const Color(0xFFEFF7E0)
+                              : const Color(0xFFF3F4F6)),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isRecorded
+                            ? const Color(0xFF518427)
+                            : (isTimeArrived
+                                ? const Color(0xFF518427)
+                                : const Color(0xFFD1D5DB)),
+                        width: isRecorded ? 1.5 : (isTimeArrived ? 1.5 : 1.0),
+                      ),
                     ),
                     child: Center(
-                      child: Icon(
-                        Icons.check,
-                        size: 16,
-                        color: isRecorded ? Colors.white : Colors.transparent,
-                      ),
+                      child: isRecorded
+                          ? const Icon(
+                              Icons.check,
+                              size: 16,
+                              color: Colors.white,
+                            )
+                          : (isTimeArrived
+                              ? Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF518427),
+                                    shape: BoxShape.circle,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.lock_outline_rounded,
+                                  size: 13,
+                                  color: Color(0xFF9CA3AF),
+                                )),
                     ),
                   ),
                 ),

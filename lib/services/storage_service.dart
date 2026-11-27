@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'last_session_service.dart';
 
 class StorageService {
   static const String _keyHabitsPrefix = 'habits_data_';
@@ -169,6 +170,20 @@ class StorageService {
     await _prefs.setString(_keyRecentSurahName, surahName);
     await _prefs.setInt(_keyRecentAyahNum, ayahNumber);
     await _prefs.setDouble(_keyRecentProgress, progress);
+
+    // Otomatis sinkronkan ke Sesi Aktivitas Terakhir (Lokal & Firestore)
+    LastSessionService.recordSession(
+      LastSessionData(
+        type: SessionType.quran,
+        title: '$surahName, Ayat $ayahNumber',
+        subtitle: 'Surah ke-$surahNumber • Terakhir dibaca',
+        surahNumber: surahNumber,
+        surahName: surahName,
+        ayahNumber: ayahNumber,
+        progress: progress,
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 
   // ── Baca Al-Qur'an Progress & Settings ──
@@ -307,6 +322,8 @@ class StorageService {
   // ── Gamifikasi & Maskot Nunu Persistence ──
   static const String _keyEquippedCostume = 'nunu_equipped_costume';
   static const String _keyOwnedCostumes = 'nunu_owned_costumes';
+  static const String _keyEquippedAccessories = 'nunu_equipped_accessories';
+  static const String _keyOwnedAccessories = 'nunu_owned_accessories';
   static const String _keyFriendshipPoints = 'nunu_friendship_points';
   static const String _keyFriendshipLevel = 'nunu_friendship_level';
   static const String _keyBoosterExpiresAt = 'nunu_booster_expires_at';
@@ -321,6 +338,16 @@ class StorageService {
       _prefs.getStringList(_keyOwnedCostumes) ?? ['normal', 'sorban_emas'];
   Future<void> setOwnedCostumes(List<String> list) =>
       _prefs.setStringList(_keyOwnedCostumes, list);
+
+  List<String> getEquippedAccessories() =>
+      _prefs.getStringList(_keyEquippedAccessories) ?? [];
+  Future<void> setEquippedAccessories(List<String> list) =>
+      _prefs.setStringList(_keyEquippedAccessories, list);
+
+  List<String> getOwnedAccessories() =>
+      _prefs.getStringList(_keyOwnedAccessories) ?? ['peci', 'syal', 'lonceng'];
+  Future<void> setOwnedAccessories(List<String> list) =>
+      _prefs.setStringList(_keyOwnedAccessories, list);
 
   int getFriendshipPoints() => _prefs.getInt(_keyFriendshipPoints) ?? 75;
   Future<void> setFriendshipPoints(int pts) =>

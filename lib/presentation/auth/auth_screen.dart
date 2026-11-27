@@ -12,6 +12,7 @@ import '../../services/storage_service.dart';
 import '../shell/main_navigation_shell.dart';
 import '../splash/animated_splash_screen.dart';
 import '../onboarding/onboarding_welcome_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isRegisterInitial;
@@ -181,7 +182,7 @@ class _AuthScreenState extends State<AuthScreen> {
         }
 
         if (mounted) {
-          _navigateToHome();
+          _navigateToOnboarding();
           return;
         }
       } else {
@@ -205,7 +206,7 @@ class _AuthScreenState extends State<AuthScreen> {
           }
           await storage.setUserEmail(email);
           await storage.setUserPassword(password);
-          _navigateToHome();
+          _navigateAfterLogin();
           return;
         }
       }
@@ -223,7 +224,7 @@ class _AuthScreenState extends State<AuthScreen> {
         if (isEmailMatch && isPasswordMatch) {
           context.read<HabitProvider>().setUserName(savedName);
           _showInfoSnackBar('Berhasil masuk.');
-          _navigateToHome();
+          _navigateAfterLogin();
           return;
         } else if (isEmailMatch && savedPass != null && !isPasswordMatch) {
           _showErrorSnackBar('Kata sandi yang Anda masukkan salah.');
@@ -238,7 +239,7 @@ class _AuthScreenState extends State<AuthScreen> {
           await storage.setUserName(userDisplayName);
           context.read<HabitProvider>().setUserName(userDisplayName);
           _showInfoSnackBar('Berhasil masuk.');
-          _navigateToHome();
+          _navigateAfterLogin();
           return;
         }
 
@@ -289,7 +290,7 @@ class _AuthScreenState extends State<AuthScreen> {
           await storage.setUserName(userDisplayName);
           context.read<HabitProvider>().setUserName(userDisplayName);
           _showInfoSnackBar('Berhasil masuk.');
-          _navigateToHome();
+          _navigateAfterLogin();
         }
       }
     } finally {
@@ -354,7 +355,7 @@ class _AuthScreenState extends State<AuthScreen> {
         context.read<HabitProvider>().setUserName(displayName);
         await storage.setUserName(displayName);
         await storage.setUserEmail(rawEmail);
-        _navigateToHome();
+        _navigateAfterLogin();
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -365,7 +366,7 @@ class _AuthScreenState extends State<AuthScreen> {
           context.read<HabitProvider>().setUserName(nameToUse);
           await storage.setUserName(nameToUse);
           _showInfoSnackBar('Google Auth belum aktif di Firebase Console. Masuk dalam sesi lokal.');
-          _navigateToHome();
+          _navigateAfterLogin();
           return;
         }
 
@@ -394,7 +395,7 @@ class _AuthScreenState extends State<AuthScreen> {
           final nameToUse = (savedName.isNotEmpty && savedName != 'Sahabat Muslim') ? savedName : 'Ahmad Husain';
           context.read<HabitProvider>().setUserName(nameToUse);
           await storage.setUserName(nameToUse);
-          _navigateToHome();
+          _navigateAfterLogin();
         }
       }
     } finally {
@@ -644,14 +645,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                     child: Row(
                       children: [
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            color: Color(0xFF2E531C),
-                            size: 20,
-                          ),
-                          onPressed: _handleBackNavigation,
-                          tooltip: 'Kembali',
+                        CustomBackButton(
+                          isLightBackground: true,
+                          onTap: _handleBackNavigation,
                         ),
                       ],
                     ),

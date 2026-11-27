@@ -5,6 +5,7 @@ import '../../models/ai_assistant_model.dart';
 import '../../providers/habit_provider.dart';
 import '../shell/main_navigation_shell.dart';
 import 'widgets/onboarding_curve_painter.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class AIDetailTargetScreen extends StatefulWidget {
   final int initialIndex;
@@ -116,18 +117,7 @@ class _AIDetailTargetScreenState extends State<AIDetailTargetScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(),
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                ),
+                const CustomBackButton(),
                 Expanded(
                   child: Center(
                     child: Padding(

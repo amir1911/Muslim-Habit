@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/doa_category_meta.dart';
 import '../../providers/doa_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 import 'doa_category_detail_screen.dart';
 import 'doa_detail_screen.dart';
 import 'widgets/doa_category_card.dart';
@@ -40,27 +41,12 @@ class _DoaScreenState extends State<DoaScreen> {
         child: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12),
-            child: Center(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ),
+          leadingWidth: 56,
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: CustomBackButton(),
           ),
+          titleSpacing: 10,
           title: _isSearching
               ? TextField(
                   controller: _searchController,

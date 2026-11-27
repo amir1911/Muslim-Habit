@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/habit_provider.dart';
 import '../../../features/mascot/screens/mascot_hub_screen.dart';
+import '../../../features/mascot/models/costume_model.dart';
+import '../../../features/mascot/providers/mascot_provider.dart';
 
 class _MascotReaction {
   final String asset;
@@ -238,6 +240,12 @@ class _InteractiveHomeMascotState extends State<InteractiveHomeMascot>
 
   @override
   Widget build(BuildContext context) {
+    final mascotProv = context.watch<MascotProvider?>();
+    final activeAccessories = mascotProv?.equippedAccessories ?? [];
+    final hasPeci = activeAccessories.contains('peci');
+    final hasSyal = activeAccessories.contains('syal');
+    final hasLonceng = activeAccessories.contains('lonceng');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       mainAxisSize: MainAxisSize.min,
@@ -322,34 +330,85 @@ class _InteractiveHomeMascotState extends State<InteractiveHomeMascot>
             },
             child: SizedBox(
               height: widget.height,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 280),
-                switchInCurve: Curves.easeOutBack,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: ScaleTransition(
-                      scale: Tween<double>(begin: 0.92, end: 1.0).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  _currentAsset,
-                  key: ValueKey<String>(_currentAsset),
-                  height: widget.height,
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomCenter,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
-                      'assets/images/mascot_standing.png',
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 280),
+                    switchInCurve: Curves.easeOutBack,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: Tween<double>(begin: 0.92, end: 1.0).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Image.asset(
+                      _currentAsset,
+                      key: ValueKey<String>(_currentAsset),
                       height: widget.height,
                       fit: BoxFit.contain,
                       alignment: Alignment.bottomCenter,
-                    );
-                  },
-                ),
+                      errorBuilder: (context, error, stackTrace) {
+                        return Image.asset(
+                          'assets/images/mascot_standing.png',
+                          height: widget.height,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomCenter,
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Syal
+                  if (hasSyal)
+                    Positioned(
+                      top: widget.height * 0.33,
+                      child: SizedBox(
+                        width: widget.height * 0.52,
+                        height: widget.height * 0.24,
+                        child: Image.asset(
+                          AccessoryPaths.syal,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+
+                  // Lonceng
+                  if (hasLonceng)
+                    Positioned(
+                      top: widget.height * 0.40,
+                      child: SizedBox(
+                        width: widget.height * 0.26,
+                        height: widget.height * 0.22,
+                        child: Image.asset(
+                          AccessoryPaths.lonceng,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+
+                  // Peci
+                  if (hasPeci)
+                    Positioned(
+                      top: widget.height * 0.02,
+                      child: SizedBox(
+                        width: widget.height * 0.36,
+                        height: widget.height * 0.20,
+                        child: Image.asset(
+                          AccessoryPaths.peci,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           ),

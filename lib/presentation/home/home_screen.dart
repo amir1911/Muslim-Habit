@@ -22,6 +22,13 @@ import '../../services/adzan_service.dart';
 import '../../features/mascot/screens/mascot_hub_screen.dart';
 import '../../features/ai_companion/screens/companion_hub_screen.dart';
 import 'widgets/interactive_home_mascot.dart';
+import '../../core/widgets/streak_badge.dart';
+import '../../core/widgets/notification_bell_button.dart';
+import '../../services/last_session_service.dart';
+import '../quran/surah_detail_screen.dart';
+import '../quran/hafalan_practice_screen.dart';
+import '../../models/surah_item.dart';
+import '../tasbih/tasbih_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME SCREEN  (sesuai desain Figma)
@@ -43,10 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _timeTheme = HomeTimeTheme.fromDateTime(DateTime.now());
-    // Mulai sensor kompas qibla segera setelah widget siap
+    // Mulai sensor kompas qibla & sinkronisasi habit dan streak terbaru
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<QiblaProvider>().determineLocationAndQibla();
+        context.read<HabitProvider>().refreshTodayProgressAndStreak();
       }
     });
   }
@@ -260,10 +268,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  // Streak badge (Dinamis & Proporsional)
-                  _headerStatBadge(
-                    icon: const Text('🔥', style: TextStyle(fontSize: 13, height: 1.1)),
-                    value: '${provider.streakCount}',
+                  // Streak badge (Terpadu & Konsisten dengan Icon Api Resmi)
+                  StreakBadge(
+                    streakOverride: provider.streakCount,
+                    backgroundColor: _timeTheme.badgeBackgroundColor,
+                    textColor: _timeTheme.badgeTextColor,
+                    iconColor: const Color(0xFFFFB300),
                   ),
                   const SizedBox(width: 8),
 
@@ -274,22 +284,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(width: 8),
 
-                  // Bell
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: _timeTheme.bellBackgroundColor,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Icon(Icons.notifications_none_rounded, color: _timeTheme.bellIconColor, size: 18),
+                  // Bell Notifikasi Terpadu dengan Badge
+                  NotificationBellButton(
+                    backgroundColor: _timeTheme.bellBackgroundColor,
+                    iconColor: _timeTheme.bellIconColor,
                   ),
                 ],
               ),
@@ -684,7 +682,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ────────────── FEATURE GRID ──────────────
+  // ────────────── FEATURE GRID (5 KARTU SEJAJAR HORIZONTAL) ──────────────
   Widget _buildFeatureGrid(BuildContext context) {
     final features = [
       {
@@ -697,7 +695,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       },
       {
-        'label': 'Al-Quran',
+        'label': 'Al-Qur\'an',
         'asset': 'assets/icon/Vector.png',
         'icon': Icons.menu_book_rounded,
         'onTap': () {
@@ -738,22 +736,18 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: features.map((f) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: _buildFeatureItem(
-              label: f['label'] as String,
-              icon: f['icon'] as IconData?,
-              asset: f['asset'] as String?,
-              onTap: f['onTap'] as VoidCallback?,
-            ),
-          );
-        }).toList(),
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: features.map((f) {
+        return Expanded(
+          child: _buildFeatureItem(
+            label: f['label'] as String,
+            icon: f['icon'] as IconData?,
+            asset: f['asset'] as String?,
+            onTap: f['onTap'] as VoidCallback?,
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -766,16 +760,18 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap ?? () {},
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 58,
-            height: 58,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
               color: const Color(0xFF518427),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF518427).withValues(alpha: 0.3),
+                  color: const Color(0xFF518427).withValues(alpha: 0.28),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),
@@ -785,20 +781,22 @@ class _HomeScreenState extends State<HomeScreen> {
               child: asset != null
                   ? Image.asset(
                       asset,
-                      width: 28,
-                      height: 28,
+                      width: 32,
+                      height: 32,
                       fit: BoxFit.contain,
                       errorBuilder: (context, error, stackTrace) =>
-                          Icon(icon ?? Icons.help_outline, color: Colors.white, size: 28),
+                          Icon(icon ?? Icons.help_outline, color: Colors.white, size: 30),
                     )
-                  : Icon(icon ?? Icons.circle, color: Colors.white, size: 28),
+                  : Icon(icon ?? Icons.circle, color: Colors.white, size: 30),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 7),
           Text(
             label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
             style: GoogleFonts.inter(
-              fontSize: 11,
+              fontSize: 11.5,
               fontWeight: FontWeight.w600,
               color: const Color(0xFF2D3C21),
             ),
@@ -810,16 +808,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // ────────────── PROGRESS CARD ──────────────
   Widget _buildProgressCard(HabitProvider provider) {
-    final progress = provider.progressFraction;
-    final habits = provider.habits;
+    final progress = provider.fiveCategoriesProgressFraction;
+    final status = provider.todayCategoriesStatus;
 
-    // Show all up to 5 (Al-Quran, Shalat, Doa, Dzikir, Puasa)
+    // 5 Kategori Habit Utama: Shalat, Al-Qur'an, Doa, Dzikir, (Puasa jika dijadwalkan hari ini)
     final displayHabits = [
-      {'label': 'Al-Quran', 'done': habits.where((h) => h.id == 'tilawah').any((h) => h.isCompleted)},
-      {'label': 'Shalat', 'done': habits.where((h) => h.category == HabitCategory.wajib && h.isCompleted).isNotEmpty},
-      {'label': 'Doa', 'done': false},
-      {'label': 'Dzikir', 'done': habits.where((h) => h.id == 'dzikir').any((h) => h.isCompleted)},
-      {'label': 'Puasa', 'done': false},
+      {'label': 'Shalat', 'done': status['Shalat'] ?? false},
+      {'label': 'Al-Qur\'an', 'done': status['Al-Qur\'an'] ?? false},
+      {'label': 'Doa', 'done': status['Doa'] ?? false},
+      {'label': 'Dzikir', 'done': status['Dzikir'] ?? false},
+      if (provider.isPuasaScheduledToday || (status['Puasa'] == true))
+        {'label': 'Puasa', 'done': status['Puasa'] ?? false},
     ];
 
     return Container(
@@ -1012,109 +1011,311 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ────────────── CONTINUE CARD ──────────────
+  // ────────────── CONTINUE CARD (LANJUTKAN SESI AKTIF TERAKHIR) ──────────────
   Widget _buildContinueCard(HabitProvider provider) {
-    // Find first incomplete habit
-    final incompleteHabits = provider.habits.where((h) => !h.isCompleted).toList();
-    final habit = incompleteHabits.isNotEmpty ? incompleteHabits.first : null;
+    return FutureBuilder<LastSessionData?>(
+      future: LastSessionService.getLastSession(),
+      builder: (context, snapshot) {
+        final session = snapshot.data ?? LastSessionService.cachedSession;
 
-    if (habit == null) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFEFF7E0),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFCDE8A0), width: 1),
-        ),
-        child: Text(
-          'Maa Syaa Allah! Semua target hari ini selesai! 🎉',
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF2D3C21),
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE8EEE0), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Habit icon
-          Container(
-            width: 48,
-            height: 48,
+        if (session == null) {
+          return Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFEFF7E0),
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE8EEE0), width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Icon(habit.icon, color: const Color(0xFF518427), size: 24),
-          ),
-          const SizedBox(width: 12),
-
-          // Info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        habit.title.length > 24
-                            ? '${habit.title.substring(0, 24)}...'
-                            : habit.title,
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF7E0),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
+                    color: Color(0xFF518427),
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Belum Ada Sesi Tersimpan',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: const Color(0xFF2D3C21),
                         ),
                       ),
-                    ),
-                    const Icon(Icons.notifications_none_rounded, size: 18, color: Color(0xFF8F9C84)),
-                    const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0xFF8F9C84)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    _infoChip(icon: Icons.calendar_today_outlined, text: '1 Minggu'),
-                    const SizedBox(width: 10),
-                    _infoChip(icon: Icons.bolt_rounded, text: '${habit.points} XP'),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    const Icon(Icons.access_time_rounded, size: 12, color: Color(0xFF5E6B52)),
-                    const SizedBox(width: 4),
-                    Text(
-                      '0/7 ${habit.title}',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: const Color(0xFF5E6B52),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Mulai baca Al-Qur\'an atau hafalan untuk melanjutkan sesi.',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: const Color(0xFF6B7280),
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (!MainNavigationShell.switchToTab(context, 2)) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const QuranScreen()),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF518427),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ],
+                  ),
+                  child: Text(
+                    'Mulai',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Tentukan Icon & Action Sesuai Tipe Sesi
+        IconData sessionIcon = Icons.menu_book_rounded;
+        String badgeText = 'Al-Qur\'an';
+
+        switch (session.type) {
+          case SessionType.hafalan:
+            sessionIcon = Icons.psychology_rounded;
+            badgeText = 'Hafalan';
+            break;
+          case SessionType.dzikir:
+            sessionIcon = Icons.spa_rounded;
+            badgeText = 'Dzikir';
+            break;
+          case SessionType.doa:
+            sessionIcon = Icons.volunteer_activism_rounded;
+            badgeText = 'Doa';
+            break;
+          case SessionType.sholat:
+            sessionIcon = Icons.mosque_rounded;
+            badgeText = 'Sholat';
+            break;
+          case SessionType.quran:
+          default:
+            sessionIcon = Icons.menu_book_rounded;
+            badgeText = 'Al-Qur\'an';
+            break;
+        }
+
+        void handleContinue() {
+          switch (session.type) {
+            case SessionType.quran:
+              final surahNum = session.surahNumber ?? 2;
+              final surahNm = session.surahName ?? 'Al-Baqarah';
+              final ayahNum = session.ayahNumber ?? 1;
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SurahDetailScreen(
+                    surah: SurahItem(
+                      number: surahNum,
+                      nameLatin: surahNm,
+                      nameArabic: '',
+                      nameId: surahNm,
+                      translation: '',
+                      numberOfAyahs: 286,
+                      revelation: 'Madaniyah',
+                    ),
+                    initialAyah: ayahNum,
+                  ),
+                ),
+              );
+              break;
+
+            case SessionType.hafalan:
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => HafalanPracticeScreen(
+                    initialSurahNumber: session.surahNumber ?? 1,
+                    initialAyahNumber: session.ayahNumber ?? 1,
+                  ),
+                ),
+              );
+              break;
+
+            case SessionType.dzikir:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DzikirScreen()),
+              );
+              break;
+
+            case SessionType.doa:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DoaScreen()),
+              );
+              break;
+
+            case SessionType.sholat:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SholatScreen()),
+              );
+              break;
+          }
+        }
+
+        return GestureDetector(
+          onTap: handleContinue,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE8EEE0), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                // Icon Sesi
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF7E0),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(sessionIcon, color: const Color(0xFF518427), size: 24),
+                ),
+                const SizedBox(width: 12),
+
+                // Info Sesi
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF518427).withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              badgeText,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF518427),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              session.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2D3C21),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        session.subtitle,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: const Color(0xFF6B7280),
+                        ),
+                      ),
+                      if (session.progress > 0) ...[
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: session.progress.clamp(0.0, 1.0),
+                            backgroundColor: const Color(0xFFE5E7EB),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF518427)),
+                            minHeight: 4,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // Tombol Lanjutkan Sesi
+                ElevatedButton(
+                  onPressed: handleContinue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF518427),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Lanjutkan',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.arrow_forward_rounded, size: 14),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 

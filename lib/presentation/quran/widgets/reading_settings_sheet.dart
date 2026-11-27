@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'tajwid_legend.dart';
 
-class ReadingSettingsSheet extends StatelessWidget {
+class ReadingSettingsSheet extends StatefulWidget {
   final double arabicFontSize;
   final double translationFontSize;
   final bool showTajwid;
@@ -69,6 +69,29 @@ class ReadingSettingsSheet extends StatelessWidget {
   }
 
   @override
+  State<ReadingSettingsSheet> createState() => _ReadingSettingsSheetState();
+}
+
+class _ReadingSettingsSheetState extends State<ReadingSettingsSheet> {
+  late double _arabicFontSize;
+  late double _translationFontSize;
+  late bool _showTajwid;
+  late bool _showTranslation;
+  late String _readerTheme;
+  late double _audioSpeed;
+
+  @override
+  void initState() {
+    super.initState();
+    _arabicFontSize = widget.arabicFontSize;
+    _translationFontSize = widget.translationFontSize;
+    _showTajwid = widget.showTajwid;
+    _showTranslation = widget.showTranslation;
+    _readerTheme = widget.readerTheme;
+    _audioSpeed = widget.audioSpeed;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -130,8 +153,9 @@ class ReadingSettingsSheet extends StatelessWidget {
                 context,
                 title: 'Sepia (Hangat)',
                 value: 'sepia',
-                bgColor: const Color(0xFFF9F8F2),
-                selected: readerTheme == 'sepia',
+                bgColor: const Color(0xFFFBF0D9),
+                selected: _readerTheme == 'sepia',
+                textColor: const Color(0xFF433022),
               ),
               const SizedBox(width: 8),
               _buildThemeChoice(
@@ -139,7 +163,8 @@ class ReadingSettingsSheet extends StatelessWidget {
                 title: 'Terang',
                 value: 'light',
                 bgColor: Colors.white,
-                selected: readerTheme == 'light',
+                selected: _readerTheme == 'light',
+                textColor: const Color(0xFF1E3710),
               ),
               const SizedBox(width: 8),
               _buildThemeChoice(
@@ -147,7 +172,7 @@ class ReadingSettingsSheet extends StatelessWidget {
                 title: 'Gelap',
                 value: 'dark',
                 bgColor: const Color(0xFF1E1E1E),
-                selected: readerTheme == 'dark',
+                selected: _readerTheme == 'dark',
                 textColor: Colors.white,
               ),
             ],
@@ -168,7 +193,7 @@ class ReadingSettingsSheet extends StatelessWidget {
                 ),
               ),
               Text(
-                '${arabicFontSize.toInt()} pt',
+                '${_arabicFontSize.toInt()} pt',
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -184,11 +209,14 @@ class ReadingSettingsSheet extends StatelessWidget {
               thumbColor: const Color(0xFF3B6114),
             ),
             child: Slider(
-              value: arabicFontSize,
+              value: _arabicFontSize,
               min: 18.0,
               max: 38.0,
               divisions: 10,
-              onChanged: onArabicFontSizeChanged,
+              onChanged: (val) {
+                setState(() => _arabicFontSize = val);
+                widget.onArabicFontSizeChanged(val);
+              },
             ),
           ),
 
@@ -207,7 +235,7 @@ class ReadingSettingsSheet extends StatelessWidget {
                 ),
               ),
               Text(
-                '${translationFontSize.toInt()} pt',
+                '${_translationFontSize.toInt()} pt',
                 style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -223,11 +251,14 @@ class ReadingSettingsSheet extends StatelessWidget {
               thumbColor: const Color(0xFF3B6114),
             ),
             child: Slider(
-              value: translationFontSize,
+              value: _translationFontSize,
               min: 11.0,
               max: 20.0,
               divisions: 9,
-              onChanged: onTranslationFontSizeChanged,
+              onChanged: (val) {
+                setState(() => _translationFontSize = val);
+                widget.onTranslationFontSizeChanged(val);
+              },
             ),
           ),
 
@@ -236,7 +267,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           // ── TOGGLE TAJWID & TRANSLATION ──
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            value: showTajwid,
+            value: _showTajwid,
             activeColor: const Color(0xFF518427),
             title: Text(
               'Tampilkan Tajwid Berwarna',
@@ -250,7 +281,10 @@ class ReadingSettingsSheet extends StatelessWidget {
               'Membantu membedakan hukum bacaan Al-Qur\'an',
               style: GoogleFonts.inter(fontSize: 11.5, color: Colors.grey[600]),
             ),
-            onChanged: onShowTajwidChanged,
+            onChanged: (val) {
+              setState(() => _showTajwid = val);
+              widget.onShowTajwidChanged(val);
+            },
           ),
 
           // Tombol Buka Panduan Tajwid
@@ -275,7 +309,7 @@ class ReadingSettingsSheet extends StatelessWidget {
 
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            value: showTranslation,
+            value: _showTranslation,
             activeColor: const Color(0xFF518427),
             title: Text(
               'Tampilkan Terjemahan',
@@ -289,7 +323,10 @@ class ReadingSettingsSheet extends StatelessWidget {
               'Terjemahan bahasa Indonesia resmi Kemenag',
               style: GoogleFonts.inter(fontSize: 11.5, color: Colors.grey[600]),
             ),
-            onChanged: onShowTranslationChanged,
+            onChanged: (val) {
+              setState(() => _showTranslation = val);
+              widget.onShowTranslationChanged(val);
+            },
           ),
 
           const SizedBox(height: 14),
@@ -306,7 +343,7 @@ class ReadingSettingsSheet extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [0.75, 1.0, 1.25, 1.5].map((speed) {
-              final isSel = (audioSpeed - speed).abs() < 0.05;
+              final isSel = (_audioSpeed - speed).abs() < 0.05;
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
@@ -321,7 +358,10 @@ class ReadingSettingsSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () => onAudioSpeedChanged(speed),
+                    onPressed: () {
+                      setState(() => _audioSpeed = speed);
+                      widget.onAudioSpeedChanged(speed);
+                    },
                     child: Text(
                       '${speed}x',
                       style: GoogleFonts.inter(
@@ -350,7 +390,10 @@ class ReadingSettingsSheet extends StatelessWidget {
   }) {
     return Expanded(
       child: GestureDetector(
-        onTap: () => onReaderThemeChanged(value),
+        onTap: () {
+          setState(() => _readerTheme = value);
+          widget.onReaderThemeChanged(value);
+        },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: BoxDecoration(

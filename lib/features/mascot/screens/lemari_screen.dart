@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../core/widgets/custom_back_button.dart';
+import '../../../core/widgets/streak_badge.dart';
 import '../../../providers/habit_provider.dart';
 import '../models/costume_model.dart';
 import '../providers/mascot_provider.dart';
@@ -9,9 +11,17 @@ import '../widgets/dashed_circle_button.dart';
 import '../widgets/mascot_character.dart';
 import 'toko_screen.dart';
 
-/// Halaman Lemari Kostum (LemariScreen)
-class LemariScreen extends StatelessWidget {
+/// Halaman Lemari Kostum & Aksesoris Unta (LemariScreen)
+class LemariScreen extends StatefulWidget {
   const LemariScreen({super.key});
+
+  @override
+  State<LemariScreen> createState() => _LemariScreenState();
+}
+
+class _LemariScreenState extends State<LemariScreen> {
+  // 0: Semua, 1: Aksesoris, 2: Kostum
+  int _selectedFilterIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +32,14 @@ class LemariScreen extends StatelessWidget {
     final ownedCostumes = CostumeModel.predefinedCostumes
         .where((c) => mascotProv.isCostumeOwned(c.id))
         .toList();
+
+    // Daftar aksesoris unta (Peci, Syal, Lonceng)
+    final accessories = AccessoryModel.predefinedAccessories
+        .where((a) => mascotProv.isAccessoryOwned(a.id))
+        .toList();
+
+    final showAccessories = _selectedFilterIndex == 0 || _selectedFilterIndex == 1;
+    final showCostumes = _selectedFilterIndex == 0 || _selectedFilterIndex == 2;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: const SystemUiOverlayStyle(
@@ -34,129 +52,314 @@ class LemariScreen extends StatelessWidget {
           bottom: false,
           child: Column(
             children: [
-              // ── 1. HEADER ATAS (KOSTUM) ──
+              // ── 1. HEADER ATAS (KOSTUM & STATS) ──
               _buildTopBar(context, habitProv),
 
-              // ── 2. PREVIEW MASKOT NUNU DENGAN BACKGROUND ALAM ──
+              // ── 2. PREVIEW MASKOT NUNU DENGAN AKSESORIS REAL-TIME ──
               _buildMascotPreview(mascotProv),
 
-              // ── 3. DAFTAR KOSTUM ANDA ──
+              // ── 3. FILTER TABS (SEMUA / AKSESORIS / KOSTUM) ──
+              _buildFilterTabs(accessories.length, ownedCostumes.length),
+
+              // ── 4. DAFTAR AKSESORIS & KOSTUM ──
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 30),
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 40),
                   children: [
-                    Text(
-                      'Kostum Anda',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: const Color(0xFF1E350E),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      'Beri Untamu Kostum Indah!',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        color: const Color(0xFF75856B),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Kartu-Kartu Kostum yang Dimiliki
-                    ...ownedCostumes.map((costume) {
-                      final isEquipped = mascotProv.equippedCostume == costume.id;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: isEquipped
-                                ? const Color(0xFF518427)
-                                : const Color(0xFFE5E7EB),
-                            width: isEquipped ? 1.5 : 1.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.02),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                    // ── SEKSI AKSESORIS UNTA ──
+                    if (showAccessories) ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Aksesoris Unta',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    color: const Color(0xFF1E350E),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Dapat dipasang bersamaan (Peci + Syal + Lonceng)',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11.5,
+                                    color: const Color(0xFF75856B),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            // Thumbnail Kostum
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF7F6EE),
-                                borderRadius: BorderRadius.circular(14),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF518427).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${mascotProv.equippedAccessories.length}/3',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF518427),
                               ),
-                              child: Center(
-                                child: Icon(
-                                  costume.icon ?? Icons.checkroom_rounded,
-                                  color: costume.themeColor,
-                                  size: 26,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // List Kartu Aksesoris Mandiri
+                      ...accessories.map((acc) {
+                        final isEquipped = mascotProv.isAccessoryEquipped(acc.id);
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: isEquipped
+                                  ? const Color(0xFF518427)
+                                  : const Color(0xFFE5E7EB),
+                              width: isEquipped ? 1.5 : 1.0,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isEquipped
+                                    ? const Color(0xFF518427).withValues(alpha: 0.08)
+                                    : Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // Icon / Thumbnail Aksesoris
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: isEquipped
+                                      ? const Color(0xFFEFF7E0)
+                                      : const Color(0xFFF7F6EE),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    acc.icon,
+                                    color: acc.themeColor,
+                                    size: 26,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
+                              const SizedBox(width: 14),
 
-                            // Nama & Keterangan Kostum
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    costume.name,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
-                                      color: const Color(0xFF1F2937),
+                              // Info Aksesoris
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          acc.name,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w800,
+                                            color: const Color(0xFF1F2937),
+                                          ),
+                                        ),
+                                        if (acc.id == 'lonceng') ...[
+                                          const SizedBox(width: 6),
+                                          const Icon(
+                                            Icons.volume_up_rounded,
+                                            size: 14,
+                                            color: Color(0xFFD4AF37),
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    costume.description,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 11.5,
-                                      color: const Color(0xFF6B7280),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      acc.description,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11.5,
+                                        color: const Color(0xFF6B7280),
+                                        height: 1.3,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
 
-                            // Tombol Status: Solid Check (Sedang Dipakai) atau Dashed (+) untuk Pasang
-                            if (isEquipped)
-                              const SolidCheckCircle(
-                                size: 34,
-                                color: Color(0xFF518427),
-                              )
-                            else
-                              DashedCircleButton(
-                                size: 34,
-                                onTap: () {
-                                  HapticFeedback.mediumImpact();
-                                  mascotProv.equipCostume(costume.id);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Kostum ${costume.name} berhasil digunakan!'),
-                                      backgroundColor: const Color(0xFF518427),
-                                      duration: const Duration(milliseconds: 1200),
-                                    ),
-                                  );
-                                },
-                              ),
-                          ],
+                              // Tombol Pasang / Lepas Aksesoris
+                              if (isEquipped)
+                                SolidCheckCircle(
+                                  size: 34,
+                                  color: const Color(0xFF518427),
+                                  onTap: () {
+                                    HapticFeedback.lightImpact();
+                                    mascotProv.toggleAccessory(acc.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Aksesoris ${acc.name} dilepas.'),
+                                        duration: const Duration(milliseconds: 1000),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                )
+                              else
+                                DashedCircleButton(
+                                  size: 34,
+                                  color: const Color(0xFF518427),
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    mascotProv.toggleAccessory(acc.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Aksesoris ${acc.name} berhasil dipasang!'),
+                                        backgroundColor: const Color(0xFF518427),
+                                        duration: const Duration(milliseconds: 1200),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // ── SEKSI KOSTUM UTAMA ──
+                    if (showCostumes) ...[
+                      Text(
+                        'Kostum Utama',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF1E350E),
                         ),
-                      );
-                    }),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Pilih kostum tubuh lengkap untuk untamu',
+                        style: GoogleFonts.inter(
+                          fontSize: 11.5,
+                          color: const Color(0xFF75856B),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // List Kartu Kostum yang Dimiliki
+                      ...ownedCostumes.map((costume) {
+                        final isEquipped = mascotProv.equippedCostume == costume.id;
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: isEquipped
+                                  ? const Color(0xFF518427)
+                                  : const Color(0xFFE5E7EB),
+                              width: isEquipped ? 1.5 : 1.0,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // Thumbnail Kostum
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF7F6EE),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    costume.icon ?? Icons.checkroom_rounded,
+                                    color: costume.themeColor,
+                                    size: 26,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 14),
+
+                              // Nama & Keterangan Kostum
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      costume.name,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xFF1F2937),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      costume.description,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11.5,
+                                        color: const Color(0xFF6B7280),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Tombol Status Kostum
+                              if (isEquipped)
+                                const SolidCheckCircle(
+                                  size: 34,
+                                  color: Color(0xFF518427),
+                                )
+                              else
+                                DashedCircleButton(
+                                  size: 34,
+                                  onTap: () {
+                                    HapticFeedback.mediumImpact();
+                                    mascotProv.equipCostume(costume.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Kostum ${costume.name} berhasil digunakan!'),
+                                        backgroundColor: const Color(0xFF518427),
+                                        duration: const Duration(milliseconds: 1200),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
                   ],
                 ),
               ),
@@ -168,95 +371,101 @@ class LemariScreen extends StatelessWidget {
   }
 
   // ==========================================
+  // FILTER TABS (Semua, Aksesoris, Kostum)
+  // ==========================================
+  Widget _buildFilterTabs(int accCount, int costumeCount) {
+    final filters = [
+      'Semua (${accCount + costumeCount})',
+      'Aksesoris ($accCount)',
+      'Kostum ($costumeCount)',
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
+      child: Row(
+        children: List.generate(filters.length, (index) {
+          final isSelected = _selectedFilterIndex == index;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                setState(() => _selectedFilterIndex = index);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: EdgeInsets.only(
+                  left: index == 0 ? 0 : 4,
+                  right: index == filters.length - 1 ? 0 : 4,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF518427) : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? const Color(0xFF518427) : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    filters[index],
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11.5,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      color: isSelected ? Colors.white : const Color(0xFF4B5563),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  // ==========================================
   // TOP BAR
   // ==========================================
   Widget _buildTopBar(BuildContext context, HabitProvider habitProv) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: Row(
         children: [
-          // Tombol Kembali
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-            icon: const Icon(
-              Icons.chevron_left_rounded,
-              color: Color(0xFF2E5714),
-              size: 28,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
+          // Tombol Kembali Standar Muslim Habit
+          const CustomBackButton(),
           const SizedBox(width: 8),
 
-          // Judul "Kostum"
-          Text(
-            'Kostum',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 19,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF2E5714),
+          // Judul "Kostum & Aksesoris" – Expanded agar fleksibel dan tidak pernah overflow
+          Expanded(
+            child: Text(
+              'Kostum & Aksesoris',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF2E5714),
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
             ),
           ),
 
-          const Spacer(),
-
-          // Pill Streak
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFF518427),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.local_fire_department_rounded,
-                  color: Color(0xFFFFB300),
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${habitProv.streakCount}',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(width: 6),
 
-          // Pill Saldo Bintang
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFF518427),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.star_rounded,
-                  color: Color(0xFFFFD700),
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${habitProv.userPoints}',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+          // Pill Streak Terpadu
+          StreakBadge(
+            streakOverride: habitProv.streakCount,
+            backgroundColor: const Color(0xFF518427),
+            iconColor: const Color(0xFFFFB300),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 5),
+
+          // Pill Saldo Bintang (compact)
+          _buildStatPill(
+            icon: Icons.star_rounded,
+            iconColor: const Color(0xFFFFD700),
+            label: '${habitProv.userPoints}',
+          ),
+          const SizedBox(width: 5),
 
           // Keranjang Toko
           GestureDetector(
@@ -267,8 +476,8 @@ class LemariScreen extends StatelessWidget {
               );
             },
             child: Container(
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               decoration: const BoxDecoration(
                 color: Color(0xFF518427),
                 shape: BoxShape.circle,
@@ -276,8 +485,37 @@ class LemariScreen extends StatelessWidget {
               child: const Icon(
                 Icons.shopping_cart_outlined,
                 color: Colors.white,
-                size: 18,
+                size: 17,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatPill({
+    required IconData icon,
+    required Color iconColor,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFF518427),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: iconColor, size: 14),
+          const SizedBox(width: 3),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
             ),
           ),
         ],
@@ -311,6 +549,7 @@ class LemariScreen extends StatelessWidget {
         child: MascotCharacter(
           height: 200,
           costumeId: mascotProv.equippedCostume,
+          equippedAccessories: mascotProv.equippedAccessories,
           onTap: () {
             HapticFeedback.lightImpact();
             mascotProv.cycleDialogue();

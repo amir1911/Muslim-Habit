@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/community_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class BuatKomunitasScreen extends StatefulWidget {
   const BuatKomunitasScreen({super.key});
@@ -75,16 +76,9 @@ class _BuatKomunitasScreenState extends State<BuatKomunitasScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Text(
           'Buat Komunitas',

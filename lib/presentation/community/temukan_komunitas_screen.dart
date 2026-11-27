@@ -5,6 +5,7 @@ import '../../providers/community_provider.dart';
 import '../../models/community/community_model.dart';
 import 'detail_komunitas_screen.dart';
 import 'buat_komunitas_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class TemukanKomunitasScreen extends StatefulWidget {
   const TemukanKomunitasScreen({super.key});
@@ -47,16 +48,9 @@ class _TemukanKomunitasScreenState extends State<TemukanKomunitasScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Text(
           'Temukan Komunitas',

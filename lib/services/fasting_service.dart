@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/fasting_plan.dart';
 import 'storage_service.dart';
@@ -37,6 +40,67 @@ class FastingService {
     final prefs = await _prefs;
     final listMap = plans.map((p) => p.toJson()).toList();
     await prefs.setString(_keyFastingPlans, jsonEncode(listMap));
+
+    // Sinkronisasi otomatis ke Cloud Firestore jika user telah login
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('fasting')
+            .doc('plans')
+            .set({
+          'plans': listMap,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      debugPrint('[FastingService] Gagal sync ke Firestore: $e');
+    }
+  }
+
+  /// Sinkronisasi rencana puasa dari Cloud Firestore
+  Future<void> syncFromCloud() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('fasting')
+          .doc('plans')
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        final cloudPlansRaw = data['plans'] as List?;
+        if (cloudPlansRaw != null && cloudPlansRaw.isNotEmpty) {
+          final cloudPlans = cloudPlansRaw
+              .map((item) => FastingPlan.fromJson(item as Map<String, dynamic>))
+              .toList();
+
+          final localPlans = await getPlans();
+          final mergedMap = <String, FastingPlan>{};
+          for (final p in localPlans) {
+            mergedMap[p.id] = p;
+          }
+          for (final p in cloudPlans) {
+            mergedMap[p.id] = p;
+          }
+
+          final mergedList = mergedMap.values.toList()
+            ..sort((a, b) => a.date.compareTo(b.date));
+
+          final prefs = await _prefs;
+          final listMap = mergedList.map((p) => p.toJson()).toList();
+          await prefs.setString(_keyFastingPlans, jsonEncode(listMap));
+        }
+      }
+    } catch (e) {
+      debugPrint('[FastingService] syncFromCloud error: $e');
+    }
   }
 
   /// Menambah atau memperbarui satu rencana puasa

@@ -9,6 +9,7 @@ import '../../models/surah_detail.dart';
 import '../../services/quran_service.dart';
 import 'widgets/surah_picker_sheet.dart';
 import 'widgets/ayah_picker_sheet.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 enum PracticeMode { perAyat, perSurah }
 
@@ -522,9 +523,9 @@ class _PendeteksiBacaanScreenState extends State<PendeteksiBacaanScreen>
       backgroundColor: const Color(0xFF518427),
       elevation: 0,
       centerTitle: true,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-        onPressed: () => Navigator.of(context).pop(),
+      leading: const Padding(
+        padding: EdgeInsets.only(left: 8),
+        child: CustomBackButton(),
       ),
       title: Text(
         'Pendeteksi Bacaan & Tajwid',

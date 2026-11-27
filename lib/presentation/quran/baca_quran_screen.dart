@@ -9,6 +9,7 @@ import '../../providers/baca_quran_provider.dart';
 import 'widgets/audio_player_panel.dart';
 import 'widgets/reading_settings_sheet.dart';
 import 'widgets/verse_card.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class BacaQuranScreen extends StatefulWidget {
   final SurahItem surah;
@@ -110,21 +111,26 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
     final prov = context.watch<BacaQuranProvider>();
 
     // Tema warna berdasarkan setting (light, sepia, dark)
-    Color scaffoldBg = const Color(0xFFF9F8F2);
-    Color cardBg = Colors.white;
-    Color textColor = const Color(0xFF1E3710);
-    Color transColor = const Color(0xFF4A4A4A);
+    Color scaffoldBg = const Color(0xFFFBF0D9); // Sepia hangat
+    Color cardBg = const Color(0xFFF5EADA);
+    Color textColor = const Color(0xFF3E2D1F);
+    Color transColor = const Color(0xFF5D4836);
 
     if (prov.readerTheme == 'light') {
-      scaffoldBg = Colors.white;
-      cardBg = const Color(0xFFFFFFFF);
-      textColor = const Color(0xFF1A2E05);
+      scaffoldBg = const Color(0xFFFAF9F6);
+      cardBg = Colors.white;
+      textColor = const Color(0xFF1E3710);
       transColor = const Color(0xFF333333);
     } else if (prov.readerTheme == 'dark') {
       scaffoldBg = const Color(0xFF141414);
       cardBg = const Color(0xFF1E1E1E);
       textColor = const Color(0xFFE8F5E9);
       transColor = const Color(0xFFB0BEC5);
+    } else if (prov.readerTheme == 'sepia') {
+      scaffoldBg = const Color(0xFFFBF0D9);
+      cardBg = const Color(0xFFF5EADA);
+      textColor = const Color(0xFF3E2D1F);
+      transColor = const Color(0xFF5D4836);
     }
 
     final detail = prov.surahDetail;
@@ -290,23 +296,8 @@ class _BacaQuranScreenState extends State<BacaQuranScreen> {
       ),
       child: Row(
         children: [
-          // Tombol Kembali Bulat Hijau Terang (sesuai screenshot)
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-               width: 38,
-               height: 38,
-               decoration: const BoxDecoration(
-                 color: Color(0xFF7EAC47), // Hijau muda bulat
-                 shape: BoxShape.circle,
-               ),
-               child: const Icon(
-                 Icons.arrow_back_ios_new_rounded,
-                 color: Colors.white,
-                 size: 18,
-               ),
-            ),
-          ),
+          // Tombol Kembali Bulat Standar
+          const CustomBackButton(),
           const SizedBox(width: 12),
 
           // Judul AI-Qur'an di Tengah

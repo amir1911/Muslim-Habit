@@ -6,6 +6,7 @@ import '../../models/dzikir/dzikir_category_model.dart';
 import 'dzikir_session_screen.dart';
 import 'dzikir_category_screen.dart';
 import 'dzikir_search_screen.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class DzikirScreen extends StatefulWidget {
   const DzikirScreen({super.key});
@@ -53,19 +54,16 @@ class _DzikirScreenState extends State<DzikirScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
         elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
+        centerTitle: false,
+        leadingWidth: 56,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 10),
+          child: CustomBackButton(),
         ),
+        titleSpacing: 10,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               'Dzikir',

@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/habit_provider.dart';
 import '../../services/auth_service.dart';
+import '../../core/widgets/custom_back_button.dart';
 import '../../services/storage_service.dart';
 import '../auth/auth_screen.dart';
 import '../shell/main_navigation_shell.dart';
@@ -14,6 +15,10 @@ import '../habits/widgets/edit_plan_bottom_sheet.dart';
 import '../badges/badges_screen.dart';
 import '../doa/doa_screen.dart';
 import '../../features/mascot/screens/chatbot_screen.dart';
+import '../../features/ai_companion/screens/companion_settings_screen.dart';
+import '../../services/smart_notification_service.dart';
+import '../../core/widgets/streak_badge.dart';
+import '../../core/widgets/notification_bell_button.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -96,7 +101,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildMenuItem(
                 icon: Icons.smart_toy_outlined,
                 title: 'Setting Chatbot',
-                onTap: () => _showChatbotSettingsSheet(context),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const CompanionSettingsScreen(),
+                    ),
+                  );
+                },
               ),
             ]),
             const SizedBox(height: 20),
@@ -187,77 +199,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // ==========================================
-  // APPBAR
+  // APPBAR (Konsisten dengan Tema Muslim Habit & Halaman Habbit)
   // ==========================================
   PreferredSizeWidget _buildAppBar(BuildContext context, int streak, int xp) {
     return AppBar(
-      backgroundColor: const Color(0xFF518427),
+      backgroundColor: const Color(0xFFF7F6EE),
       elevation: 0,
       scrolledUnderElevation: 0,
-      leading: IconButton(
-        icon: Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFF86AB53),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.chevron_left_rounded,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-          }
-        },
+      centerTitle: false,
+      leadingWidth: 56,
+      leading: const Padding(
+        padding: EdgeInsets.only(left: 10),
+        child: CustomBackButton(isLightBackground: true),
       ),
+      titleSpacing: 10,
       title: Text(
         'Profile',
         style: GoogleFonts.plusJakartaSans(
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          color: const Color(0xFF2E5714),
         ),
       ),
       actions: [
-        // Streak pill
-        Container(
-          margin: const EdgeInsets.only(right: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFF3E601C),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.local_fire_department_rounded,
-                color: Color(0xFFFFB300),
-                size: 15,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '$streak',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
+        // Streak pill terpadu
+        StreakBadge(
+          streakOverride: streak,
+          backgroundColor: const Color(0xFF2E5714),
+          iconColor: const Color(0xFFFFB300),
         ),
+        const SizedBox(width: 6),
+
         // Star XP pill
         Container(
-          margin: const EdgeInsets.only(right: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: const Color(0xFF3E601C),
-            borderRadius: BorderRadius.circular(16),
+            color: const Color(0xFF518427),
+            borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -265,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Icon(
                 Icons.star_rounded,
                 color: Color(0xFFFFD700),
-                size: 15,
+                size: 16,
               ),
               const SizedBox(width: 4),
               Text(
@@ -279,32 +257,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-        // Bell icon
-        Container(
-          margin: const EdgeInsets.only(right: 14),
-          width: 32,
-          height: 32,
-          decoration: const BoxDecoration(
-            color: Color(0xFF3E601C),
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: Colors.white,
-              size: 17,
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Notifikasi profile aktif'),
-                  duration: Duration(milliseconds: 1000),
-                ),
-              );
-            },
-          ),
+        const SizedBox(width: 6),
+
+        // Bell icon terpadu
+        const NotificationBellButton(
+          backgroundColor: Color(0xFF2E5714),
+          size: 34,
         ),
+        const SizedBox(width: 14),
       ],
     );
   }
@@ -949,72 +909,217 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
+      isScrollControlled: true,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
-            return Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Pengaturan Pengingat',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF2E5714),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SwitchListTile(
-                    activeColor: const Color(0xFF518427),
-                    contentPadding: EdgeInsets.zero,
-                    title: Text('Aktifkan Notifikasi Pengingat', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w700)),
-                    subtitle: Text('Kirim alarm waktu sholat & habit harian', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: const Color(0xFF75856B))),
-                    value: isEnabled,
-                    onChanged: (val) {
-                      setSheetState(() => isEnabled = val);
-                      try {
-                        context.read<StorageService>().setHabitRemindersEnabled(val);
-                      } catch (_) {}
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(isEnabled ? 'Pengingat ibadah aktif' : 'Pengingat ibadah dinonaktifkan'),
-                            backgroundColor: const Color(0xFF518427),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF518427),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+            return SafeArea(
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.88,
+                ),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                        ),
                       ),
-                      child: Text('Simpan Pengaturan', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
-                    ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Pengaturan Pengingat',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF2E5714),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SwitchListTile(
+                        activeColor: const Color(0xFF518427),
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('Aktifkan Notifikasi Pengingat', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w700)),
+                        subtitle: Text('Kirim alarm waktu sholat & habit harian', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: const Color(0xFF75856B))),
+                        value: isEnabled,
+                        onChanged: (val) {
+                          setSheetState(() => isEnabled = val);
+                          try {
+                            context.read<StorageService>().setHabitRemindersEnabled(val);
+                          } catch (_) {}
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                      const SizedBox(height: 16),
+
+                      // ── SECTION UJI COBA NOTIFIKASI ──
+                      Row(
+                        children: [
+                          const Icon(Icons.science_rounded, size: 18, color: Color(0xFF518427)),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Uji Coba Notifikasi di HP',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1E293B),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Tekan tombol di bawah untuk memastikan izin sistem dan penjadwalan alarm di HP Anda aktif:',
+                        style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: const Color(0xFF64748B)),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 1. Tombol Tes Notifikasi Sekarang
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final ok = await SmartNotificationService().testInstantNotification();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(ok
+                                      ? 'Notifikasi tes berhasil dikirim! Periksa bar status HP Anda.'
+                                      : 'Gagal mengirim. Pastikan izin notifikasi diizinkan.'),
+                                  backgroundColor: ok ? const Color(0xFF518427) : Colors.red,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.notifications_active_rounded, size: 18, color: Color(0xFF518427)),
+                          label: Text('Tes Notifikasi Sekarang', style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2E5714))),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF86A789)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // 2. Tombol Tes Notifikasi 1 Menit Lagi
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final ok = await SmartNotificationService().testNotificationInOneMinute();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(ok
+                                      ? 'Notifikasi dijadwalkan 1 menit lagi! Anda bisa meminimalkan aplikasi.'
+                                      : 'Gagal menjadwalkan notifikasi.'),
+                                  backgroundColor: ok ? const Color(0xFF2E7D32) : Colors.red,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.timer_outlined, size: 18, color: Color(0xFF1B5E20)),
+                          label: Text('Tes Notifikasi 1 Menit Lagi', style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1B5E20))),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF86A789)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // 3. Tombol Tes Notifikasi Terjadwal (10 Detik)
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () async {
+                            final ok = await SmartNotificationService().testScheduledNotification(seconds: 10);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(ok
+                                      ? 'Notifikasi dijadwalkan dalam 10 detik! Tunggu sebentar...'
+                                      : 'Gagal menjadwalkan notifikasi.'),
+                                  backgroundColor: ok ? const Color(0xFF388E3C) : Colors.red,
+                                  duration: const Duration(seconds: 4),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.alarm_rounded, size: 18, color: Color(0xFF2E7D32)),
+                          label: Text('Tes Notifikasi Terjadwal (10 Detik)', style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF2E7D32))),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF86A789)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Info MIUI/Xiaomi Tip
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFF475569)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Khusus Xiaomi/MIUI/Oppo: Pastikan izin "Mulai Otomatis" (Autostart) aktif dan "Penghemat Baterai" disetel ke "Tidak ada pembatasan" agar notifikasi tidak tertahan saat aplikasi ditutup.',
+                                style: GoogleFonts.plusJakartaSans(fontSize: 10.5, color: const Color(0xFF475569), height: 1.3),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(isEnabled ? 'Pengingat ibadah aktif' : 'Pengingat ibadah dinonaktifkan'),
+                                backgroundColor: const Color(0xFF518427),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF518427),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          child: Text('Simpan Pengaturan', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             );
           },

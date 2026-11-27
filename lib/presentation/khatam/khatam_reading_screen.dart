@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../models/khatam/khatam_plan_model.dart';
 import '../../providers/khatam_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 /// Halaman Baca Al-Qur'an Mode Khatam (KhatamReaderScreen)
 class KhatamReadingScreen extends StatefulWidget {
@@ -80,20 +81,14 @@ class _KhatamReadingScreenState extends State<KhatamReadingScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF518427),
           elevation: 0,
-          leading: IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF84B74E),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 26),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: CustomBackButton(
+              onTap: () {
+                prov.stopAudio();
+                Navigator.of(context).pop();
+              },
             ),
-            onPressed: () {
-              prov.stopAudio();
-              Navigator.of(context).pop();
-            },
           ),
           centerTitle: true,
           title: Text(

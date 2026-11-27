@@ -9,6 +9,7 @@ import '../../models/habit_item.dart';
 import '../../providers/habit_provider.dart';
 import 'services/habit_navigation_helper.dart';
 import 'widgets/edit_plan_bottom_sheet.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 /// Halaman Kalender Planning (KalenderPlanningScreen)
 class KalenderPlanningScreen extends StatefulWidget {
@@ -110,17 +111,9 @@ class _KalenderPlanningScreenState extends State<KalenderPlanningScreen> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF55822B),
           elevation: 0,
-          leading: IconButton(
-            icon: Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF84B74E),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 26),
-            ),
-            onPressed: () => Navigator.of(context).pop(),
+          leading: const Padding(
+            padding: EdgeInsets.only(left: 8),
+            child: CustomBackButton(),
           ),
           centerTitle: true,
           title: Text(

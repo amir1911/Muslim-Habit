@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background">
+
+    <!-- Lentera Gantung Islami di Kiri Atas -->
+    <ImageView
+        android:id="@+id/iv_lantern"
+        android:layout_width="20dp"
+        android:layout_height="38dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="0dp"
+        android:src="@drawable/ic_lentera"
+        android:scaleType="fitCenter" />
+
+    <!-- Konten Utama Small Widget (Vertical Flow) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <!-- Baris Badge Sekarang + Nama Sholat -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginStart="14dp">
+
+            <TextView
+                android:id="@+id/tv_badge_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/badge_sekarang_bg"
+                android:text="Sekarang"
+                android:textColor="#FFFFFF"
+                android:textSize="8.5sp"
+                android:textStyle="bold"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:paddingTop="1.5dp"
+                android:paddingBottom="1.5dp" />
+
+            <TextView
+                android:id="@+id/tv_next_prayer_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="Subuh"
+                android:textColor="#1F3814"
+                android:textSize="11.5sp"
+                android:textStyle="bold"
+                android:maxLines="1" />
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_marginStart="3dp"
+                android:src="@drawable/ic_sabit"
+                android:scaleType="fitCenter" />
+        </LinearLayout>
+
+        <!-- Jam Digital (TextClock Otomatis Realtime) -->
+        <TextClock
+            android:id="@+id/tv_next_prayer_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:format12Hour="HH:mm 'WIB'"
+            android:format24Hour="HH:mm 'WIB'"
+            android:textColor="#1B3B12"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Lokasi -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@drawable/ic_widget_location"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/tv_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:text="Palembang"
+                android:textColor="#4C752B"
+                android:textSize="9.5sp"
+                android:textStyle="bold"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <!-- Maskot Nunu -->
+        <ImageView
+            android:id="@+id/iv_mascot"
+            android:layout_width="48dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="2dp"
+            android:src="@drawable/mascot_nunu"
+            android:scaleType="fitCenter" />
+
+        <!-- Sholat Berikutnya Banner -->
+        <TextView
+            android:id="@+id/tv_small_next_banner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/row_next_highlight_bg"
+            android:paddingStart="7dp"
+            android:paddingEnd="7dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp"
+            android:text="Berikutnya: Dzuhur 11:55"
+            android:textColor="#8C5807"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:maxLines="1" />
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Tombol Pantau Habit -->
+        <LinearLayout
+            android:id="@+id/btn_open_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_pantau_bg"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="9dp"
+            android:paddingEnd="9dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pantau Habit"
+                android:textColor="#FFFFFF"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" →"
+                android:textColor="#FFFFFF"
+                android:textSize="8.5sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

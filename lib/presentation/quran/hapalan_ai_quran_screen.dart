@@ -10,6 +10,7 @@ import '../../services/arabic_matching_service.dart';
 import '../../services/hapalan_progress_service.dart';
 import 'widgets/hapalan_result_sheet.dart';
 import 'widgets/hapalan_method_sheet.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class HapalanAiQuranScreen extends StatefulWidget {
   final int initialSurahNumber;
@@ -634,25 +635,8 @@ class _HapalanAiQuranScreenState extends State<HapalanAiQuranScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Row(
                         children: [
-                          // Tombol kembali (lingkaran hijau muda)
-                          GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(
-                              width: 38,
-                              height: 38,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF84B74E),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.chevron_left_rounded,
-                                  color: Colors.white,
-                                  size: 26,
-                                ),
-                              ),
-                            ),
-                          ),
+                          // Tombol kembali standar
+                          const CustomBackButton(),
 
                           // Judul Hapalan AI Quran & Chip Metode
                           Expanded(

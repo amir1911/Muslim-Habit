@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/tilawah_provider.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class TilawahScreen extends StatelessWidget {
   const TilawahScreen({super.key});
@@ -14,6 +15,12 @@ class TilawahScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.creamBackground,
       appBar: AppBar(
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(
+            isLightBackground: true,
+          ),
+        ),
         title: Text(
           'Tilawah Al-Qur\'an',
           style: GoogleFonts.balooTammudu2(

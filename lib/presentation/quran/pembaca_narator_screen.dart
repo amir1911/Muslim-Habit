@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/widgets/custom_back_button.dart';
 
 class PembacanNaratorScreen extends StatefulWidget {
   const PembacanNaratorScreen({super.key});
@@ -80,9 +81,9 @@ class _PembacanNaratorScreenState extends State<PembacanNaratorScreen> {
       backgroundColor: const Color(0xFFF9F8F2),
       appBar: AppBar(
         backgroundColor: const Color(0xFF518427),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.pop(context),
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 8),
+          child: CustomBackButton(),
         ),
         title: Text(
           'Pembaca & Narator',

@@ -1,0 +1,610 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background">
+
+    <!-- Siluet Masjid Background (Opacity lembut) -->
+    <ImageView
+        android:id="@+id/iv_bg_masjid"
+        android:layout_width="180dp"
+        android:layout_height="140dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="50dp"
+        android:layout_marginBottom="-8dp"
+        android:src="@drawable/ic_masjid"
+        android:alpha="0.12"
+        android:scaleType="fitCenter" />
+
+    <!-- Lentera Gantung Islami di Kiri Atas -->
+    <ImageView
+        android:id="@+id/iv_lantern"
+        android:layout_width="26dp"
+        android:layout_height="50dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="0dp"
+        android:src="@drawable/ic_lentera"
+        android:scaleType="fitCenter" />
+
+    <!-- Konten Utama: 2 Kolom Seimbang (Kiri 43% & Kanan 57%) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+
+        <!-- ── KOLOM KIRI (43%): Info Sholat Sekarang, Jam Digital, Maskot Nunu & Tombol ── -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="43"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <!-- Baris Badge Sekarang + Nama Sholat + Bulan Sabit -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="24dp">
+
+                <TextView
+                    android:id="@+id/tv_badge_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/badge_sekarang_bg"
+                    android:text="Sekarang"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9.5sp"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp" />
+
+                <TextView
+                    android:id="@+id/tv_next_prayer_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Subuh"
+                    android:textColor="#1F3814"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/ic_sabit"
+                    android:scaleType="fitCenter" />
+            </LinearLayout>
+
+            <!-- Jam Digital Berukuran Besar (TextClock Otomatis Realtime) -->
+            <TextClock
+                android:id="@+id/tv_next_prayer_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="2dp"
+                android:format12Hour="HH:mm 'WIB'"
+                android:format24Hour="HH:mm 'WIB'"
+                android:textColor="#1B3B12"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                android:singleLine="true" />
+
+            <!-- Informasi Lokasi -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginStart="4dp">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_widget_location"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:id="@+id/tv_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="Palembang"
+                    android:textColor="#4C752B"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <!-- Spacer Fleksibel -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- Maskot Nunu (Duduk Membaca Al-Qur'an - Tampil Utuh) -->
+            <ImageView
+                android:id="@+id/iv_mascot"
+                android:layout_width="68dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/mascot_nunu"
+                android:scaleType="fitCenter" />
+
+            <!-- Tombol Pantau Habit (Tampil Sepenuhnya di Bagian Bawah) -->
+            <LinearLayout
+                android:id="@+id/btn_open_app"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_pantau_bg"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="2dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pantau Habit"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" →"
+                    android:textColor="#FFFFFF"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- ── KOLOM KANAN (57%): Card Putih Jadwal Sholat Hari Ini ── -->
+        <LinearLayout
+            android:id="@+id/right_card_container"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="57"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/widget_right_card_bg"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp">
+
+            <!-- Judul Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <ImageView
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:src="@drawable/ic_widget_calendar"
+                    android:scaleType="fitCenter" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="Jadwal Sholat Hari Ini"
+                    android:textColor="#1F3814"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold"
+                    android:singleLine="true" />
+            </LinearLayout>
+
+            <!-- Kontainer 5 Waktu Sholat (Membagi Tinggi Sama Rata dengan weight=1) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <!-- 1. Subuh Row -->
+                <LinearLayout
+                    android:id="@+id/row_subuh"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <ImageView
+                        android:id="@+id/iv_icon_subuh"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_widget_subuh"
+                        android:scaleType="fitCenter" />
+
+                    <!-- Nama Sholat -->
+                    <TextView
+                        android:id="@+id/tv_label_subuh"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Subuh"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="none" />
+
+                    <!-- Jam Sholat -->
+                    <TextView
+                        android:id="@+id/tv_subuh"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="04:30"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true" />
+
+                    <!-- Wadah Status -->
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/iv_check_subuh"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/ic_widget_check"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_badge_subuh"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:background="@drawable/badge_berikutnya_bg"
+                            android:text="Berikutnya"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingTop="1.5dp"
+                            android:paddingBottom="1.5dp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 2. Dzuhur Row -->
+                <LinearLayout
+                    android:id="@+id/row_dzuhur"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <ImageView
+                        android:id="@+id/iv_icon_dzuhur"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_widget_dzuhur"
+                        android:scaleType="fitCenter" />
+
+                    <TextView
+                        android:id="@+id/tv_label_dzuhur"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Dzuhur"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="none" />
+
+                    <TextView
+                        android:id="@+id/tv_dzuhur"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="11:55"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true" />
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/iv_check_dzuhur"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/ic_widget_check"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_badge_dzuhur"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:background="@drawable/badge_berikutnya_bg"
+                            android:text="Berikutnya"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingTop="1.5dp"
+                            android:paddingBottom="1.5dp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 3. Ashar Row -->
+                <LinearLayout
+                    android:id="@+id/row_ashar"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <ImageView
+                        android:id="@+id/iv_icon_ashar"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_widget_ashar"
+                        android:scaleType="fitCenter" />
+
+                    <TextView
+                        android:id="@+id/tv_label_ashar"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Ashar"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="none" />
+
+                    <TextView
+                        android:id="@+id/tv_ashar"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="15:30"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true" />
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/iv_check_ashar"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/ic_widget_check"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_badge_ashar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:background="@drawable/badge_berikutnya_bg"
+                            android:text="Berikutnya"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingTop="1.5dp"
+                            android:paddingBottom="1.5dp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 4. Maghrib Row -->
+                <LinearLayout
+                    android:id="@+id/row_maghrib"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <ImageView
+                        android:id="@+id/iv_icon_maghrib"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_widget_maghrib"
+                        android:scaleType="fitCenter" />
+
+                    <TextView
+                        android:id="@+id/tv_label_maghrib"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Maghrib"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="none" />
+
+                    <TextView
+                        android:id="@+id/tv_maghrib"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="17:50"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true" />
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/iv_check_maghrib"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/ic_widget_check"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_badge_maghrib"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:background="@drawable/badge_berikutnya_bg"
+                            android:text="Berikutnya"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingTop="1.5dp"
+                            android:paddingBottom="1.5dp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+
+                <!-- 5. Isya Row -->
+                <LinearLayout
+                    android:id="@+id/row_isya"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp">
+
+                    <ImageView
+                        android:id="@+id/iv_icon_isya"
+                        android:layout_width="13dp"
+                        android:layout_height="13dp"
+                        android:src="@drawable/ic_widget_isya"
+                        android:scaleType="fitCenter" />
+
+                    <TextView
+                        android:id="@+id/tv_label_isya"
+                        android:layout_width="48dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="Isya"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="none" />
+
+                    <TextView
+                        android:id="@+id/tv_isya"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="19:00"
+                        android:textColor="#223E16"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold"
+                        android:singleLine="true" />
+
+                    <FrameLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/iv_check_isya"
+                            android:layout_width="13dp"
+                            android:layout_height="13dp"
+                            android:layout_gravity="center_vertical|end"
+                            android:src="@drawable/ic_widget_check"
+                            android:scaleType="fitCenter"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tv_badge_isya"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|end"
+                            android:background="@drawable/badge_berikutnya_bg"
+                            android:text="Berikutnya"
+                            android:textColor="#FFFFFF"
+                            android:textSize="8sp"
+                            android:textStyle="bold"
+                            android:singleLine="true"
+                            android:paddingStart="5dp"
+                            android:paddingEnd="5dp"
+                            android:paddingTop="1.5dp"
+                            android:paddingBottom="1.5dp"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

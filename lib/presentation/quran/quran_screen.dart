@@ -11,6 +11,9 @@ import 'surah_detail_screen.dart';
 import 'widgets/quran_belajar_tab.dart';
 import 'widgets/quran_bookmark_tab.dart';
 import '../shell/main_navigation_shell.dart';
+import '../../core/widgets/custom_back_button.dart';
+import '../../core/widgets/streak_badge.dart';
+import '../../core/widgets/notification_bell_button.dart';
 
 class QuranScreen extends StatefulWidget {
   const QuranScreen({super.key});
@@ -132,21 +135,24 @@ class _QuranScreenState extends State<QuranScreen> {
       child: Row(
         children: [
           // Back button
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E3710), size: 18),
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                final switched = MainNavigationShell.switchToTab(context, 0);
-                if (!switched) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
-                  );
+          Padding(
+            padding: const EdgeInsets.only(right: 6),
+            child: CustomBackButton(
+              isLightBackground: true,
+              onTap: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  final switched = MainNavigationShell.switchToTab(context, 0);
+                  if (!switched) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const MainNavigationShell(initialIndex: 0)),
+                    );
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
           const SizedBox(width: 4),
 
@@ -162,10 +168,11 @@ class _QuranScreenState extends State<QuranScreen> {
             ),
           ),
 
-          // Streak badge (🔥 0)
-          _buildPillBadge(
-            icon: '🔥',
-            label: '${habitProv.streakCount}',
+          // Streak badge (Terpadu)
+          StreakBadge(
+            streakOverride: habitProv.streakCount,
+            backgroundColor: const Color(0xFF518427),
+            iconColor: const Color(0xFFFFB300),
           ),
           const SizedBox(width: 6),
 
@@ -176,19 +183,10 @@ class _QuranScreenState extends State<QuranScreen> {
           ),
           const SizedBox(width: 6),
 
-          // Notification Bell
-          Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: Color(0xFF3E611C),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.notifications_none_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
+          // Notification Bell Terpadu
+          const NotificationBellButton(
+            backgroundColor: Color(0xFF3E611C),
+            size: 32,
           ),
         ],
       ),

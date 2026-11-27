@@ -1,10 +1,15 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/habit_item.dart';
 import '../models/badge_item.dart';
 import '../models/ai_assistant_model.dart';
 import '../services/storage_service.dart';
 import '../services/smart_notification_service.dart';
+import '../services/habit_progress_service.dart';
 import '../core/utils/streak_helper.dart';
 
 class HabitProvider extends ChangeNotifier {
@@ -16,12 +21,20 @@ class HabitProvider extends ChangeNotifier {
 
   int _userPoints = 10;
   int _userLevel = 1;
-  int _streakCount = 17;
+  int _streakCount = 0;
   Set<String> _activeDates = {};
   String _selectedCategory = 'all'; // all, wajib, sunnah
   String _userName = 'Sahabat Muslim';
   String _selectedAIId = 'teen';
   bool _hasCompletedOnboarding = false;
+
+  Map<String, bool> _todayCategoriesStatus = {
+    'Shalat': false,
+    'Al-Qur\'an': false,
+    'Doa': false,
+    'Dzikir': false,
+    'Puasa': false,
+  };
 
   int get userPoints => _userPoints;
   int get userLevel => _userLevel;
@@ -31,6 +44,38 @@ class HabitProvider extends ChangeNotifier {
   String get userName => _userName;
   String get selectedAIId => _selectedAIId;
   bool get hasCompletedOnboarding => _hasCompletedOnboarding;
+  Map<String, bool> get todayCategoriesStatus => _todayCategoriesStatus;
+
+  /// Apakah puasa dijadwalkan hari ini
+  bool get isPuasaScheduledToday => _todayCategoriesStatus['_PuasaScheduled'] == true;
+
+  /// Jumlah target aktivitas hari ini (5 jika ada puasa, 4 jika tidak puasa)
+  int get todayTargetCategoriesCount {
+    if (isPuasaScheduledToday || _todayCategoriesStatus['Puasa'] == true) {
+      return 5;
+    }
+    return 4;
+  }
+
+  /// Jumlah aktivitas yang sudah diselesaikan hari ini
+  int get todayCompletedCategoriesCount {
+    int count = 0;
+    if (_todayCategoriesStatus['Shalat'] == true) count++;
+    if (_todayCategoriesStatus['Al-Qur\'an'] == true) count++;
+    if (_todayCategoriesStatus['Doa'] == true) count++;
+    if (_todayCategoriesStatus['Dzikir'] == true) count++;
+    if (_todayCategoriesStatus['Puasa'] == true) count++;
+    return count;
+  }
+
+  /// Progres harian kategori ibadah:
+  /// (Jumlah aktivitas selesai / Jumlah target aktivitas hari ini)
+  double get fiveCategoriesProgressFraction {
+    if (todayTargetCategoriesCount == 0) return 0.0;
+    return (todayCompletedCategoriesCount / todayTargetCategoriesCount).clamp(0.0, 1.0);
+  }
+
+  int get fiveCategoriesProgressPercent => (fiveCategoriesProgressFraction * 100).round();
 
   AIAssistantModel get currentAssistant => AIAssistantModel.getById(_selectedAIId);
 
@@ -358,7 +403,7 @@ class HabitProvider extends ChangeNotifier {
   }
 
   // Toggle Centang Selesai Habit
-  void toggleHabit(String id, {bool is2xBooster = false}) {
+  void toggleHabit(String id, {bool is2xBooster = false}) async {
     final index = _habits.indexWhere((h) => h.id == id);
     if (index != -1) {
       final current = _habits[index];
@@ -395,6 +440,27 @@ class HabitProvider extends ChangeNotifier {
       _storageService.setUserPoints(_userPoints);
       _saveState();
 
+      // Sinkronkan aktivitas ke sistem Streak & 5 Kategori
+      if (newStatus) {
+        final catLower = current.categoryGroup.toLowerCase();
+        final idLower = current.id.toLowerCase();
+        if (catLower.contains('sholat') || idLower.contains('subuh') || idLower.contains('dzuhur') || idLower.contains('ashar') || idLower.contains('magrib') || idLower.contains('isya') || idLower.contains('dhuha')) {
+          await HabitProgressService.markShalatActivityToday();
+        } else if (catLower.contains('qur') || idLower.contains('baca') || idLower.contains('tilawah')) {
+          await HabitProgressService.markQuranActivityToday();
+        } else if (catLower.contains('doa')) {
+          await HabitProgressService.markDoaActivityToday();
+        } else if (catLower.contains('dzikir')) {
+          await HabitProgressService.markDzikirActivityToday();
+        } else if (catLower.contains('puasa')) {
+          await HabitProgressService.markPuasaActivityToday();
+        } else {
+          await HabitProgressService.recordHabitActivityCompleted(current.title);
+        }
+      }
+
+      await refreshTodayProgressAndStreak();
+
       // Trigger Smart Notification Evaluation
       _triggerSmartNotificationSync();
 
@@ -424,9 +490,18 @@ class HabitProvider extends ChangeNotifier {
     }
   }
 
+  static const String _keyCustomHabits = 'muslim_habit_custom_habits_v1';
+
+  static const Set<String> _defaultHabitIds = {
+    'subuh', 'dhuha', 'dzikir_pagi', 'doa_pagi', 'dzuhur', 'dzikir_siang',
+    'ashar', 'puasa', 'maghrib', 'dzikir_petang', 'tilawah', 'isya',
+    'tahiyyatul_masjid', 'target_baca'
+  };
+
   // Tambah Habit Baru
   void addHabit(HabitItem item) {
     _habits.add(item);
+    _saveCustomHabits();
     notifyListeners();
   }
 
@@ -435,8 +510,74 @@ class HabitProvider extends ChangeNotifier {
     final index = _habits.indexWhere((h) => h.id == item.id);
     if (index != -1) {
       _habits[index] = item;
+      _saveCustomHabits();
       _triggerSmartNotificationSync();
       notifyListeners();
+    }
+  }
+
+  Future<void> _saveCustomHabits() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final customList = _habits.where((h) => !_defaultHabitIds.contains(h.id)).map((h) => {
+        'id': h.id,
+        'title': h.title,
+        'subtitle': h.subtitle,
+        'category': h.category.name,
+        'categoryGroup': h.categoryGroup,
+        'points': h.points,
+        'timeSuggestion': h.timeSuggestion,
+        'timeSlot': h.timeSlot,
+        'scheduledTime': h.scheduledTime,
+        'frequency': h.frequency,
+      }).toList();
+      await prefs.setString(_keyCustomHabits, jsonEncode(customList));
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('habits')
+            .doc('custom_list')
+            .set({
+          'habits': customList,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+      }
+    } catch (e) {
+      debugPrint('[HabitProvider] Error saving custom habits: $e');
+    }
+  }
+
+  Future<void> _loadCustomHabits() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonStr = prefs.getString(_keyCustomHabits);
+      if (jsonStr != null && jsonStr.isNotEmpty) {
+        final list = jsonDecode(jsonStr) as List;
+        for (final item in list) {
+          final map = item as Map<String, dynamic>;
+          final id = map['id'] as String;
+          if (!_habits.any((h) => h.id == id)) {
+            _habits.add(HabitItem(
+              id: id,
+              title: map['title'] as String,
+              subtitle: (map['subtitle'] as String?) ?? 'Kebiasaan Sunnah Harian',
+              category: map['category'] == 'wajib' ? HabitCategory.wajib : HabitCategory.sunnah,
+              categoryGroup: (map['categoryGroup'] as String?) ?? 'Sholat Sunnah',
+              icon: Icons.mosque_rounded,
+              points: (map['points'] as int?) ?? 20,
+              timeSuggestion: (map['timeSuggestion'] as String?) ?? '1x Setiap Hari',
+              timeSlot: (map['timeSlot'] as String?) ?? 'pagi',
+              scheduledTime: (map['scheduledTime'] as String?) ?? '10:15 AM',
+              frequency: (map['frequency'] as String?) ?? '1x Setiap Hari',
+            ));
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[HabitProvider] Error loading custom habits: $e');
     }
   }
 
@@ -529,7 +670,23 @@ class HabitProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadState() {
+  /// Muat dan perbarui status 5 kategori habit & streak secara real-time
+  Future<void> refreshTodayProgressAndStreak() async {
+    try {
+      final catStatus = await HabitProgressService.checkTodayHabitCategories();
+      final streakData = await HabitProgressService.getStreakData();
+
+      _todayCategoriesStatus = catStatus;
+      _streakCount = streakData.currentStreak;
+      _activeDates = streakData.activeDates;
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[HabitProvider] Error refresh categories and streak: $e');
+    }
+  }
+
+  void _loadState() async {
     _userPoints = _storageService.getUserPoints() > 0 ? _storageService.getUserPoints() : 10;
     _userLevel = _storageService.getUserLevel();
     _userName = _storageService.getUserName();
@@ -539,12 +696,12 @@ class HabitProvider extends ChangeNotifier {
     final todayStr = StreakHelper.formatDate(DateTime.now());
     _activeDates = _storageService.getActiveDates().toSet();
 
-    final savedStreak = _storageService.getStreakCount();
-    if (savedStreak > 0) {
-      _streakCount = savedStreak;
-    } else {
-      _streakCount = 17;
-    }
+    // Muat data streak otentik dari HabitProgressService
+    final streakData = await HabitProgressService.getStreakData();
+    _streakCount = streakData.currentStreak;
+
+    // Muat kebiasaan kustom yang pernah ditambahkan
+    await _loadCustomHabits();
 
     final completedToday = _storageService.getDailyCompletedHabitIds(todayStr);
     if (completedToday.isNotEmpty) {
@@ -556,6 +713,21 @@ class HabitProvider extends ChangeNotifier {
         }
       }
     }
+
+    // Refresh 5 kategori habit hari ini
+    await refreshTodayProgressAndStreak();
+
+    // Download update streak terbaru dari cloud
+    HabitProgressService.syncStreakFromCloud().then((cloudStreak) {
+      if (cloudStreak != null) {
+        _streakCount = cloudStreak.currentStreak;
+        _activeDates = cloudStreak.activeDates;
+        notifyListeners();
+      }
+    });
+
+    // Sinkronkan jadwal smart notification saat aplikasi dimuat
+    _triggerSmartNotificationSync();
   }
 
   void _saveState() {
